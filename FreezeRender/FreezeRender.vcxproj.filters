@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Sources\Core">
+      <UniqueIdentifier>{e9762f36-733c-4d81-b229-1c65d8823fc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Shader">
+      <UniqueIdentifier>{f8981825-afed-402f-ad71-7a4f051f0b75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader">
+      <UniqueIdentifier>{9cad8842-4545-4560-852e-afaf58794161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Core\Public">
+      <UniqueIdentifier>{3eeea4ff-b1b7-481e-ac36-208b72f5d3eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Core\Private">
+      <UniqueIdentifier>{ed3d0d19-f06a-4c22-913f-6134eec38f86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Core\Inline">
+      <UniqueIdentifier>{f9b57438-43b2-4a2d-9051-d3f81b3782a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Shader\Private">
+      <UniqueIdentifier>{a1acb904-50cc-4428-8772-76c1643523c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Shader\Public">
+      <UniqueIdentifier>{991f3c7c-5262-46b8-b0c3-7523a7b21732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Container">
+      <UniqueIdentifier>{f870d8be-21fa-46af-a6ab-2d9514b8c360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader\Mesh">
+      <UniqueIdentifier>{99d21fd1-ae0a-406f-93d4-4b59ee5d4a39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader\Texture">
+      <UniqueIdentifier>{29e3268f-d1e8-4f92-ac17-6c0d99d2b019}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader\Texture\Private">
+      <UniqueIdentifier>{e27eb505-76cd-4b1f-8304-075ae01f5b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader\Texture\Public">
+      <UniqueIdentifier>{cbc5770f-bc8a-4334-b20f-e364263641bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader\Mesh\Private">
+      <UniqueIdentifier>{0ca5af3b-e536-4023-b5e1-ef5196e05bf0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Loader\Mesh\Public">
+      <UniqueIdentifier>{887494f6-8939-4bd8-8946-cf8ec3af8a0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Container\Public">
+      <UniqueIdentifier>{3adb43f5-c0f8-4147-a907-ca140d957d22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Container\Inline">
+      <UniqueIdentifier>{446d8f18-60a5-4175-abfc-b496bf3f83e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Windows">
+      <UniqueIdentifier>{92aab701-eaa5-4077-8152-b5ce11ef85e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Windows\resources">
+      <UniqueIdentifier>{2f31bdf1-ae67-4f8a-9e90-428eb07cbedd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Windows\D2D">
+      <UniqueIdentifier>{9e94f4d3-a764-4f6a-8b4d-264e1d3531a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Config">
+      <UniqueIdentifier>{21f24a47-3238-471f-9226-c8de22e16732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Utility">
+      <UniqueIdentifier>{78d41f20-ed9b-45fa-8537-a928e51bd856}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Utility\Inline">
+      <UniqueIdentifier>{682f4e7b-4f40-4b81-92d2-f3174aaa209f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Utility\Public">
+      <UniqueIdentifier>{0724b516-a11e-4eb9-8b9b-2e4b28b22b0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Renderer">
+      <UniqueIdentifier>{24aba6cd-d884-4a99-b955-cbaeec10786b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Renderer\raster">
+      <UniqueIdentifier>{a7be4205-1345-41b8-bc76-82ee9c2e87c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Renderer\raytracing">
+      <UniqueIdentifier>{a55efafe-ad2c-4aac-a1f2-d963e7a81c61}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\FreezeRender.hpp" />
+    <ClInclude Include="Sources\Core\Matrix.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Camera.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Color.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Meshlet.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\RenderTarget.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Rotator.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Texture.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Shader\FragmentShader.hpp">
+      <Filter>Sources\Shader\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\ShadingElement.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Shader\VertexShader.hpp">
+      <Filter>Sources\Shader\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Light.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\TextureSampler.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\LoaderUitlity.hpp">
+      <Filter>Sources\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\Mesh\MeshLoader.hpp">
+      <Filter>Sources\Loader\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\Texture\TextureLoader.hpp">
+      <Filter>Sources\Loader\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\Texture\TextureLoaderLibrary.hpp">
+      <Filter>Sources\Loader\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\Mesh\OBJMeshLoader.hpp">
+      <Filter>Sources\Loader\Mesh\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\Mesh\MeshLoaderLibrary.hpp">
+      <Filter>Sources\Loader\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Loader\Texture\WICTextureLoader.hpp">
+      <Filter>Sources\Loader\Texture\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Container\Bulkdata.hpp">
+      <Filter>Sources\Container\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Container\String.hpp">
+      <Filter>Sources\Container\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\PixelFormat.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Windows\resource.h">
+      <Filter>Sources\Windows\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Windows\D2DApp.hpp">
+      <Filter>Sources\Windows\D2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Common.hpp" />
+    <ClInclude Include="Sources\Windows\WindowsTargetVersion.h">
+      <Filter>Sources\Windows\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\Singleton.hpp">
+      <Filter>Sources\Utility\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\Delegate.hpp">
+      <Filter>Sources\Utility\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\Math.hpp">
+      <Filter>Sources\Utility\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\Number.hpp">
+      <Filter>Sources\Utility\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\SIMD.hpp">
+      <Filter>Sources\Utility\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Renderer\Rasterizer.hpp">
+      <Filter>Sources\Renderer\raster</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\FreezeRender.cpp" />
+    <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\Shader\FragmentShader.cpp">
+      <Filter>Sources\Shader\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Shader\VertexShader.cpp">
+      <Filter>Sources\Shader\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Core\TextureSampler.cpp">
+      <Filter>Sources\Core\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Loader\Texture\TextureLoaderLibrary.cpp">
+      <Filter>Sources\Loader\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Loader\Mesh\OBJMeshLoader.cpp">
+      <Filter>Sources\Loader\Mesh\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Loader\Mesh\MeshLoaderLibrary.cpp">
+      <Filter>Sources\Loader\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Loader\Texture\WICTextureLoader.cpp">
+      <Filter>Sources\Loader\Texture\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Windows\D2DApp.cpp">
+      <Filter>Sources\Windows\D2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Core\Camera.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Renderer\Rasterizer.cpp">
+      <Filter>Sources\Renderer\raster</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Sources\Core\Matrix.inl">
+      <Filter>Sources\Core\Inline</Filter>
+    </None>
+    <None Include="Sources\Core\Rotator.inl">
+      <Filter>Sources\Core\Inline</Filter>
+    </None>
+    <None Include="Sources\Core\Color.inl">
+      <Filter>Sources\Core\Inline</Filter>
+    </None>
+    <None Include="Sources\Container\String.inl">
+      <Filter>Sources\Container\Inline</Filter>
+    </None>
+    <None Include="cpp.hint">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="Sources\Utility\Math.inl">
+      <Filter>Sources\Utility\Inline</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Sources\Windows\small.ico">
+      <Filter>Sources\Windows\resources</Filter>
+    </Image>
+    <Image Include="Sources\Windows\FreezeRender.ico">
+      <Filter>Sources\Windows\resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Sources\Windows\FreezeRender.rc">
+      <Filter>Sources\Windows\resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

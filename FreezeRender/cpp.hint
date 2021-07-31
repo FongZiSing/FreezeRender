@@ -1,0 +1,3 @@
+// Details see https://go.microsoft.com/fwlink/?linkid=865984
+#define force_inline
+#define warn_nodiscard [[nodiscard]]
