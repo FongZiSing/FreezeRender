@@ -1,6 +1,6 @@
 ﻿#include "FreezeRender.hpp"
 
-#include <Renderer/Rasterizer.hpp>
+#include <Renderer/ParallelRasterizer.hpp>
 #include <Core/Camera.hpp>
 #include <Loader/Texture/TextureLoaderLibrary.hpp>
 #include <Loader/Mesh/MeshLoaderLibrary.hpp>
@@ -42,9 +42,8 @@ void FreezeRender::InitScene()
 		mesh.transform = Translate * Rotation * Scale;
 		meshBuffer.emplace_back(std::move(mesh));
 
-		meshBuffer[0].texture = std::make_unique<Texture>();
-		TextureLoaderLibrary::Load(tex, meshBuffer[0].texture.get());
-		//meshBuffer[0].texture->InitSampler(Texture::TexelSamplerMode::Nearest);
+		auto& material = meshBuffer[0].materials.emplace_back();
+		TextureLoaderLibrary::Load(tex, material.ReallocateDiffuse());
 	}
 
 	auto& pointLightBuffer = rasterizer->GetPointLightBuffer();
@@ -54,10 +53,10 @@ void FreezeRender::InitScene()
 
 HRESULT FreezeRender::HandleCreateEvent(UINT width, UINT height)
 {
-	rasterizer.reset(new Rasterizer(width, height));
+	rasterizer.reset(new ParallelRasterizer(width, height));
 	camera.reset(new Camera(width, height));
 
-	camera->handleUpdated.Bind(&Rasterizer::UpdateViewState, rasterizer.get(), std::placeholders::_1);
+	camera->handleUpdated.Bind(&ParallelRasterizer::UpdateViewState, rasterizer.get(), std::placeholders::_1);
 	camera->Update();
 	InitScene();
 	return S_OK;
@@ -65,7 +64,7 @@ HRESULT FreezeRender::HandleCreateEvent(UINT width, UINT height)
 
 HPAINTRESULT FreezeRender::HandlePaintEvent(const float deltaTime)
 {
-	SceneRenderTarget& Scene = rasterizer->Draw();
+	ColorRenderTarget& Scene = rasterizer->Draw();
 	return { Scene.Data(), (UINT)Scene.Width(), (UINT)Scene.Height() };
 }
 

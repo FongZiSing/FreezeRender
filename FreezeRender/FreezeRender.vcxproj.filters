@@ -80,11 +80,14 @@
     <Filter Include="Sources\Renderer">
       <UniqueIdentifier>{24aba6cd-d884-4a99-b955-cbaeec10786b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Renderer\raster">
-      <UniqueIdentifier>{a7be4205-1345-41b8-bc76-82ee9c2e87c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Renderer\raytracing">
       <UniqueIdentifier>{a55efafe-ad2c-4aac-a1f2-d963e7a81c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Algorithm">
+      <UniqueIdentifier>{2e9b1384-c6cf-4428-ab6b-d4a08665f531}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Renderer\Raster">
+      <UniqueIdentifier>{a7be4205-1345-41b8-bc76-82ee9c2e87c4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -112,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="Sources\Shader\FragmentShader.hpp">
       <Filter>Sources\Shader\Public</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Core\ShadingElement.hpp">
-      <Filter>Sources\Core\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Shader\VertexShader.hpp">
       <Filter>Sources\Shader\Public</Filter>
@@ -181,7 +181,25 @@
       <Filter>Sources\Utility\Public</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Renderer\Rasterizer.hpp">
-      <Filter>Sources\Renderer\raster</Filter>
+      <Filter>Sources\Renderer\Raster</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Algorithm\KahanSummation.hpp">
+      <Filter>Sources\Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Renderer\ParallelRasterizer.hpp">
+      <Filter>Sources\Renderer\Raster</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\RunnableTask.hpp">
+      <Filter>Sources\Utility\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Polygon.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Shadingon.hpp">
+      <Filter>Sources\Core\Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Core\Material.hpp">
+      <Filter>Sources\Core\Public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -211,11 +229,11 @@
     <ClCompile Include="Sources\Windows\D2DApp.cpp">
       <Filter>Sources\Windows\D2D</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Core\Camera.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Renderer\Rasterizer.cpp">
-      <Filter>Sources\Renderer\raster</Filter>
+      <Filter>Sources\Renderer\Raster</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Renderer\ParallelRasterizer.cpp">
+      <Filter>Sources\Renderer\Raster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

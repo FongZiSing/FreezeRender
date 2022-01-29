@@ -24,4 +24,8 @@ namespace Number
 	constexpr const float FLOAT_NON_FRACTIONAL = 8388608.f;
 
 	constexpr const float SMALL_NUMBER         = 1e-6f;
+	constexpr const float FLOAT_NAN            = __builtin_nanf("0");
+	constexpr const float FLOAT_SIGNAL_NAN     = __builtin_nansf("1");
+	constexpr const float FLOAT_INF            = __builtin_huge_valf();
+	constexpr const float FLOAT_NEG_INF        = -__builtin_huge_valf();
 }

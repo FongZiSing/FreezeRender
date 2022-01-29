@@ -36,6 +36,7 @@ public:
 	constexpr unsigned long long Size() const noexcept { return count; }
 	constexpr Type* Get() const noexcept { return ptr; }
 	constexpr Type* Get(long long offset) const noexcept { assert((signed)count > offset); return ptr + offset; }
+	constexpr void Swap(Bulkdata& rhs) const noexcept { std::swap(ptr, rhs.ptr); std::swap(count, rhs.count); }
 	/// Inline function.
 
 	/**
@@ -79,9 +80,25 @@ public:
 	template<typename Type>
 	template<typename ...Args> inline void Bulkdata<Type>::Initialize(Args&& ...args)
 	{
-		for (Type* begin = ptr, *end = ptr + count; begin != end; ++begin)
+		Type temp = { std::forward<Args>(args)... };
+		unsigned long long ext = count % 8;
+		unsigned long long batch = count / 8;
+		Type* begin = ptr;
+		while (ext --> 0)
 		{
-			new (begin)Type(std::forward<Args>(args)...);
+			*(begin++) = temp;
+		}
+
+		while (batch --> 0)
+		{
+			*(begin++) = temp;
+			*(begin++) = temp;
+			*(begin++) = temp;
+			*(begin++) = temp;
+			*(begin++) = temp;
+			*(begin++) = temp;
+			*(begin++) = temp;
+			*(begin++) = temp;
 		}
 	}
 

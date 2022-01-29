@@ -295,7 +295,7 @@ struct Matrix
 
 
 	/// Constants.
-	alignas(16) static const Matrix Identity;
+	static const Matrix Identity;
 	/// Constants.
 
 

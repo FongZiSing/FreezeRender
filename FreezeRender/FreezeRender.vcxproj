@@ -19,18 +19,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Algorithm\KahanSummation.hpp" />
     <ClInclude Include="Sources\Common.hpp" />
     <ClInclude Include="Sources\Container\Bulkdata.hpp" />
     <ClInclude Include="Sources\Container\String.hpp" />
     <ClInclude Include="Sources\Core\Camera.hpp" />
     <ClInclude Include="Sources\Core\Color.hpp" />
     <ClInclude Include="Sources\Core\Light.hpp" />
+    <ClInclude Include="Sources\Core\Material.hpp" />
     <ClInclude Include="Sources\Core\Matrix.hpp" />
     <ClInclude Include="Sources\Core\Meshlet.hpp" />
     <ClInclude Include="Sources\Core\PixelFormat.hpp" />
+    <ClInclude Include="Sources\Core\Polygon.hpp" />
     <ClInclude Include="Sources\Core\RenderTarget.hpp" />
     <ClInclude Include="Sources\Core\Rotator.hpp" />
-    <ClInclude Include="Sources\Core\ShadingElement.hpp" />
+    <ClInclude Include="Sources\Core\Shadingon.hpp" />
     <ClInclude Include="Sources\Core\Texture.hpp" />
     <ClInclude Include="Sources\Core\TextureSampler.hpp" />
     <ClInclude Include="Sources\FreezeRender.hpp" />
@@ -41,12 +44,14 @@
     <ClInclude Include="Sources\Loader\Texture\TextureLoader.hpp" />
     <ClInclude Include="Sources\Loader\Texture\TextureLoaderLibrary.hpp" />
     <ClInclude Include="Sources\Loader\Texture\WICTextureLoader.hpp" />
+    <ClInclude Include="Sources\Renderer\ParallelRasterizer.hpp" />
     <ClInclude Include="Sources\Renderer\Rasterizer.hpp" />
     <ClInclude Include="Sources\Shader\FragmentShader.hpp" />
     <ClInclude Include="Sources\Shader\VertexShader.hpp" />
     <ClInclude Include="Sources\Utility\Delegate.hpp" />
     <ClInclude Include="Sources\Utility\Math.hpp" />
     <ClInclude Include="Sources\Utility\Number.hpp" />
+    <ClInclude Include="Sources\Utility\RunnableTask.hpp" />
     <ClInclude Include="Sources\Utility\SIMD.hpp" />
     <ClInclude Include="Sources\Utility\Singleton.hpp" />
     <ClInclude Include="Sources\Windows\D2DApp.hpp" />
@@ -54,7 +59,6 @@
     <ClInclude Include="Sources\Windows\WindowsTargetVersion.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\Core\Camera.cpp" />
     <ClCompile Include="Sources\Core\TextureSampler.cpp" />
     <ClCompile Include="Sources\FreezeRender.cpp" />
     <ClCompile Include="Sources\Loader\Mesh\MeshLoaderLibrary.cpp" />
@@ -62,6 +66,7 @@
     <ClCompile Include="Sources\Loader\Texture\TextureLoaderLibrary.cpp" />
     <ClCompile Include="Sources\Loader\Texture\WICTextureLoader.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
+    <ClCompile Include="Sources\Renderer\ParallelRasterizer.cpp" />
     <ClCompile Include="Sources\Renderer\Rasterizer.cpp" />
     <ClCompile Include="Sources\Shader\FragmentShader.cpp" />
     <ClCompile Include="Sources\Shader\VertexShader.cpp" />

@@ -5,7 +5,7 @@
 #include <Core/Camera.hpp>
 #include <Core/Matrix.hpp>
 #include <Core/RenderTarget.hpp>
-#include <Core/ShadingElement.hpp>
+#include <Core/Shadingon.hpp>
 #include <Shader/VertexShader.hpp>
 #include <Shader/FragmentShader.hpp>
 #include <vector>
@@ -21,7 +21,7 @@ class Rasterizer
 	int width, height;
 
 	// The final render output buffer.
-	SceneRenderTarget sceneBuffer;
+	ColorRenderTarget sceneBuffer;
 
 	// The z-depth testing buffer.
 	DepthRenderTarget depthBuffer;
@@ -61,7 +61,7 @@ public:
 	/**
 	 * @brief The root entry for rendering in every frame.
 	 */
-	SceneRenderTarget& Draw();
+	ColorRenderTarget& Draw();
 
 private:
 	/**
@@ -78,5 +78,5 @@ private:
 	/**
 	 * @brief The process of rasterize a triangle. 
 	 */
-	void RasterizerTriangle(const ShadingTriangle& payload, const Texture* sampleTexture);
+	void RasterizerTriangle(const ShadingTriangle& payload);
 };

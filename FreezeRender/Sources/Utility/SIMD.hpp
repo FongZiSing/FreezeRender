@@ -6,11 +6,25 @@
 
 
 
+// 128-bit register.
+using R128 = __m128;
+
+// 128-bit integer register.
+using R128i = __m128i;
+
+// 256-bit register.
+using R256 = __m256;
+
+// 256-bit integer register.
+using R256i = __m256i;
+
+
+
 namespace Number
 {
-	force_inline constexpr __m128 MakeVector(const unsigned int& x, const unsigned int& y, const unsigned int& z, const unsigned int& w)
+	force_inline constexpr R128 MakeRegister(const unsigned int& x, const unsigned int& y, const unsigned int& z, const unsigned int& w)
 	{
-		__m128 result;
+		R128 result;
 		result.m128_u32[0] = x;
 		result.m128_u32[1] = y;
 		result.m128_u32[2] = z;
@@ -18,9 +32,19 @@ namespace Number
 		return result;
 	}
 
-	force_inline constexpr __m128 MakeVector(const float& x, const float& y, const float& z, const float& w)
+	force_inline constexpr R128 MakeRegister(const unsigned int& x)
 	{
-		__m128 result;
+		R128 result;
+		result.m128_u32[0] = x;
+		result.m128_u32[1] = x;
+		result.m128_u32[2] = x;
+		result.m128_u32[3] = x;
+		return result;
+	}
+
+	force_inline constexpr R128 MakeRegister(const float& x, const float& y, const float& z, const float& w)
+	{
+		R128 result;
 		result.m128_f32[0] = x;
 		result.m128_f32[1] = y;
 		result.m128_f32[2] = z;
@@ -28,38 +52,48 @@ namespace Number
 		return result;
 	}
 
-	constexpr const __m128 V_ZERO          = MakeVector( 0.f, 0.f, 0.f, 0.f );
-	constexpr const __m128 V_ONE           = MakeVector(  1.f,  1.f,  1.f,  1.f );
-	constexpr const __m128 V_NEGONE        = MakeVector( -1.f, -1.f, -1.f, -1.f );
-	constexpr const __m128 V_TWO           = MakeVector(  2.f,  2.f,  2.f,  2.f );
-	constexpr const __m128 V_NEGTWO        = MakeVector( -2.f, -2.f, -2.f, -2.f );
-	constexpr const __m128 V_HALF          = MakeVector( 0.5f, 0.5f, 0.5f, 0.5f );
-	constexpr const __m128 V_PI            = MakeVector( PI, PI, PI, PI );
-	constexpr const __m128 V_PI_2          = MakeVector( 0.5f * PI, 0.5f * PI, 0.5f * PI, 0.5f * PI );
-	constexpr const __m128 V_PI2           = MakeVector( 2.0f * PI, 2.0f * PI, 2.0f * PI, 2.0f * PI );
-	constexpr const __m128 V_ONE_PI2       = MakeVector( 1.f / (2.f * PI), 1.f / (2.f * PI), 1.f / (2.f * PI), 1.f / (2.f * PI) );
-	constexpr const __m128 V_SIGNBIT       = MakeVector( unsigned int(1 << 31), unsigned int(1 << 31), unsigned int(1 << 31), unsigned int(1 << 31) );
-	constexpr const __m128 V_SIGNMASK      = MakeVector( unsigned int(~(1 << 31)), unsigned int(~(1 << 31)), unsigned int(~(1 << 31)), unsigned int(~(1 << 31)) );
+	force_inline constexpr R128 MakeRegister(const float& x)
+	{
+		R128 result;
+		result.m128_f32[0] = x;
+		result.m128_f32[1] = x;
+		result.m128_f32[2] = x;
+		result.m128_f32[3] = x;
+		return result;
+	}
 
-	constexpr const __m128 V_DEG_TO_RAD    = MakeVector( DEG_TO_RAD, DEG_TO_RAD, DEG_TO_RAD, DEG_TO_RAD );
-	constexpr const __m128 V_RAD_TO_DEG    = MakeVector( RAD_TO_DEG, RAD_TO_DEG, RAD_TO_DEG, RAD_TO_DEG );
-	constexpr const __m128 V_180F          = MakeVector( 180.f, 180.f, 180.f, 180.f);
-	constexpr const __m128 V_360F          = MakeVector( 360.f, 360.f, 360.f, 360.f );
+	constexpr const R128 R_ZERO          = MakeRegister(  0.f );
+	constexpr const R128 R_ONE           = MakeRegister(  1.f );
+	constexpr const R128 R_NEGONE        = MakeRegister( -1.f );
+	constexpr const R128 R_TWO           = MakeRegister(  2.f );
+	constexpr const R128 R_NEGTWO        = MakeRegister( -2.f );
+	constexpr const R128 R_HALF          = MakeRegister( 0.5f );
+	constexpr const R128 R_PI            = MakeRegister(  PI  );
+	constexpr const R128 R_PI_2          = MakeRegister( 0.5f * PI );
+	constexpr const R128 R_PI2           = MakeRegister( 2.0f * PI );
+	constexpr const R128 R_ONE_PI2       = MakeRegister( 1.f / (2.f * PI) );
+	constexpr const R128 R_SIGNBIT       = MakeRegister( unsigned int(1 << 31) );
+	constexpr const R128 R_SIGNMASK      = MakeRegister( unsigned int(~(1 << 31)) );
+
+	constexpr const R128 R_DEG_TO_RAD    = MakeRegister( DEG_TO_RAD );
+	constexpr const R128 R_RAD_TO_DEG    = MakeRegister( RAD_TO_DEG );
+	constexpr const R128 R_180F          = MakeRegister( 180.f );
+	constexpr const R128 R_360F          = MakeRegister( 360.f );
 	
-	constexpr const __m128 V_FLOAT_NON_FRACTIONAL = MakeVector( FLOAT_NON_FRACTIONAL, FLOAT_NON_FRACTIONAL, FLOAT_NON_FRACTIONAL, FLOAT_NON_FRACTIONAL );
+	constexpr const R128 R_FLOAT_NON_FRACTIONAL = MakeRegister( FLOAT_NON_FRACTIONAL );
 
-	constexpr const __m128 V_XMASK         = MakeVector( 0xffffffffu, 0u, 0u, 0u );
-	constexpr const __m128 V_YMASK         = MakeVector( 0u, 0xffffffffu, 0u, 0u );
-	constexpr const __m128 V_ZMASK         = MakeVector( 0u, 0u, 0xffffffffu, 0u );
-	constexpr const __m128 V_WMASK         = MakeVector( 0u, 0u, 0u, 0xffffffffu );
-	constexpr const __m128 V_XYMASK        = MakeVector( 0xffffffffu, 0xffffffffu, 0u, 0u );
-	constexpr const __m128 V_XZMASK        = MakeVector( 0xffffffffu, 0u, 0xffffffffu, 0u );
-	constexpr const __m128 V_YWMASK        = MakeVector( 0u, 0xffffffffu, 0u, 0xffffffffu );
-	constexpr const __m128 V_ZWMASK        = MakeVector( 0u, 0u, 0xffffffffu, 0xffffffffu );
-	constexpr const __m128 V_XYZMASK       = MakeVector( 0xffffffffu, 0xffffffffu, 0xffffffffu, 0u );
-	constexpr const __m128 V_YZWMASK       = MakeVector( 0u, 0xffffffffu, 0xffffffffu, 0xffffffffu );
+	constexpr const R128 R_XMASK         = MakeRegister( 0xffffffffu,     0u,          0u,          0u      );
+	constexpr const R128 R_YMASK         = MakeRegister(     0u,      0xffffffffu,     0u,          0u      );
+	constexpr const R128 R_ZMASK         = MakeRegister(     0u,          0u,      0xffffffffu,     0u      );
+	constexpr const R128 R_WMASK         = MakeRegister(     0u,          0u,          0u,      0xffffffffu );
+	constexpr const R128 R_XYMASK        = MakeRegister( 0xffffffffu, 0xffffffffu,     0u,          0u      );
+	constexpr const R128 R_XZMASK        = MakeRegister( 0xffffffffu,     0u,      0xffffffffu,     0u      );
+	constexpr const R128 R_YWMASK        = MakeRegister(     0u,      0xffffffffu,     0u,      0xffffffffu );
+	constexpr const R128 R_ZWMASK        = MakeRegister(     0u,          0u,      0xffffffffu, 0xffffffffu );
+	constexpr const R128 R_XYZMASK       = MakeRegister( 0xffffffffu, 0xffffffffu, 0xffffffffu,     0u      );
+	constexpr const R128 R_YZWMASK       = MakeRegister(     0u,      0xffffffffu, 0xffffffffu, 0xffffffffu );
 
-	constexpr const __m128 V_255F          = MakeVector( 255.f, 255.f, 255.f, 255.f );
+	constexpr const R128 R_255F          = MakeRegister( 255.f );
 }
 
 
@@ -67,14 +101,14 @@ namespace Number
 #define SIMD_HPP_SSE_IMPL
 
 	/**
-	 * @brief Load a vector from aligned memory.
+	 * @brief Load a R128 from aligned memory.
 	 */
-	#define VectorLoadAligned( ptr )                _mm_load_ps( (const float*)(ptr) )
+	#define RegisterLoadAligned( ptr )                _mm_load_ps( (const float*)(ptr) )
 	
 	/**
-	 * @brief Stores a vector to aligned memory.
+	 * @brief Stores a R128 to aligned memory.
 	 */
-	#define VectorStoreAligned( vec, ptr )          _mm_store_ps( (float*)(ptr), vec )
+	#define RegisterStoreAligned( reg, ptr )          _mm_store_ps( (float*)(ptr), reg )
 
 	/**
 	 * @brief Mask a shuffle mask.
@@ -82,306 +116,297 @@ namespace Number
 	#define ShuffleMask( a0, a1, b2, b3 )           ( (a0) | ((a1)<<2) | ((b2)<<4) | ((b3)<<6) )
 
 	/**
-	 * @brief Replicates one element into all four elements and returns the new vector.
-	 * @return        ( Vec[index], Vec[index], Vec[index], Vec[index] )
+	 * @brief Replicates one element into all four elements and returns the new R128.
+	 * @return        ( reg[index], reg[index], reg[index], reg[index] )
 	 */
-	#define VectorReplicate( vec, index )           _mm_shuffle_ps( (vec), (vec), ShuffleMask( index, index, index, index ) )
+	#define RegisterReplicate( reg, index )           _mm_shuffle_ps( (reg), (reg), ShuffleMask( index, index, index, index ) )
 	
 	/**
-	 * @brief Selects four specific values from vector via a mask.
+	 * @brief Selects four specific values from R128 via a mask.
 	 */
-	#define VectorPermute( vec, mask )              _mm_shuffle_ps( (vec), (vec), (mask) )
+	#define RegisterPermute( reg, mask )              _mm_shuffle_ps( (reg), (reg), (mask) )
 	
 	/**
-	 * @brief Swizzles the vector.
-	 * @return        ( vec[x], vec[y], vec[z], vec[w] )
+	 * @brief Swizzles the R128.
+	 * @return        ( reg[x], reg[y], reg[z], reg[w] )
 	 */
-	#define VectorSwizzle( vec, x, y, z, w )        _mm_shuffle_ps( (vec), (vec), ShuffleMask( (x), (y), (z), (w) ) )
+	#define RegisterSwizzle( reg, x, y, z, w )        _mm_shuffle_ps( (reg), (reg), ShuffleMask( (x), (y), (z), (w) ) )
 
 	/**
-	 * @brief Creates a vector through selecting two elements from each vector via a shuffle mask.
-	 * @return        ( vec1[x], vec1[y], vec2[z], vec2[w] )
+	 * @brief Creates a R128 through selecting two elements from each R128 via a shuffle mask.
+	 * @return        ( reg1[x], reg1[y], reg2[z], reg2[w] )
 	 */
-	#define VectorShuffle( vec1, vec2, x, y, z, w ) _mm_shuffle_ps( (vec1), (vec2), ShuffleMask( (x), (y), (z), (w) ) )
+	#define RegisterShuffle( reg1, reg2, x, y, z, w ) _mm_shuffle_ps( (reg1), (reg2), ShuffleMask( (x), (y), (z), (w) ) )
 
 	/**
-	 * @brief Returns the negated vector.
-	 * @return        ( -vec.x, -vec.y, -vec.z, -vec.w )
+	 * @brief Returns the negated R128.
+	 * @return        ( -reg.x, -reg.y, -reg.z, -reg.w )
 	 */
-	#define VectorNegate( vec )                     _mm_sub_ps( _mm_setzero_ps(), (vec) )
+	#define RegisterNegate( reg )                     _mm_sub_ps( _mm_setzero_ps(), (reg) )
 
 	/**
-	 * @brief Returns the minimum values of two vectors.
-	 * @return        ( min( vec1.x, vec2.x ), same for yzw )
+	 * @brief Returns the minimum values of two R128.
+	 * @return        ( min( reg1.x, reg2.x ), same for yzw )
 	 */
-	#define VectorMin( vec1, vec2 )                 _mm_min_ps( vec1, vec2 )
+	#define RegisterMin( reg1, reg2 )                 _mm_min_ps( reg1, reg2 )
 
 	/**
-	 * @brief Returns the maximum values of two vectors.
-	 * @return        ( max( vec1.x, vec2.x ), same for yzw )
+	 * @brief Returns the maximum values of two R128.
+	 * @return        ( max( reg1.x, reg2.x ), same for yzw )
 	 */
-	#define VectorMax( vec1, vec2 )                 _mm_max_ps( vec1, vec2 )
+	#define RegisterMax( reg1, reg2 )                 _mm_max_ps( reg1, reg2 )
 
 	/**
-	 * @brief Returns the absolute vector.
-	 * @return        ( abs( vec1.x, vec2.x ), same for yzw )
+	 * @brief Returns the absolute R128.
+	 * @return        ( abs( reg1.x, reg2.x ), same for yzw )
 	 */
-	#define VectorAbs( vec )                        _mm_and_ps( (vec), Number::V_SIGNMASK )
+	#define RegisterAbs( reg )                        _mm_and_ps( (reg), Number::R_SIGNMASK )
 
 	/**
-	 * @brief Creates a four-part mask through elements comparison from each vector.
-	 * @return        ( vec1.x == vec2.x ? 0xFFFFFFFF : 0, same for yzw )
+	 * @brief Creates a four-part mask through elements comparison from each R128.
+	 * @return        ( reg1.x == reg2.x ? 0xFFFFFFFF : 0, same for yzw )
 	 */
-	#define VectorEQ( vec1, vec2 )                  _mm_cmpeq_ps( (vec1), (vec2) )
+	#define RegisterEQ( reg1, reg2 )                  _mm_cmpeq_ps( (reg1), (reg2) )
 	
 	/**
-	 * @brief Creates a four-part mask through elements comparison from each vector.
-	 * @return        ( vec1.x != vec2.x ? 0xFFFFFFFF : 0, same for yzw )
+	 * @brief Creates a four-part mask through elements comparison from each R128.
+	 * @return        ( reg1.x != reg2.x ? 0xFFFFFFFF : 0, same for yzw )
 	 */
-	#define VectorNE( vec1, vec2 )                  _mm_cmpneq_ps( (vec1), (vec2) )
+	#define RegisterNE( reg1, reg2 )                  _mm_cmpneq_ps( (reg1), (reg2) )
 	
 	/**
-	 * @brief Creates a four-part mask through elements comparison from each vector.
-	 * @return        ( vec1.x  > vec2.x ? 0xFFFFFFFF : 0, same for yzw )
+	 * @brief Creates a four-part mask through elements comparison from each R128.
+	 * @return        ( reg1.x  > reg2.x ? 0xFFFFFFFF : 0, same for yzw )
 	 */
-	#define VectorGT( vec1, vec2 )                  _mm_cmpgt_ps( (vec1), (vec2) )
+	#define RegisterGT( reg1, reg2 )                  _mm_cmpgt_ps( (reg1), (reg2) )
 	
 	/**
-	 * @brief Creates a four-part mask through elements comparison from each vector.
-	 * @return        ( vec1.x >= vec2.x ? 0xFFFFFFFF : 0, same for yzw )
+	 * @brief Creates a four-part mask through elements comparison from each R128.
+	 * @return        ( reg1.x >= reg2.x ? 0xFFFFFFFF : 0, same for yzw )
 	 */
-	#define VectorGE( vec1, vec2 )                  _mm_cmpge_ps( (vec1), (vec2) )
+	#define RegisterGE( reg1, reg2 )                  _mm_cmpge_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Creates a four-part mask through elements comparison from each vector.
-	 * @return        ( vec1.x  < vec2.x ? 0xFFFFFFFF : 0, same for yzw )
+	 * @brief Creates a four-part mask through elements comparison from each R128.
+	 * @return        ( reg1.x  < reg2.x ? 0xFFFFFFFF : 0, same for yzw )
 	 */
-	#define VectorLT( vec1, vec2 )                  _mm_cmplt_ps( (vec1), (vec2) )
+	#define RegisterLT( reg1, reg2 )                  _mm_cmplt_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Creates a four-part mask through elements comparison from each vector.
-	 * @return        ( vec1.x <= vec2.x ? 0xFFFFFFFF : 0, same for yzw )
+	 * @brief Creates a four-part mask through elements comparison from each R128.
+	 * @return        ( reg1.x <= reg2.x ? 0xFFFFFFFF : 0, same for yzw )
 	 */	
-	#define VectorLE( vec1, vec2 )                  _mm_cmple_ps( (vec1), (vec2) )
+	#define RegisterLE( reg1, reg2 )                  _mm_cmple_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Adds two vectors.
-	 * @return        ( vec1.x + vec2.x, same for yzw )
+	 * @brief Adds two R128.
+	 * @return        ( reg1.x + reg2.x, same for yzw )
 	 */
-	#define VectorAdd( vec1, vec2 )                 _mm_add_ps( (vec1), (vec2) )
+	#define RegisterAdd( reg1, reg2 )                 _mm_add_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Subtracts two vectors.
-	 * @return        ( vec1.x - vec2.x, same for yzw )
+	 * @brief Subtracts two R128.
+	 * @return        ( reg1.x - reg2.x, same for yzw )
 	 */
-	#define VectorSubtract( vec1, vec2 )            _mm_sub_ps( (vec1), (vec2) )
+	#define RegisterSubtract( reg1, reg2 )            _mm_sub_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Multiplies two vectors.
-	 * @return        ( vec1.x * vec2.x, same for yzw )
+	 * @brief Multiplies two R128.
+	 * @return        ( reg1.x * reg2.x, same for yzw )
 	 */
-	#define VectorMultiply( vec1, vec2 )            _mm_mul_ps( (vec1), (vec2) )
+	#define RegisterMultiply( reg1, reg2 )            _mm_mul_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Divides two vectors.
-	 * @return        ( vec1.x / vec2.x, same for yzw )
+	 * @brief Divides two R128.
+	 * @return        ( reg1.x / reg2.x, same for yzw )
 	 */
-	#define VectorDivide( vec1, vec2 )              _mm_div_ps( (vec1), (vec2) )
+	#define RegisterDivide( reg1, reg2 )              _mm_div_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Multiplies two vectors, adds in the third vector.
-	 * @return        ( vec1.x * vec2.x + vec3.x, same for yzw )
+	 * @brief Multiplies two R128, adds in the third R128.
+	 * @return        ( reg1.x * reg2.x + reg3.x, same for yzw )
 	 */
-	#define VectorMultiplyAdd( vec1, vec2, vec3 )   _mm_add_ps( _mm_mul_ps( (vec1), (vec2) ), (vec3) )
+	#define RegisterMultiplyAdd( reg1, reg2, reg3 )   _mm_add_ps( _mm_mul_ps( (reg1), (reg2) ), (reg3) )
 
 	/**
-	 * @brief Multiplies two vectors, then adds each result.
-	 * @return        ( vec1.x * vec2.x + vec3.x * vec4.x, same for yzw )
+	 * @brief Multiplies two R128, then adds each result.
+	 * @return        ( reg1.x * reg2.x + reg3.x * reg4.x, same for yzw )
 	 */
-	#define VectorMultiplyAddMultiply( vec1, vec2, vec3, vec4 )   _mm_add_ps( _mm_mul_ps( (vec1), (vec2) ), _mm_mul_ps( (vec3), (vec4) ) )
+	#define RegisterMultiplyAddMultiply( reg1, reg2, reg3, reg4 )   _mm_add_ps( _mm_mul_ps( (reg1), (reg2) ), _mm_mul_ps( (reg3), (reg4) ) )
 
 	/**
-	 * @brief Combines two vectors using bitwise AND.
-	 * @return        (vec1.x & vec2.x, same for yzw )
+	 * @brief Combines two R128 using bitwise AND.
+	 * @return        (reg1.x & reg2.x, same for yzw )
 	 */
-	#define VectorAnd( vec1, vec2 )                 _mm_and_ps( (vec1), (vec2) )
+	#define RegisterAnd( reg1, reg2 )                 _mm_and_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Combines two vectors using bitwise ANDNOT.
-	 * @return        ( ~vec1.x & vec2.x, same for yzw )
+	 * @brief Combines two R128 using bitwise ANDNOT.
+	 * @return        ( ~reg1.x & reg2.x, same for yzw )
 	 */
-	#define VectorAndNot( vec1, vec2 )              _mm_andnot_ps( (vec1), (vec2) )
+	#define RegisterAndNot( reg1, reg2 )              _mm_andnot_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Combines two vectors using bitwise OR.
-	 * @return        ( vec1.x | vec2.x, same for yzw )
+	 * @brief Combines two R128 using bitwise OR.
+	 * @return        ( reg1.x | reg2.x, same for yzw )
 	 */
-	#define VectorOr( vec1, vec2 )                  _mm_or_ps( (vec1), (vec2) )
+	#define RegisterOr( reg1, reg2 )                  _mm_or_ps( (reg1), (reg2) )
 	
 	/**
-	 * @brief Combines two vectors using bitwise OR.
-	 * @return        ( vec1.x ^ vec2.x, same for yzw )
+	 * @brief Combines two R128 using bitwise OR.
+	 * @return        ( reg1.x ^ reg2.x, same for yzw )
 	 */
-	#define VectorXor( vec1, vec2 )                 _mm_xor_ps( (vec1), (vec2) )
+	#define RegisterXor( reg1, reg2 )                 _mm_xor_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Returns an integer bit-mask (0x00 - 0x0f) based on the sign-bit for each elements in a vector.
+	 * @brief Returns an integer bit-mask (0x00 - 0x0f) based on the sign-bit for each elements in a R128.
 	 * @return        Bit 0 = sign(mask.x), Bit 1 = sign(mask.y), Bit 2 = sign(mask.z), Bit 3 = sign(mask.w)
 	 */
-	#define VectorMaskBits( mask )                  _mm_movemask_ps( (mask) )
+	#define RegisterMaskBits( mask )                  _mm_movemask_ps( (mask) )
 
 	/**
 	 * @brief Keeps yzw, set x=0.
-	 * @return        ( 0, vec.y, vec.z, vec.w )
+	 * @return        ( 0, reg.y, reg.z, reg.w )
 	 */
-	#define VectorSetX0( vec )                      _mm_and_ps( (vec), Number::V_YZWMASK )
+	#define RegisterSetX0( reg )                      _mm_and_ps( (reg), Number::R_YZWMASK )
 
 	/**
 	 * @brief Keeps xyz, set w=0.
-	 * @return        ( vec.x, vec.y, vec.z, 0 )
+	 * @return        ( reg.x, reg.y, reg.z, 0 )
 	 */
-	#define VectorSetW0( vec )                      _mm_and_ps( (vec), Number::V_XYZMASK )
+	#define RegisterSetW0( reg )                      _mm_and_ps( (reg), Number::R_XYZMASK )
 
 	/**
 	 * @biref Extracts x, ignore yzw.
-	 * @return        ( vec.x )
+	 * @return        ( reg.x )
 	 */
-	#define VectorGetX( vec )                       _mm_cvtss_f32( (vec) )
+	#define RegisterGetX( reg )                       _mm_cvtss_f32( (reg) )
 
 	/**
-	 * @brief Convert float vector to signed 32-bit integer vector.
-	 * @return        ( (int)vec.x, same for yzw )
+	 * @brief Convert float R128 to signed 32-bit integer R128.
+	 * @return        ( (int)reg.x, same for yzw )
 	 */
-	#define VectorCastInteger( vec )                _mm_cvtps_epi32( (vec) )
+	#define RegisterCastInteger( reg )                _mm_cvtps_epi32( (reg) )
 
 	/**
-	 * @brief Convert signed 32-bit integer vector to float vector.
-	 * @return        ( (float)vec.x, same for yzw )
+	 * @brief Convert signed 32-bit integer R128 to float R128.
+	 * @return        ( (float)reg.x, same for yzw )
 	 */
-	#define VectorCastFloat( vec )                _mm_cvtepi32_ps( (vec) )
+	#define RegisterCastFloat( reg )                  _mm_cvtepi32_ps( (reg) )
 
 	/**
-	 * @brief Returns a bitwise equivalent vector based on 4 uint32.
+	 * @brief Returns a R128 based on 4 floats.
 	 */
-	//force_inline __m128 MakeVector(const unsigned int& x, const unsigned int& y, const unsigned int& z, const unsigned int& w)
-	//{
-	//	union { __m128 v; __m128i i; } result;
-	//	result.i = _mm_setr_epi32(x, y, z, w);
-	//	return result.v;
-	//}
-
-	/**
-	 * @brief Returns a vector based on 4 floats.
-	 */
-	force_inline __m128 MakeVector(const float& x, const float& y, const float& z, const float& w)
+	force_inline R128 MakeRegister(const float& x, const float& y, const float& z, const float& w)
 	{
 		return _mm_setr_ps(x, y, z, w);
 	}
 
 	/**
-	 * @brief Returns a signed 32-bits vector based on 4 integer.
+	 * @brief Returns a signed 32-bits R128 based on 4 integer.
 	 */
-	force_inline __m128i MakeVectorInteger(const int& x, const int& y, const int& z, const int& w)
+	force_inline R128i MakeRegisterInteger(const int& x, const int& y, const int& z, const int& w)
 	{
 		return _mm_setr_epi32(x, y, z, w);
 	}
 
 	/**
-	 * @brief Returns a vector based on 1 float.
+	 * @brief Returns a R128 based on 1 float.
 	 */
-	force_inline __m128 MakeVector(const float& val)
+	force_inline R128 MakeRegister(const float& val)
 	{
 		return _mm_set_ps1(val);
 	}
 
 	/**
-	 * @brief copy each elements in a vector.
+	 * @brief copy 4 floats.
 	 */
-	force_inline void VectorCopy(const void* inVec, void* outVec) noexcept
+	force_inline void RegisterCopy(const void* src, void* dst) noexcept
 	{
-		VectorStoreAligned(VectorLoadAligned(inVec), outVec);
+		_mm_store_ps((float*)(dst), *(__m128*)(src));
+		//RegisterStoreAligned(RegisterLoadAligned(src), dst);
 	}
 
 	/**
-	 * @brief Does a bitwise vector selection based on a mask.
-	 * @return        ( for each bit i: Mask[i] ? vec1[i] : vec2[i] )
+	 * @brief Does a bitwise R128 selection based on a mask.
+	 * @return        ( for each bit i: Mask[i] ? reg1[i] : reg2[i] )
 	 */
-	force_inline __m128 VectorSelect(const __m128& mask, const __m128& vec1, const __m128& vec2)
+	force_inline R128 RegisterSelect(const R128& mask, const R128& reg1, const R128& reg2)
 	{
-		return _mm_xor_ps(vec2, _mm_and_ps(mask, _mm_xor_ps(vec1, vec2)));
+		return _mm_xor_ps(reg2, _mm_and_ps(mask, _mm_xor_ps(reg1, reg2)));
 	}
 
 	/**
-	 * @brief Rounds A to an integer with truncation towards zero for each elements in a vector. (e.g. -1.7 truncated to -1, 2.8 truncated to 2)
-	 * @return        ( truncate(vec.x), same for yzw )
+	 * @brief Rounds A to an integer with truncation towards zero for each elements in a R128. (e.g. -1.7 truncated to -1, 2.8 truncated to 2)
+	 * @return        ( truncate(reg.x), same for yzw )
 	 */
-	force_inline __m128 VectorTruncate(const __m128& vec)
+	force_inline R128 RegisterTruncate(const R128& reg)
 	{
-		return _mm_cvtepi32_ps(_mm_cvttps_epi32(vec));
+		return _mm_cvtepi32_ps(_mm_cvttps_epi32(reg));
 	}
 
 	/**
-	 * @brief Returns a sum of four elements in a vector.
-	 * @return        ( vec[0] + vec[1] + vec[2] + vec[3] )
+	 * @brief Returns a sum of four elements in a R128.
+	 * @return        ( reg[0] + reg[1] + reg[2] + reg[3] )
 	 */
-	force_inline float VectorSum(const __m128& vec)
+	force_inline float RegisterSum(const R128& reg)
 	{
-		__m128 xy_zw = _mm_hadd_ps(vec, vec);
-		__m128 xyzw = _mm_hadd_ps(xy_zw, xy_zw);
-		return VectorGetX(xyzw);
+		R128 xy_zw = _mm_hadd_ps(reg, reg);
+		R128 xyzw = _mm_hadd_ps(xy_zw, xy_zw);
+		return RegisterGetX(xyzw);
 	}
 
 	/**
-	 * @brief Returns a sum of four elements in a vector.
-	 * @return        ( vec[0] + vec[1] + vec[2] + vec[3], same for yzw )
+	 * @brief Returns a sum of four elements in a R128.
+	 * @return        ( reg[0] + reg[1] + reg[2] + reg[3], same for yzw )
 	 */
-	force_inline __m128 VectorSum4(const __m128& vec)
+	force_inline R128 RegisterSum4(const R128& reg)
 	{
-		__m128 xy_zw = _mm_hadd_ps(vec, vec);
-		__m128 xyzw = _mm_hadd_ps(xy_zw, xy_zw);
+		R128 xy_zw = _mm_hadd_ps(reg, reg);
+		R128 xyzw = _mm_hadd_ps(xy_zw, xy_zw);
 		return xyzw;
 	}
 
 	/**
-	 * @brief Computes a vector remainder of the division operation.
-	 * @return        __m128( vec1.X % vec2.X,  same for yzw )
+	 * @brief Computes a R128 remainder of the division operation.
+	 * @return        R128( reg1.X % reg2.X,  same for yzw )
 	 */
-	force_inline __m128 VectorMod(const __m128& vec1, const __m128& vec2)
+	force_inline R128 RegisterMod(const R128& reg1, const R128& reg2)
 	{
-		__m128 div = VectorDivide(vec1, vec2);
+		R128 div = RegisterDivide(reg1, reg2);
 
-		// Floats where abs(f) >= 2^23 have no fractional portion, and larger values would overflow VectorTruncate.
-		__m128 noFractionMask = VectorGE(VectorAbs(div), Number::V_FLOAT_NON_FRACTIONAL);
-		__m128 temp = VectorSelect(noFractionMask, div, VectorTruncate(div));
-		__m128 result = VectorSubtract(vec1, VectorMultiply(vec2, temp));
+		// Floats where abs(f) >= 2^23 have no fractional portion, and larger values would overflow RegisterTruncate.
+		R128 noFractionMask = RegisterGE(RegisterAbs(div), Number::R_FLOAT_NON_FRACTIONAL);
+		R128 temp = RegisterSelect(noFractionMask, div, RegisterTruncate(div));
+		R128 result = RegisterSubtract(reg1, RegisterMultiply(reg2, temp));
 
 		// Clamp to [-abs2, abs2] because of possible failures for very large numbers (>1e10) due to precision loss.
-		__m128 abs2 = VectorAbs(vec2);
-		return VectorMax(VectorNegate(abs2), VectorMin(result, abs2));
+		R128 abs2 = RegisterAbs(reg2);
+		return RegisterMax(RegisterNegate(abs2), RegisterMin(result, abs2));
 	}
 
 	/**
-	 * @brief Calculate floor() for each elements in a vector.
-	 * @return        ( floor(vec.x), same for yzw )
+	 * @brief Calculate floor() for each elements in a R128.
+	 * @return        ( floor(reg.x), same for yzw )
 	 */
-	force_inline __m128 VectorFloor(const __m128& vec)
+	force_inline R128 RegisterFloor(const R128& reg)
 	{
-		__m128 trunc = VectorTruncate(vec);
-		__m128 mask = VectorGE(vec, Number::V_ZERO);
-		__m128 sub = VectorSelect(mask, Number::V_ZERO, Number::V_ONE);
-		return VectorSubtract(trunc, sub);
+		R128 trunc = RegisterTruncate(reg);
+		R128 mask = RegisterGE(reg, Number::R_ZERO);
+		R128 sub = RegisterSelect(mask, Number::R_ZERO, Number::R_ONE);
+		return RegisterSubtract(trunc, sub);
 	}
 
 	/**
-	 * @brief Calculate ceil() for each elements in a vector.
-	 * @return        ( ceil(vec.x), same for yzw )
+	 * @brief Calculate ceil() for each elements in a R128.
+	 * @return        ( ceil(reg.x), same for yzw )
 	 */
-	force_inline __m128 VectorCeil(const __m128& vec)
+	force_inline R128 RegisterCeil(const R128& reg)
 	{
-		__m128 trunc = VectorTruncate(vec);
-		__m128 mask = VectorGE(vec, Number::V_ZERO);
-		__m128 add = VectorSelect(mask, Number::V_ONE, Number::V_ZERO);
-		return VectorAdd(trunc, add);
+		R128 trunc = RegisterTruncate(reg);
+		R128 mask = RegisterGE(reg, Number::R_ZERO);
+		R128 add = RegisterSelect(mask, Number::R_ONE, Number::R_ZERO);
+		return RegisterAdd(trunc, add);
 	}
 
 #endif // !SIMD_HPP_SSE_IMPL
@@ -392,73 +417,89 @@ namespace Number
 #define SIMD_HPP_AVX_IMPL
 
 	/**
-	 * @brief Adds two vector8.
-	 * @return        ( vec1.x1 + vec2.x1, same for y1z1w1, x2y2z2w2 )
+	 * @brief Load a R256 from aligned memory.
 	 */
-	#define Vector8Add( vec1, vec2 )                 _mm256_add_ps( (vec1), (vec2) )
+	#define Register8LoadAligned( ptr )                _mm256_load_ps( (const float*)(ptr) )
+	
+	/**
+	 * @brief Stores a R256 to aligned memory.
+	 */
+	#define Register8StoreAligned( reg, ptr )          _mm256_store_ps( (float*)(ptr), reg )
 
 	/**
-	 * @brief Subtracts two vector8.
-	 * @return        ( vec1.x1 - vec2.x1, same for y1z1w1, x2y2z2w2 )
+	 * @brief Copy 8 floats.
 	 */
-	#define Vector8Subtract( vec1, vec2 )            _mm256_sub_ps( (vec1), (vec2) )
+	#define Register8Copy( src, dst )                  _mm256_store_ps( (float*)(dst), *(__m256*)(src) )
 
 	/**
-	 * @brief Multiplies two vector8.
-	 * @return        ( vec1.x1 * vec2.x1, same for y1z1w1, x2y2z2w2 )
+	 * @brief Adds two R256.
+	 * @return        ( reg1.x1 + reg2.x1, same for y1z1w1, x2y2z2w2 )
 	 */
-	#define Vector8Multiply( vec1, vec2 )            _mm256_mul_ps( (vec1), (vec2) )
+
+	#define Register8Add( reg1, reg2 )                 _mm256_add_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Divides two vector8.
-	 * @return        ( vec1.x1 / vec2.x1, same for y1z1w1, x2y2z2w2 )
+	 * @brief Subtracts two R256.
+	 * @return        ( reg1.x1 - reg2.x1, same for y1z1w1, x2y2z2w2 )
 	 */
-	#define Vector8Divide( vec1, vec2 )              _mm256_div_ps( (vec1), (vec2) )
+	#define Register8Subtract( reg1, reg2 )            _mm256_sub_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Multiplies two vector8, adds in the third vector8.
-	 * @return        ( vec1.x1 * vec2.x1 + vec3.x1, same for y1z1w1, x2y2z2w2 )
+	 * @brief Multiplies two R256.
+	 * @return        ( reg1.x1 * reg2.x1, same for y1z1w1, x2y2z2w2 )
 	 */
-	#define Vector8MultiplyAdd( vec1, vec2, vec3 )   _mm256_add_ps( _mm256_mul_ps( (vec1), (vec2) ), (vec3) )
+	#define Register8Multiply( reg1, reg2 )            _mm256_mul_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Multiplies two vector8, then adds each result.
-	 * @return        ( vec1.x1 * vec2.x1 + vec3.x1 * vec4.x1, same for y1z1w1, x2y2z2w2 )
+	 * @brief Divides two R256.
+	 * @return        ( reg1.x1 / reg2.x1, same for y1z1w1, x2y2z2w2 )
 	 */
-	#define Vector8MultiplyAddMultiply( vec1, vec2, vec3, vec4 )   _mm256_add_ps( _mm256_mul_ps( (vec1), (vec2) ), _mm256_mul_ps( (vec3), (vec4) ) )
+	#define Register8Divide( reg1, reg2 )              _mm256_div_ps( (reg1), (reg2) )
 
 	/**
-	 * @brief Returns a vector8 based on 8 floats.
+	 * @brief Multiplies two R256, adds in the third R256.
+	 * @return        ( reg1.x1 * reg2.x1 + reg3.x1, same for y1z1w1, x2y2z2w2 )
 	 */
-	force_inline __m256 MakeVector8(const float& x1, const float& y1, const float& z1, const float& w1, const float& x2, const float& y2, const float& z2, const float& w2)
+	#define Register8MultiplyAdd( reg1, reg2, reg3 )   _mm256_add_ps( _mm256_mul_ps( (reg1), (reg2) ), (reg3) )
+
+	/**
+	 * @brief Multiplies two R256, then adds each result.
+	 * @return        ( reg1.x1 * reg2.x1 + reg3.x1 * reg4.x1, same for y1z1w1, x2y2z2w2 )
+	 */
+	#define Register8MultiplyAddMultiply( reg1, reg2, reg3, reg4 )   _mm256_add_ps( _mm256_mul_ps( (reg1), (reg2) ), _mm256_mul_ps( (reg3), (reg4) ) )
+
+	/**
+	 * @brief Returns a R256 based on 8 floats.
+	 */
+	force_inline R256 MakeRegister8(const float& x1, const float& y1, const float& z1, const float& w1, const float& x2, const float& y2, const float& z2, const float& w2)
 	{
 		return _mm256_setr_ps(x1, y1, z1, w1, x2, y2, z2, w2);
 	}
 
 	/**
-	 * @brief Returns a vector8 based on 1 floats.
+	 * @brief Returns a R256 based on 1 floats.
 	 */
-	force_inline __m256 MakeVector8(const float& val)
+	force_inline R256 MakeRegister8(const float& val)
 	{
 		return _mm256_set1_ps(val);
 	}
 
 	/**
-	 * @brief Returns a vector8 based on vector.
-	 * @return        index == 0xffffffff ? ( vec, vec ) : ( vec[index], same for y1z1w1, x2y2z2w2 )
+	 * @brief Returns a R256 based on R128.
+	 * @return        index == 0xffffffff ? ( reg, reg ) : ( reg[index], same for y1z1w1, x2y2z2w2 )
 	 */
 	template <unsigned int index = 0xffffffff>
-	force_inline __m256 Vector8Replicate(const __m128& vec)
+	force_inline R256 Register8Replicate(const R128& reg)
 	{
 		if constexpr (index == 0xffffffff)
 		{
-			__m256 result = _mm256_castps128_ps256(vec);
-			return _mm256_insertf128_ps(result, vec, 1);
+			R256 result = _mm256_castps128_ps256(reg);
+			return _mm256_insertf128_ps(result, reg, 1);
 		}
 		else
 		{
-			__m128 v = VectorReplicate(vec, index);
-			__m256 result = _mm256_castps128_ps256(v);
+			R128 v = RegisterReplicate(reg, index);
+			R256 result = _mm256_castps128_ps256(v);
 			return _mm256_insertf128_ps(result, v, 1);
 		}
 	}

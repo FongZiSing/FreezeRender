@@ -98,7 +98,7 @@ namespace Detail
 		template<TextureSampler::AddressMode AddressX, TextureSampler::AddressMode AddressY = AddressX>
 		Color BilinearSampler(const Texture* target, const float& u, const float& v)
 		{
-			__m128 alphax, alphay;
+			R128 alphax, alphay;
 			int x0, x1, y0, y1;
 			bool xborder = false, yborder = false;
 			if constexpr (AddressX == TextureSampler::AddressMode::Warp)
@@ -113,31 +113,31 @@ namespace Detail
 				x1 = (x0 + 1) % width;
 
 				// Get interpolation coefficient.
-				alphax = MakeVector(realx - x0);
+				alphax = MakeRegister(realx - x0);
 			}
 			else if constexpr (AddressX == TextureSampler::AddressMode::Mirror)
 			{
 				// Limit to range [0, 2], rounded toward zero.
-				__m128 u2 = MakeVector(u, u, u + 1.f / target->width, u + 1.f / target->width);
-				__m128 fixedu = VectorMultiply(u2, Number::V_HALF);
-				fixedu = VectorMultiply(VectorSubtract(fixedu, VectorFloor(fixedu)), Number::V_TWO);
+				R128 u2 = MakeRegister(u, u, u + 1.f / target->width, u + 1.f / target->width);
+				R128 fixedu = RegisterMultiply(u2, Number::R_HALF);
+				fixedu = RegisterMultiply(RegisterSubtract(fixedu, RegisterFloor(fixedu)), Number::R_TWO);
 
 				// f(u) = 1 - | u - 1 |
-				fixedu = VectorSubtract(Number::V_ONE, VectorAbs(VectorSubtract(fixedu, Number::V_ONE)));
+				fixedu = RegisterSubtract(Number::R_ONE, RegisterAbs(RegisterSubtract(fixedu, Number::R_ONE)));
 
 				// Get location of texel.
-				__m128 width = MakeVector(target->width - 1.f);
-				__m128 realx = VectorMultiply(fixedu, width);
-				__m128 maskx = VectorGT(VectorReplicate(realx, 0), VectorReplicate(realx, 2));
+				R128 width = MakeRegister(target->width - 1.f);
+				R128 realx = RegisterMultiply(fixedu, width);
+				R128 maskx = RegisterGT(RegisterReplicate(realx, 0), RegisterReplicate(realx, 2));
 
-				__m128i x2 = VectorCastInteger(VectorFloor(realx));
+				R128i x2 = RegisterCastInteger(RegisterFloor(realx));
 				x0 = x2.m128i_i32[0];
 				x1 = x2.m128i_i32[2];
 
 				// Get interpolation coefficient.
-				__m128 alpha = VectorSubtract(realx, VectorCastFloat(x2));
-				alphax = VectorReplicate(alpha, 0);
-				alphax = VectorSelect(maskx, VectorSubtract(Number::V_ONE, alphax), alphax);
+				R128 alpha = RegisterSubtract(realx, RegisterCastFloat(x2));
+				alphax = RegisterReplicate(alpha, 0);
+				alphax = RegisterSelect(maskx, RegisterSubtract(Number::R_ONE, alphax), alphax);
 			}
 			else if constexpr (AddressX == TextureSampler::AddressMode::Clamp)
 			{
@@ -151,7 +151,7 @@ namespace Detail
 				x1 = Math::Clamp(0, x0 + 1, width - 1);
 
 				// Get interpolation coefficient.
-				alphax = MakeVector(realx - x0);
+				alphax = MakeRegister(realx - x0);
 			}
 			else if constexpr (AddressX == TextureSampler::AddressMode::Border)
 			{
@@ -165,7 +165,7 @@ namespace Detail
 					xborder = x0 == x1;
 
 					// Get interpolation coefficient.
-					alphax = MakeVector(realx - x0);
+					alphax = MakeRegister(realx - x0);
 				}
 				else
 				{
@@ -189,32 +189,32 @@ namespace Detail
 				y1 = (y0 + 1) % height;
 
 				// Get interpolation coefficient.
-				alphay = MakeVector(realy - y0);
+				alphay = MakeRegister(realy - y0);
 			}
 			else if constexpr (AddressY == TextureSampler::AddressMode::Mirror)
 			{
 				// Limit to range [0, 2], rounded toward zero.
-				__m128 v2 = MakeVector(v, v, v + 1.f / target->height, v + 1.f / target->height);
-				__m128 fixedv = VectorMultiply(v2, Number::V_HALF);
-				fixedv = VectorSubtract(fixedv, VectorFloor(fixedv));
-				fixedv = VectorMultiply(VectorSubtract(Number::V_ONE, fixedv), Number::V_TWO);
+				R128 v2 = MakeRegister(v, v, v + 1.f / target->height, v + 1.f / target->height);
+				R128 fixedv = RegisterMultiply(v2, Number::R_HALF);
+				fixedv = RegisterSubtract(fixedv, RegisterFloor(fixedv));
+				fixedv = RegisterMultiply(RegisterSubtract(Number::R_ONE, fixedv), Number::R_TWO);
 
 				// f(v) = 1 - | v - 1 |
-				fixedv = VectorSubtract(Number::V_ONE, VectorAbs(VectorSubtract(fixedv, Number::V_ONE)));
+				fixedv = RegisterSubtract(Number::R_ONE, RegisterAbs(RegisterSubtract(fixedv, Number::R_ONE)));
 
 				// Get location of texel.
-				__m128 height = MakeVector(target->height - 1.f);
-				__m128 realy = VectorMultiply(fixedv, height);
-				__m128 masky = VectorGT(VectorReplicate(realy, 0), VectorReplicate(realy, 2));
+				R128 height = MakeRegister(target->height - 1.f);
+				R128 realy = RegisterMultiply(fixedv, height);
+				R128 masky = RegisterGT(RegisterReplicate(realy, 0), RegisterReplicate(realy, 2));
 
-				__m128i y2 = VectorCastInteger(VectorFloor(realy));
+				R128i y2 = RegisterCastInteger(RegisterFloor(realy));
 				y0 = y2.m128i_i32[0];
 				y1 = y2.m128i_i32[2];
 
 				// Get interpolation coefficient.
-				__m128 alpha = VectorSubtract(realy, VectorCastFloat(y2));
-				alphay = VectorReplicate(alpha, 0);
-				alphay = VectorSelect(masky, VectorSubtract(Number::V_ONE, alphay), alphay);
+				R128 alpha = RegisterSubtract(realy, RegisterCastFloat(y2));
+				alphay = RegisterReplicate(alpha, 0);
+				alphay = RegisterSelect(masky, RegisterSubtract(Number::R_ONE, alphay), alphay);
 			}
 			else if constexpr (AddressY == TextureSampler::AddressMode::Clamp)
 			{
@@ -228,7 +228,7 @@ namespace Detail
 				y1 = Math::Clamp(0, y0 + 1, height - 1);
 
 				// Get interpolation coefficient.
-				alphay = MakeVector(realy - y0);
+				alphay = MakeRegister(realy - y0);
 			}
 			else if constexpr (AddressY == TextureSampler::AddressMode::Border)
 			{
@@ -242,7 +242,7 @@ namespace Detail
 					yborder = y0 == y1;
 
 					// Get interpolation coefficient.
-					alphay = MakeVector(realy - y0);
+					alphay = MakeRegister(realy - y0);
 				}
 				else
 				{
@@ -255,29 +255,29 @@ namespace Detail
 			}
 
 			// Get a piece of color.
-			__m128 texel00, texel01, texel10, texel11;
+			R128 texel00, texel01, texel10, texel11;
 			unsigned char* color = target->bits.Get(y0 * target->strides + x0 * target->bytePerPixel);
-			texel00 = MakeVector(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
+			texel00 = MakeRegister(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
 
 			color = xborder ? (unsigned char*)(&target->border) : target->bits.Get(y0 * target->strides + x1 * target->bytePerPixel);
-			texel01 = MakeVector(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
+			texel01 = MakeRegister(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
 
 			color = yborder ? (unsigned char*)(&target->border) : target->bits.Get(y1 * target->strides + x0 * target->bytePerPixel);
-			texel10 = MakeVector(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
+			texel10 = MakeRegister(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
 
 			color = xborder && yborder ? (unsigned char*)(&target->border) : target->bits.Get(y1 * target->strides + x1 * target->bytePerPixel);
-			texel11 = MakeVector(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
+			texel11 = MakeRegister(float(color[0]), float(color[1]), float(color[2]), float(color[3]));
 
 			// interpolation.
-			__m128 tempx0 = VectorMultiplyAdd(alphax, VectorSubtract(texel01, texel00), texel00);
-			__m128 tempx1 = VectorMultiplyAdd(alphax, VectorSubtract(texel11, texel10), texel10);
-			__m128 temp = VectorMultiplyAdd(alphay, VectorSubtract(tempx1, tempx0), tempx0);
+			R128 tempx0 = RegisterMultiplyAdd(alphax, RegisterSubtract(texel01, texel00), texel00);
+			R128 tempx1 = RegisterMultiplyAdd(alphax, RegisterSubtract(texel11, texel10), texel10);
+			R128 temp = RegisterMultiplyAdd(alphay, RegisterSubtract(tempx1, tempx0), tempx0);
 
 			// Clamp to [0, 255].
-			temp = VectorSelect(VectorGT(temp, Number::V_255F), Number::V_255F, temp);
-			temp = VectorSelect(VectorLT(temp, Number::V_ZERO), Number::V_ZERO, temp);
+			temp = RegisterSelect(RegisterGT(temp, Number::R_255F), Number::R_255F, temp);
+			temp = RegisterSelect(RegisterLT(temp, Number::R_ZERO), Number::R_ZERO, temp);
 			Vector4 result;
-			VectorStoreAligned(temp, &result);
+			RegisterStoreAligned(temp, &result);
 			return Color::FromClampedVector(result);
 		}
 

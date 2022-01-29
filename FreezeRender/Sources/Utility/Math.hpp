@@ -15,31 +15,6 @@
 namespace Math
 {
 	/**
-	 * @brief The implemention of Kanhan Sumation Algorithm.
-	 * @see https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-	 */
-	struct VectorKahanSummationAlgorithm
-	{
-		__m128 error = Number::V_ZERO;
-
-		force_inline void Add(__m128& sum, __m128& increment) noexcept
-		{
-			__m128 temp = VectorSubtract(increment, error);
-			__m128 result = VectorAdd(sum, temp);
-			error = VectorSubtract(VectorSubtract(result, sum), increment);
-			sum = result;
-		}
-	};
-
-	/**
-	 * @brief <minwindef.h> defined marco `max`, `min`, conflicts with std::max, std::min.
-	 */
-	template <typename T> force_inline constexpr T Min(const T& inA, const T& inB) { return std::min<T>(inA, inB); }
-	template <typename T> force_inline constexpr T Max(const T& inA, const T& inB) { return std::max<T>(inA, inB); }
-	template <typename T> force_inline constexpr T Min(std::initializer_list<T> inList) { return std::min<T>(inList); }
-	template <typename T> force_inline constexpr T Max(std::initializer_list<T> inList) { return std::max<T>(inList); }
-
-	/**
 	 * @brief Clamps `inVal` to be between `inMin` and `inMax`, inclusive.
 	 * @return        max( inMin, min( inVal, inMax ) )
 	 */
@@ -103,13 +78,13 @@ namespace Math
 	 */
 	force_inline void VectorLerp(const float& alpha, const void* inVec1, const void* inVec2, void* outVec)
 	{
-		const __m128& v1 = *static_cast<const __m128*>(inVec1);
-		const __m128& v2 = *static_cast<const __m128*>(inVec2);
-		__m128 temp = VectorSubtract(v2, v1);
-		__m128 coeff = MakeVector(alpha);
+		const R128& v1 = *static_cast<const R128*>(inVec1);
+		const R128& v2 = *static_cast<const R128*>(inVec2);
+		R128 temp = RegisterSubtract(v2, v1);
+		R128 coeff = MakeRegister(alpha);
 
-		temp = VectorMultiplyAdd(coeff, temp, v1);
-		VectorStoreAligned(temp, outVec);
+		temp = RegisterMultiplyAdd(coeff, temp, v1);
+		RegisterStoreAligned(temp, outVec);
 	}
 
 	/**
@@ -125,9 +100,9 @@ namespace Math
 	 */
 	force_inline void Degrees2Radians(const void* inDegrees, void* outRadians)
 	{
-		const __m128& v1 = *static_cast<const __m128*>(inDegrees);
-		__m128& v2 = *static_cast<__m128*>(outRadians);
-		v2 = VectorMultiply(v1, Number::V_DEG_TO_RAD);
+		const R128& v1 = *static_cast<const R128*>(inDegrees);
+		R128& v2 = *static_cast<R128*>(outRadians);
+		v2 = RegisterMultiply(v1, Number::R_DEG_TO_RAD);
 	}
 
 	/**
@@ -143,9 +118,9 @@ namespace Math
 	 */
 	force_inline void Radians2Degrees(const void* inRadians, void* outDegrees)
 	{
-		const __m128& v1 = *static_cast<const __m128*>(inRadians);
-		__m128& v2 = *static_cast<__m128*>(outDegrees);
-		v2 = VectorMultiply(v1, Number::V_RAD_TO_DEG);
+		const R128& v1 = *static_cast<const R128*>(inRadians);
+		R128& v2 = *static_cast<R128*>(outDegrees);
+		v2 = RegisterMultiply(v1, Number::R_RAD_TO_DEG);
 	}
 
 
@@ -191,19 +166,19 @@ namespace Math
 	 * @brief 2x2 row major Matrix multiply.
 	 * @return        ( a * b )
 	 */
-	force_inline __m128 Matrix2x2Multiply(const __m128& vec1, const __m128& vec2);
+	force_inline R128 Matrix2x2Multiply(const R128& vec1, const R128& vec2);
 
 	/**
 	 * @brief 2x2 row major Matrix adjugate multiply.
 	 * @return        ( (a#) * b )
 	 */
-	force_inline __m128 Matrix2x2AdjMultiply(const __m128& vec1, const __m128& vec2);
+	force_inline R128 Matrix2x2AdjMultiply(const R128& vec1, const R128& vec2);
 
 	/**
 	 * @brief 2x2 row major Matrix multiply adjugate.
 	 * @return        ( a * (b#) )
 	 */
-	force_inline __m128 Matrix2x2MultiplyAdj(const __m128& vec1, const __m128& vec2);
+	force_inline R128 Matrix2x2MultiplyAdj(const R128& vec1, const R128& vec2);
 
 	/**
 	 * @brief Transpose a 4x4 matrix.

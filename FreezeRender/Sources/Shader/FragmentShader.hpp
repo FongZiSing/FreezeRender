@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Core/ShadingElement.hpp>
 #include <Core/Matrix.hpp>
 #include <Core/Color.hpp>
 #include <Core/Texture.hpp>
@@ -15,14 +14,6 @@ namespace Shader
 	 */
 	struct FragmentPayload
 	{
-		struct
-		{
-			Vector3 position;
-			Vector3 normal;
-			Vector2 uv;
-		}
-		vertices[3];
-
 		struct
 		{
 			Vector3 position;
@@ -47,23 +38,10 @@ namespace Shader
 
 
 		// Initialize.
-		FragmentPayload(const ShadingTriangle& triange, const Texture* sampleTexture, const Vector3& cameraPosition, const std::vector<PointLight>* scenePointLights)
+		FragmentPayload(const Texture* sampling, const Vector3& cameraPosition, const std::vector<PointLight>* scenePointLights)
 		{
-			// Initialize triangle.
-			vertices[0].position = triange.vertices[0].viewspace.position;
-			vertices[1].position = triange.vertices[1].viewspace.position;
-			vertices[2].position = triange.vertices[2].viewspace.position;
-
-			vertices[0].normal = triange.vertices[0].viewspace.normal;
-			vertices[1].normal = triange.vertices[1].viewspace.normal;
-			vertices[2].normal = triange.vertices[2].viewspace.normal;
-
-			vertices[0].uv = triange.vertices[0].localspace.uv;
-			vertices[1].uv = triange.vertices[1].localspace.uv;
-			vertices[2].uv = triange.vertices[2].localspace.uv;
-
 			// Initialize texture.
-			texture = sampleTexture;
+			texture = sampling;
 
 			// Initialize viewpoint elements.
 			viewpoint.position = cameraPosition;
@@ -121,6 +99,65 @@ namespace Shader
 			//
 			// if the compiler supports that...
 			if constexpr (handle != Fragment::Nothing)
+			{
+				return handle(payload);
+			}
+			else
+			{
+				return Color::Black;
+			}
+		}
+	};
+
+
+	/**
+	 * @brief The BRDF data structure used by the deferred fragment shader.
+	 */
+	struct DeferredFragmentPayload
+	{
+		const std::vector<PointLight>* pointlights = nullptr;
+		Vector3 viewpoint;
+		Vector3 shadingpoint;
+
+		Vector3 normal;
+		Color diffuse;
+	};
+
+
+	/**
+	 * @brief All supported deferred fragment shader.
+	 */
+	namespace DeferredFragment
+	{
+		static Color Nothing(const DeferredFragmentPayload& payload) { return Color::Black; }
+
+		Color PhongShader(const DeferredFragmentPayload& payload);
+	}
+
+
+	/**
+	 * @brief The entry of fragment shader.
+	 */
+	class DeferredFragmentShader
+	{
+		typedef Color(*PrivateHandle)(const DeferredFragmentPayload&);
+
+		static constexpr const PrivateHandle handle = DeferredFragment::PhongShader;
+
+	public:
+
+		force_inline without_globalvar auto operator() (const DeferredFragmentPayload& payload)
+		{
+			// Empty function optimize.
+			// for example:
+			//     line 1:    FragmentShader fs;
+			//     line 2:    Color c = fs( FragmentPayload { ... } );
+			//
+			// if `VertexShader::handle == Vertex::Nothing` is true,
+			// line 2 will be  compiled as `Color c = Color::Black`, and FragmentPayload constructor function will not even be called.
+			//
+			// if the compiler supports that...
+			if constexpr (handle != DeferredFragment::Nothing)
 			{
 				return handle(payload);
 			}

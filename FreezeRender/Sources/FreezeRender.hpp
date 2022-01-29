@@ -4,6 +4,7 @@
 #include <memory>
 
 /// forward declaration.
+class ParallelRasterizer;
 class Rasterizer;
 struct Camera;
 /// forward declaration.
@@ -16,7 +17,7 @@ struct Camera;
 class FreezeRender final : public D2DApp
 {
 	// The core of raster rendering.
-	std::unique_ptr<Rasterizer> rasterizer;
+	std::unique_ptr<ParallelRasterizer> rasterizer;
 
 	// The main player's perspective in the world scene.
 	std::unique_ptr<Camera> camera;

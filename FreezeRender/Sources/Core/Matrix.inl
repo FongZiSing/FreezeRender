@@ -188,7 +188,7 @@
 #ifndef MATRIX_INL_VECTOR4_IPML
 #define MATRIX_INL_VECTOR4_IPML
 
-	static_assert(sizeof(Vector4) == sizeof(__m128), "[FreezeRender] Vector4 size is invalid!");
+	static_assert(sizeof(Vector4) == sizeof(R128), "[FreezeRender] Vector4 size is invalid!");
 
 	force_inline Vector4& Vector4::operator = (const Vector4& inValue) noexcept { x = inValue.x; y = inValue.y; z = inValue.z; w = inValue.w; return *this; }
 
@@ -268,7 +268,7 @@
 #ifndef MATRIX_INL_MATRIX_IPML
 #define MATRIX_INL_MATRIX_IPML
 
-	static_assert(sizeof(Matrix) == sizeof(__m128) * 4, "[FreezeRender] matrix size is invalid!");
+	static_assert(sizeof(Matrix) == sizeof(R128) * 4, "[FreezeRender] matrix size is invalid!");
 
 	force_inline Matrix::Matrix(const float& value) noexcept
 	{
@@ -296,18 +296,14 @@
 
 	force_inline Matrix::Matrix(const Matrix& value)
 	{
-		VectorCopy(&value.m[0][0], &m[0][0]);
-		VectorCopy(&value.m[1][0], &m[1][0]);
-		VectorCopy(&value.m[2][0], &m[2][0]);
-		VectorCopy(&value.m[3][0], &m[3][0]);
+		Register8Copy(&value.m[0][0], &m[0][0]);
+		Register8Copy(&value.m[2][0], &m[2][0]);
 	}
 
 	force_inline Matrix& Matrix::operator = (const Matrix& value)
 	{
-		VectorCopy(&value.m[0][0], &m[0][0]);
-		VectorCopy(&value.m[1][0], &m[1][0]);
-		VectorCopy(&value.m[2][0], &m[2][0]);
-		VectorCopy(&value.m[3][0], &m[3][0]);
+		Register8Copy(&value.m[0][0], &m[0][0]);
+		Register8Copy(&value.m[2][0], &m[2][0]);
 		return *this;
 	}
 
