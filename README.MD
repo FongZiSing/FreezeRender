@@ -1,5 +1,5 @@
 # FreezeRender
-A softare renderer written by c++2x.
+A software renderer written by c++2x.
 
 
 ## Platform
@@ -22,7 +22,7 @@ Windows only. With Visual studio 2019.
 * Multi-thread rasterizer.  
 * Cubemap.  
 * ECS.  
-* Softare ray tracing.  
+* Software ray tracing.  
 
 
 ## TOFIX
