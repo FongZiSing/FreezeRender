@@ -629,12 +629,14 @@ LRESULT D2DApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
-	case WM_CREATE:
+	branch_unlikely case WM_CREATE:
 		pThis = static_cast<D2DApp*>(reinterpret_cast<LPCREATESTRUCT>(lParam)->lpCreateParams);
 		break;
 
-	if (pThis)
-	{
+	branch_unlikely case WM_DESTROY:
+		return pThis->OnDestroy();
+
+
 		case WM_ACTIVATE:       return pThis->OnActivate(wParam, (HWND)lParam);
 		case WM_KEYDOWN:        return pThis->OnKeyDown(wParam);
 		case WM_KEYUP:          return pThis->OnKeyUp(wParam);
@@ -654,8 +656,6 @@ LRESULT D2DApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_SIZE:           return pThis->OnSize(wParam, LOWORD(lParam), HIWORD(lParam));
 		case WM_EXITSIZEMOVE:   return pThis->OnExitSizeMove();
 
-		case WM_DESTROY:        return pThis->OnDestroy();
-	}
 	default:
 		return DefWindowProc(hwnd, message, wParam, lParam);
 	}
