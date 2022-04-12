@@ -8,7 +8,7 @@ class PointLightComponent
 {
 private:
 	PointLight& entity;
-	ShadingPointLight light;
+	ShadingPointLight& light;
 
 
 public:
