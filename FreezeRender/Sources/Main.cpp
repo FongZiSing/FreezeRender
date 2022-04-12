@@ -1,7 +1,7 @@
-﻿#include "FreezeRender.hpp"
+﻿#include "Engine.hpp"
 
 
-#include <Container/String.hpp>
+
 /**
  * @brief Start your journey of FreezeRender.
  */
@@ -15,11 +15,11 @@ int APIENTRY wWinMain(
 	::HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
 	if (SUCCEEDED(::CoInitialize(nullptr)))
 	{
-		FreezeRender render;
-		if (SUCCEEDED(render.Initialize(hInstance, nCmdShow)))
+		Engine FreezeRender;
+		if (SUCCEEDED(FreezeRender.Initialize(hInstance, nCmdShow)))
 		{
 			// スタープラチナ·ザ・ワールド
-			render.Run();
+			FreezeRender.Run();
 		}
 		::CoUninitialize();
 	}

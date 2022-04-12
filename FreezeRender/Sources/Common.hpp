@@ -86,6 +86,13 @@
 #define inline_variable __declspec(selectany)
 #endif
 
+#ifndef branch_likely
+#define branch_likely [[likely]]
+#endif
+
+#ifndef branch_unlikely
+#define branch_unlikely [[unlikely]]
+#endif
 
 // All of the warnings that we are able to enable
 #pragma warning(default: 4996) // 'function' was declared deprecated.

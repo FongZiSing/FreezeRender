@@ -19,73 +19,87 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sources\Algorithm\KahanSummation.hpp" />
+    <ClInclude Include="Sources\Asset\Camera\Camera.hpp" />
+    <ClInclude Include="Sources\Asset\Light\Light.hpp" />
+    <ClInclude Include="Sources\Asset\Material\Material.hpp" />
+    <ClInclude Include="Sources\Asset\Meshlet\Loader\MeshLoader.hpp" />
+    <ClInclude Include="Sources\Asset\Meshlet\Loader\MeshLoaderLibrary.hpp" />
+    <ClInclude Include="Sources\Asset\Meshlet\Loader\OBJMeshLoader.hpp" />
+    <ClInclude Include="Sources\Asset\Meshlet\Meshlet.hpp" />
+    <ClInclude Include="Sources\Asset\Meshlet\Polygon.hpp" />
+    <ClInclude Include="Sources\Asset\Texture\Loader\TextureLoader.hpp" />
+    <ClInclude Include="Sources\Asset\Texture\Loader\TextureLoaderLibrary.hpp" />
+    <ClInclude Include="Sources\Asset\Texture\Loader\WICTextureLoader.hpp" />
+    <ClInclude Include="Sources\Asset\Texture\Texture.hpp" />
+    <ClInclude Include="Sources\Asset\Utility\LoaderUitlity.hpp" />
+    <ClInclude Include="Sources\Asset\World\Loader\WorldLoaderLibrary.hpp" />
+    <ClInclude Include="Sources\Asset\World\World.hpp" />
     <ClInclude Include="Sources\Common.hpp" />
-    <ClInclude Include="Sources\Container\Bulkdata.hpp" />
-    <ClInclude Include="Sources\Container\String.hpp" />
-    <ClInclude Include="Sources\Core\Camera.hpp" />
-    <ClInclude Include="Sources\Core\Color.hpp" />
-    <ClInclude Include="Sources\Core\Light.hpp" />
-    <ClInclude Include="Sources\Core\Material.hpp" />
-    <ClInclude Include="Sources\Core\Matrix.hpp" />
-    <ClInclude Include="Sources\Core\Meshlet.hpp" />
-    <ClInclude Include="Sources\Core\PixelFormat.hpp" />
-    <ClInclude Include="Sources\Core\Polygon.hpp" />
-    <ClInclude Include="Sources\Core\RenderTarget.hpp" />
-    <ClInclude Include="Sources\Core\Rotator.hpp" />
-    <ClInclude Include="Sources\Core\Shadingon.hpp" />
-    <ClInclude Include="Sources\Core\Texture.hpp" />
-    <ClInclude Include="Sources\Core\TextureSampler.hpp" />
-    <ClInclude Include="Sources\FreezeRender.hpp" />
-    <ClInclude Include="Sources\Loader\LoaderUitlity.hpp" />
-    <ClInclude Include="Sources\Loader\Mesh\MeshLoader.hpp" />
-    <ClInclude Include="Sources\Loader\Mesh\MeshLoaderLibrary.hpp" />
-    <ClInclude Include="Sources\Loader\Mesh\OBJMeshLoader.hpp" />
-    <ClInclude Include="Sources\Loader\Texture\TextureLoader.hpp" />
-    <ClInclude Include="Sources\Loader\Texture\TextureLoaderLibrary.hpp" />
-    <ClInclude Include="Sources\Loader\Texture\WICTextureLoader.hpp" />
-    <ClInclude Include="Sources\Renderer\ParallelRasterizer.hpp" />
-    <ClInclude Include="Sources\Renderer\Rasterizer.hpp" />
-    <ClInclude Include="Sources\Shader\FragmentShader.hpp" />
-    <ClInclude Include="Sources\Shader\VertexShader.hpp" />
-    <ClInclude Include="Sources\Utility\Delegate.hpp" />
-    <ClInclude Include="Sources\Utility\Math.hpp" />
-    <ClInclude Include="Sources\Utility\Number.hpp" />
-    <ClInclude Include="Sources\Utility\RunnableTask.hpp" />
-    <ClInclude Include="Sources\Utility\SIMD.hpp" />
-    <ClInclude Include="Sources\Utility\Singleton.hpp" />
-    <ClInclude Include="Sources\Windows\D2DApp.hpp" />
-    <ClInclude Include="Sources\Windows\resource.h" />
-    <ClInclude Include="Sources\Windows\WindowsTargetVersion.h" />
+    <ClInclude Include="Sources\Core\Base\Algorithm\KahanSummation.hpp" />
+    <ClInclude Include="Sources\Core\Base\Container\Array.hpp" />
+    <ClInclude Include="Sources\Core\Base\Container\Bulkdata.hpp" />
+    <ClInclude Include="Sources\Core\Base\Container\Detail\String.hpp" />
+    <ClInclude Include="Sources\Core\Base\Container\String.hpp" />
+    <ClInclude Include="Sources\Core\Base\Pattern\Delegate.hpp" />
+    <ClInclude Include="Sources\Core\Base\Pattern\Singleton.hpp" />
+    <ClInclude Include="Sources\Core\Base\Thread\ParallelFor.hpp" />
+    <ClInclude Include="Sources\Core\Base\Thread\RunnableTask.hpp" />
+    <ClInclude Include="Sources\Core\Math\Color.hpp" />
+    <ClInclude Include="Sources\Core\Math\Math.hpp" />
+    <ClInclude Include="Sources\Core\Math\Matrix.hpp" />
+    <ClInclude Include="Sources\Core\Math\Number.hpp" />
+    <ClInclude Include="Sources\Core\Math\Rotator.hpp" />
+    <ClInclude Include="Sources\Core\Math\SIMD.hpp" />
+    <ClInclude Include="Sources\Engine\Component\CameraComponent.hpp" />
+    <ClInclude Include="Sources\Engine\Component\MeshletComponent.hpp" />
+    <ClInclude Include="Sources\Engine\Component\PointLightComponent.hpp" />
+    <ClInclude Include="Sources\Engine\Input\InputSystem.hpp" />
+    <ClInclude Include="Sources\Engine\Renderer\Rasterizer.hpp" />
+    <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp" />
+    <ClInclude Include="Sources\Engine\Render\RenderVisibilityBuffer.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingCamera.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingLight.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingMaterial.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingMeshlet.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingPixel.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingPolygon.hpp" />
+    <ClInclude Include="Sources\Engine\Render\ShadingTexture.hpp" />
+    <ClInclude Include="Sources\Engine\Shader\FragmentShader.hpp" />
+    <ClInclude Include="Sources\Engine\Shader\VertexShader.hpp" />
+    <ClInclude Include="Sources\Engine\World\RenderWorld.hpp" />
+    <ClInclude Include="Sources\Engine.hpp" />
+    <ClInclude Include="Sources\Platform\Windows\D2DApp.hpp" />
+    <ClInclude Include="Sources\Platform\Windows\resource.h" />
+    <ClInclude Include="Sources\Platform\Windows\WindowsTargetVersion.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sources\Core\TextureSampler.cpp" />
-    <ClCompile Include="Sources\FreezeRender.cpp" />
-    <ClCompile Include="Sources\Loader\Mesh\MeshLoaderLibrary.cpp" />
-    <ClCompile Include="Sources\Loader\Mesh\OBJMeshLoader.cpp" />
-    <ClCompile Include="Sources\Loader\Texture\TextureLoaderLibrary.cpp" />
-    <ClCompile Include="Sources\Loader\Texture\WICTextureLoader.cpp" />
+    <ClCompile Include="Sources\Asset\Meshlet\Loader\MeshLoaderLibrary.cpp" />
+    <ClCompile Include="Sources\Asset\Meshlet\Loader\OBJMeshLoader.cpp" />
+    <ClCompile Include="Sources\Asset\Texture\Loader\TextureLoaderLibrary.cpp" />
+    <ClCompile Include="Sources\Asset\Texture\Loader\WICTextureLoader.cpp" />
+    <ClCompile Include="Sources\Asset\World\Loader\WorldLoaderLibrary.cpp" />
+    <ClCompile Include="Sources\Engine\Component\CameraComponent.cpp" />
+    <ClCompile Include="Sources\Engine\Component\MeshletComponent.cpp" />
+    <ClCompile Include="Sources\Engine\Component\PointLightComponent.cpp" />
+    <ClCompile Include="Sources\Engine\Input\InputSystem.cpp" />
+    <ClCompile Include="Sources\Engine\Renderer\Rasterizer.cpp" />
+    <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp" />
+    <ClCompile Include="Sources\Engine\Shader\FragmentShader.cpp" />
+    <ClCompile Include="Sources\Engine\Shader\VertexShader.cpp" />
+    <ClCompile Include="Sources\Engine\World\RenderWorld.cpp" />
+    <ClCompile Include="Sources\Engine.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
-    <ClCompile Include="Sources\Renderer\ParallelRasterizer.cpp" />
-    <ClCompile Include="Sources\Renderer\Rasterizer.cpp" />
-    <ClCompile Include="Sources\Shader\FragmentShader.cpp" />
-    <ClCompile Include="Sources\Shader\VertexShader.cpp" />
-    <ClCompile Include="Sources\Windows\D2DApp.cpp" />
+    <ClCompile Include="Sources\Platform\Windows\D2DApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
-    <None Include="Sources\Container\String.inl" />
-    <None Include="Sources\Core\Color.inl" />
-    <None Include="Sources\Core\Matrix.inl" />
-    <None Include="Sources\Core\Rotator.inl" />
-    <None Include="Sources\Utility\Math.inl" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Sources\Windows\FreezeRender.ico" />
-    <Image Include="Sources\Windows\small.ico" />
+    <Image Include="Sources\Platform\Windows\FreezeRender.ico" />
+    <Image Include="Sources\Platform\Windows\small.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Sources\Windows\FreezeRender.rc" />
+    <ResourceCompile Include="Sources\Platform\Windows\FreezeRender.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -98,26 +112,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -147,11 +161,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>..\FreezeRender\Sources;$(IncludePath)</IncludePath>
+    <IncludePath>..\FreezeRender\Sources;..\FreezeRender\Sources\Core;..\FreezeRender\Sources\Core\Base;..\FreezeRender\Sources\Engine</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>..\FreezeRender\Sources</IncludePath>
+    <IncludePath>..\FreezeRender\Sources;..\FreezeRender\Sources\Core;..\FreezeRender\Sources\Core\Base;..\FreezeRender\Sources\Engine</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
