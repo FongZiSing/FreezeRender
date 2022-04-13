@@ -93,6 +93,7 @@ private:
 	
 
 	//~ Begin internal message handle.
+	
 	HRESULT OnCreate();
 
 	LRESULT OnActivate(const WPARAM& nFlags, const HWND& hwnd);
@@ -124,6 +125,7 @@ private:
 	LRESULT OnExitSizeMove();
 
 	LRESULT OnDestroy();
+	
 	//~ End internal message handle.
 
 
@@ -152,6 +154,7 @@ protected:
 
 private:
 	//~ Begin D2D
+
 	D2D1_RECT_U                 m_rect = { 0, 0, m_width, m_height };
 
 	ComPtr<ID3D11Device>        m_pD3DDevice;
@@ -173,12 +176,19 @@ private:
 	D3D_FEATURE_LEVEL           m_featureLevel;
 
 	DXGI_PRESENT_PARAMETERS     m_parameters;
+
 	//~ End D2D
 
 
 	//~ Begin operation.
-	bool                        m_bResizing = false;
+
+	bool         m_bResizing = false;
 	
-	bool                        m_bWindowMaximum = false;
+	bool         m_bWindowMaximum = false;
+
+	bool         m_bWindowMinimum = false;
+
+	unsigned int m_PressingMouseNum = 0;
+
 	//~ End operation.
 };

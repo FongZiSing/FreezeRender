@@ -77,8 +77,6 @@ void RenderWorld::ScreenResize(const unsigned int& width, const unsigned int& he
 
 void RenderWorld::Tick(float deltaTime)
 {
-	assert(GInput != nullptr);
-
 	for (auto& camera : logic.cameras)
 	{
 		camera.TickComponent(deltaTime);

@@ -14,6 +14,9 @@
 #pragma comment(lib, "d2d1.lib" )
 #pragma comment(lib, "dxguid.lib")
 
+#define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
+#define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
+
 
 
 /**
@@ -140,7 +143,7 @@ void D2DApp::Draw(
 	unsigned int strides
 )
 {
-	if (m_pD2DDeviceContext && m_pD2DRenderTarget)
+	if (m_pD2DDeviceContext && m_pD2DRenderTarget && !m_bWindowMinimum)
 	{
 		m_pD2DRenderTarget->CopyFromMemory(&m_rect, bits, strides);
 		m_pD2DDeviceContext->BeginDraw();
@@ -381,7 +384,8 @@ LRESULT D2DApp::OnActivate(const WPARAM& nFlags, const HWND& hwnd)
 	if (WA_INACTIVE == nFlags)
 	{
 		m_bResizing = false;
-		m_bWindowMaximum = false;
+		m_PressingMouseNum = 0;
+		ReleaseCapture();
 	}
 	return FALSE;
 }
@@ -410,6 +414,8 @@ LRESULT D2DApp::OnLeftMouseDown(const WPARAM& nFlags, const int& x, const int& y
 	// An application should return zero if it processes this message.
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttondown
 	HandleLeftMouseDownEvent(nFlags, x, y);
+	SetCapture(m_hWnd);
+	m_PressingMouseNum++;
 	return FALSE;
 }
 
@@ -419,6 +425,12 @@ LRESULT D2DApp::OnLeftMouseUp(const WPARAM& nFlags, const int& x, const int& y)
 	// An application should return zero if it processes this message.
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
 	HandleLeftMouseUpEvent(nFlags, x, y);
+	ReleaseCapture();
+	m_PressingMouseNum = std::max(0u, m_PressingMouseNum - 1);
+	if (0 == m_PressingMouseNum)
+	{
+		ReleaseCapture();
+	}
 	return FALSE;
 }
 
@@ -428,6 +440,7 @@ LRESULT D2DApp::OnMiddleMouseDown(const WPARAM& nFlags, const int& x, const int&
 	// An application should return zero if it processes this message.
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondown
 	HandleMiddleMouseDownEvent(nFlags, x, y);
+	SetCapture(m_hWnd);
 	return FALSE;
 }
 
@@ -440,6 +453,11 @@ LRESULT D2DApp::OnMiddleMouseUp(const WPARAM& nFlags, const int& x, const int& y
 	//     Because TrackPopupMenu is an asynchronous call and the WM_MBUTTONUP notification does not have a special flag indicating coordinate derivation,
 	//     an application cannot tell if the x,y coordinates contained in lParam are relative to the screen or the client area.
 	HandleMiddleMouseUpEvent(nFlags, x, y);
+	m_PressingMouseNum = std::max(0u, m_PressingMouseNum - 1);
+	if (0 == m_PressingMouseNum)
+	{
+		ReleaseCapture();
+	}
 	return FALSE;
 }
 
@@ -449,6 +467,7 @@ LRESULT D2DApp::OnRightMouseDown(const WPARAM& nFlags, const int& x, const int& 
 	// An application should return zero if it processes this message.
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondown
 	HandleRightMouseDownEvent(nFlags, x, y);
+	SetCapture(m_hWnd);
 	return FALSE;
 }
 
@@ -458,6 +477,11 @@ LRESULT D2DApp::OnRightMouseUp(const WPARAM& nFlags, const int& x, const int& y)
 	// An application should return zero if it processes this message.
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttonup
 	HandleRightMouseUpEvent(nFlags, x, y);
+	m_PressingMouseNum = std::max(0u, m_PressingMouseNum - 1);
+	if (0 == m_PressingMouseNum)
+	{
+		ReleaseCapture();
+	}
 	return FALSE;
 }
 
@@ -505,18 +529,20 @@ LRESULT D2DApp::OnSize(const WPARAM& nFlags, const UINT& width, const UINT& heig
 	m_height = height;
 	m_rect.right = width;
 	m_rect.bottom = height;
+
 	if (nFlags == SIZE_MAXIMIZED)
 	{
-		m_bWindowMaximum = true;
 		CreateWindowSizeDependentResources();
 		HandleResizeEvent(width, height);
 	}
 	else if (nFlags == SIZE_RESTORED && m_bWindowMaximum)
 	{
-		m_bWindowMaximum = false;
 		CreateWindowSizeDependentResources();
 		HandleResizeEvent(width, height);
 	}
+
+	m_bWindowMaximum = (nFlags == SIZE_MAXIMIZED);
+	m_bWindowMinimum = (nFlags == SIZE_MINIMIZED);
 	return FALSE;
 }
 
@@ -649,7 +675,7 @@ LRESULT D2DApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_MBUTTONUP:      return pThis->OnMiddleMouseDown(wParam, LOWORD(lParam), HIWORD(lParam));
 		case WM_RBUTTONUP:      return pThis->OnRightMouseUp(wParam, LOWORD(lParam), HIWORD(lParam));
 
-		case WM_MOUSEMOVE:      return pThis->OnMouseMove(wParam, LOWORD(lParam), HIWORD(lParam));
+		case WM_MOUSEMOVE:      return pThis->OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 		case WM_MOUSEWHEEL:     return pThis->OnMouseWheel(LOWORD(wParam), HIWORD(wParam), LOWORD(lParam), HIWORD(lParam));
 
 		case WM_SIZING:         return pThis->OnSizing(wParam);
