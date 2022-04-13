@@ -198,9 +198,6 @@
     <ClInclude Include="Sources\Engine\Render\ShadingLight.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Asset\Light\Light.hpp">
-      <Filter>Sources\Asset %28 Resource Layer %29\Light\Loader</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Asset\World\World.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\World</Filter>
     </ClInclude>
@@ -263,6 +260,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Core\Math\Rotator.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Asset\Light\Light.hpp">
+      <Filter>Sources\Asset %28 Resource Layer %29\Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
