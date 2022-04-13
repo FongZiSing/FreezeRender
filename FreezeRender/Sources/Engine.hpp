@@ -5,12 +5,6 @@
 
 
 
-class Rasterizer;
-class RenderWorld;
-class InputSystem;
-
-
-
 /**
  * @brief The FreezeRender root system.
  */
@@ -44,12 +38,5 @@ protected:
 	 * @brief The root entry of tick system, call every frame.
 	 */
 	virtual void Tick(const float deltaTime) override;
-
-private:
-	std::unique_ptr<Rasterizer> raster;
-
-	std::unique_ptr<RenderWorld> world;
-
-	std::unique_ptr<InputSystem> input;
 };
 

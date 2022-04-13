@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Container/Array.hpp>
+#include <Pattern/Singleton.hpp>
 #include <Render/ShadingLight.hpp>
 #include <Component/CameraComponent.hpp>
 #include <Component/MeshletComponent.hpp>
@@ -56,4 +57,4 @@ private:
 	void Tick(float deltaTime);
 };
 
-extern RenderWorld* GWorld;
+extern UniqueResource<RenderWorld> GWorld;

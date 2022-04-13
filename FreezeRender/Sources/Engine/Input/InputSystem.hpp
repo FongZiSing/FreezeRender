@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Math/SIMD.hpp>
+#include <Pattern/Singleton.hpp>
 
 
 
@@ -231,4 +232,4 @@ public:
 	~InputSystem();
 };
 
-extern InputSystem* GInput;
+extern UniqueResource<InputSystem> GInput;

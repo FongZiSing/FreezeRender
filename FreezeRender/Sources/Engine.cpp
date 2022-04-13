@@ -6,6 +6,15 @@
 
 
 
+/**
+ * @brief Global InputSystem.
+ */
+UniqueResource<Rasterizer> GRaster;
+UniqueResource<RenderWorld> GWorld;
+UniqueResource<InputSystem> GInput;
+
+
+
 Engine::Engine()
 {
 }
@@ -16,90 +25,90 @@ Engine::~Engine()
 
 bool Engine::HandleCreateEvent(UINT width, UINT height)
 {
-	raster = std::make_unique<Rasterizer>();
-	world = std::make_unique<RenderWorld>();
-	input = std::make_unique<InputSystem>();
+	//raster = std::make_unique<Rasterizer>();
+	//world = std::make_unique<RenderWorld>();
+	//input = std::make_unique<InputSystem>();
 	
-	raster->Startup(width, height);
-	world->Startup(width, height);
+	GRaster->Startup(width, height);
+	GWorld->Startup(width, height);
 	return true;
 }
 
 void Engine::HandleKeyDownEvent(WPARAM nKey)
 {
-	input->PressedKey(static_cast<unsigned char>(nKey));
+	GInput->PressedKey(static_cast<unsigned char>(nKey));
 }
 
 void Engine::HandleKeyUpEvent(WPARAM nKey)
 {
-	input->ReleasedKey(static_cast<unsigned char>(nKey));
+	GInput->ReleasedKey(static_cast<unsigned char>(nKey));
 }
 
 void Engine::HandleLeftMouseDownEvent(WPARAM nFlags, int x, int y)
 {
-	input->PressedMouse(InputSystem::VM_L, x, y);
+	GInput->PressedMouse(InputSystem::VM_L, x, y);
 }
 
 void Engine::HandleLeftMouseUpEvent(WPARAM nFlags, int x, int y)
 {
-	input->ReleasedMouse(InputSystem::VM_L, x, y);
+	GInput->ReleasedMouse(InputSystem::VM_L, x, y);
 }
 
 void Engine::HandleMiddleMouseDownEvent(WPARAM nFlags, int x, int y)
 {
-	input->PressedMouse(InputSystem::VM_M, x, y);
+	GInput->PressedMouse(InputSystem::VM_M, x, y);
 }
 
 void Engine::HandleMiddleMouseUpEvent(WPARAM nFlags, int x, int y)
 {
-	input->ReleasedMouse(InputSystem::VM_M, x, y);
+	GInput->ReleasedMouse(InputSystem::VM_M, x, y);
 }
 
 void Engine::HandleRightMouseDownEvent(WPARAM nFlags, int x, int y)
 {
-	input->PressedMouse(InputSystem::VM_R, x, y);
+	GInput->PressedMouse(InputSystem::VM_R, x, y);
 }
 
 void Engine::HandleRightMouseUpEvent(WPARAM nFlags, int x, int y)
 {
-	input->ReleasedMouse(InputSystem::VM_R, x, y);
+	GInput->ReleasedMouse(InputSystem::VM_R, x, y);
 }
 
 void Engine::HandleMouseMoveEvent(WPARAM nFlags, int x, int y)
 {
-	input->MovingMouse(x, y);
+	GInput->MovingMouse(x, y);
 }
 
 void Engine::HandleMouseWheelEvent(UINT nFlags, short zDelta, int x, int y)
 {
-	input->WheelingMouse(x, y, zDelta);
+	GInput->WheelingMouse(x, y, zDelta);
 }
 
 void Engine::HandleResizeEvent(UINT width, UINT height)
 {
-	world->ScreenResize(width, height);
-	raster->ScreenResize(width, height);
+	GWorld ->ScreenResize(width, height);
+	GRaster->ScreenResize(width, height);
 }
 
 void Engine::HandleDestroyEvent()
 {
-	raster->Shutdown();
-	world->Shutdown();
+	GRaster->Shutdown();
+	GWorld->Shutdown();
 }
 
 void Engine::Tick(const float deltaTime)
 {
 	// Update window state.
-	input->Window.Resizing = IsResizing();
-	input->Window.Maximum = IsWindowMaximum();
+	GInput->Window.Resizing = IsResizing();
+	GInput->Window.Maximum = IsWindowMaximum();
 
 	// Tick logic.
-	world->Tick(deltaTime);
+	GWorld->Tick(deltaTime);
 
 	// Tick Render.
-	auto& result = raster->Render(world->render.cameras[0], world->render.meshlets, world->render.pointlights);
+	auto& result = GRaster->Render(GWorld->render.cameras[0], GWorld->render.meshlets, GWorld->render.pointlights);
 	Draw(result.Data(), (UINT)result.Width(), (UINT)result.Height(), result.Width() * 4u);
 	
 	// Reset input.
-	input->Reset();
+	GInput->Reset();
 }

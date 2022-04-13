@@ -9,6 +9,7 @@
 #include <Math/Matrix.hpp>
 #include <Shader/VertexShader.hpp>
 #include <Shader/FragmentShader.hpp>
+#include <Pattern/Singleton.hpp>
 
 
 
@@ -52,3 +53,5 @@ protected:
 	bool BackFaceCulling(const ShadingTriangle& triangle);
 	void HomogeneousClipping(const ShadingTriangle& inTriangle, ShadingTriangle* outTriangles, int& triangleNum);
 };
+
+extern UniqueResource<Rasterizer> GRaster;

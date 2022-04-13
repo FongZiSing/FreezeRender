@@ -4,12 +4,6 @@
 #include <Input/InputSystem.hpp>
 
 
-/**
- * @brief Global RenderWorld.
- */
-RenderWorld* GWorld = nullptr;
-
-
 
 /**
  * @brief Internal data of RenderWorld.
@@ -23,12 +17,10 @@ inline namespace RenderWorldData
 
 RenderWorld::RenderWorld()
 {
-	GWorld = this;
 }
 
 RenderWorld::~RenderWorld()
 {
-	GWorld = nullptr;
 }
 
 void RenderWorld::Load()
