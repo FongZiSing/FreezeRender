@@ -57,15 +57,13 @@ protected:
 	virtual void HandleResizeEvent(UINT width, UINT height) {}
 
 	virtual void HandleDestroyEvent() {}
-
-	virtual void Tick(const float deltaTime) = 0;
 	
 	//~ End override message handle.
 
 
-	bool IsResizing() const noexcept { return m_bResizing; }
+	//~ Begin Engine.
 
-	bool IsWindowMaximum() const noexcept { return m_bWindowMaximum; }
+	virtual void Tick(const float deltaTime) = 0;
 
 	void Draw(
 		const unsigned char* bits,
@@ -73,6 +71,12 @@ protected:
 		unsigned int height,
 		unsigned int strides
 	);
+
+	//~ End Engine.
+
+	bool IsResizing() const noexcept { return m_bResizing; }
+
+	bool IsWindowMaximum() const noexcept { return m_bWindowMaximum; }
 
 private:
 	// Initialize device-independent resources.
@@ -84,13 +88,17 @@ private:
 	// Device-dependent resources when window resize.
 	void CreateWindowSizeDependentResources();
 
-	// Calculate frames info.
-	void CalculateFrameStats();
+	// Text resources.
+	HRESULT CreateDrawTextResources();
 
-	// Interanl tick.
-	void OnTick(const float& deltaTime);
-	
-	
+	// Called every frames.
+	bool BeginDraw();
+
+	// Update frames info.
+	void UpdateFrameStats(const float& deltaTime, const unsigned int& elapsedTime);
+
+	// Called every frames.
+	void EndDraw();
 
 	//~ Begin internal message handle.
 	
@@ -152,6 +160,8 @@ protected:
 	
 	UINT                        m_height = 700;
 
+	unsigned long long          m_frameCount = 0;
+
 private:
 	//~ Begin D2D
 
@@ -173,6 +183,14 @@ private:
 
 	ComPtr<IDXGISwapChain1>     m_pSwapChain;
 
+	ComPtr<IDWriteFactory>      m_pWriteFactory;
+
+	ComPtr<IDWriteTextFormat>   m_pWriteTextFormat;
+
+	D2D1_RECT_F                 m_textLayoutRect_FPS;
+
+	ComPtr<ID2D1SolidColorBrush> m_pBrush_FPS;
+
 	D3D_FEATURE_LEVEL           m_featureLevel;
 
 	DXGI_PRESENT_PARAMETERS     m_parameters;
@@ -181,6 +199,8 @@ private:
 
 
 	//~ Begin operation.
+
+	bool         m_bDestory = false;
 
 	bool         m_bResizing = false;
 	

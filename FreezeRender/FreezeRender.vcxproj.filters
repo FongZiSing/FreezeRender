@@ -110,6 +110,12 @@
     <Filter Include="Sources\Editor %28 Tool Layer %29\TODO">
       <UniqueIdentifier>{e5587bef-4afe-4d76-a3ef-857a4c9e2f04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Core %28 Core Layer %29\Base\Utility">
+      <UniqueIdentifier>{b03a1fed-ebb7-4d01-a180-1fcbca5d39db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Platform %28 Platform Layer %29\Windows\Utility">
+      <UniqueIdentifier>{147d0dda-c9a8-4bd1-976c-4d6f420a85b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Engine.hpp" />
@@ -312,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Engine\Shader\VertexShader.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Platform\Windows\Timer.hpp">
+      <Filter>Sources\Platform %28 Platform Layer %29\Windows\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

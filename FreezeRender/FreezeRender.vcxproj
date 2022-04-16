@@ -90,6 +90,7 @@
     <ClCompile Include="Sources\Engine.cpp" />
     <ClCompile Include="Sources\Main.cpp" />
     <ClCompile Include="Sources\Platform\Windows\D2DApp.cpp" />
+    <ClCompile Include="Sources\Platform\Windows\Timer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />

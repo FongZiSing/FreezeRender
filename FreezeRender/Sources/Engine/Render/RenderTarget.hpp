@@ -34,7 +34,7 @@ public:
 		{
 			width = inWidth;
 			height = inHeight;
-			data.Reallocate(inWidth * inHeight);
+			data.Reallocate(1LL * inWidth * inHeight);
 			data.Initialize(PixelTraits::defaultPixelValue);
 		}
 	}

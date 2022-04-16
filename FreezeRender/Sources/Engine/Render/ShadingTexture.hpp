@@ -383,6 +383,10 @@ public:
 				sampler = TextureSamplerDetail::Nearest[entry];
 			}
 		}
+		else
+		{
+			sampler = nullptr;
+		}
 	}
 
 	force_inline Color operator() (const Vector2& uv) const noexcept { return sampler(target, uv.x, uv.y); }

@@ -1,123 +1,27 @@
-﻿#include "WindowsTargetVersion.h"
+﻿#include "D2DApp.hpp"
 
-#include "D2DApp.hpp"
+// Windows header.
+#include "WindowsTargetVersion.h"
 #include "Resource.h"
-
-#include <Container/Array.hpp>
-
-// C++ RunTime Header.
-#include <sstream>
-#include <Common.hpp>
+#include "Timer.hpp"
+#include <dwrite.h>
 
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d2d1.lib" )
 #pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "Dwrite.lib")
+
 
 #define GET_X_LPARAM(lp) ((int)(short)LOWORD(lp))
 #define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
 
+// Engine header.
+#include <Container/Array.hpp>
 
-
-/**
- * @brief time counter.
- */
-class D2D1Timer
-{
-public:
-
-	D2D1Timer()
-	{
-		m_secondsPerCount = 1.0 / static_cast<double>(GetPerformanceFrequency());
-	}
-
-	warn_nodiscard float TotalTime() const
-	{
-		return m_bStopped
-			? static_cast<float>(((m_stopTime - m_pausedTime) - m_baseTime) * m_secondsPerCount)
-			: static_cast<float>(((m_currTime - m_pausedTime) - m_baseTime) * m_secondsPerCount);
-	}
-
-	warn_nodiscard float GetDeltaTime() const
-	{
-		return static_cast<float>(m_deltaTime);
-	}
-
-	void Reset()
-	{
-		__int64 tempCurTime = GetPerformanceCounter();
-		m_baseTime = tempCurTime;
-		m_prevTime = tempCurTime;
-		m_stopTime = 0;
-		m_bStopped = false;
-	}
-
-	void Start()
-	{
-		if (m_bStopped)
-		{
-			__int64 tempCurTime = GetPerformanceCounter();
-			m_pausedTime += (tempCurTime - m_stopTime);
-			m_prevTime = tempCurTime;
-			m_stopTime = 0;
-			m_bStopped = false;
-		}
-	}
-
-	void Stop()
-	{
-		if (!m_bStopped)
-		{
-			__int64 TempCurTime = GetPerformanceCounter();
-			m_stopTime = TempCurTime;
-			m_bStopped = true;
-		}
-	}
-
-	void Tick()
-	{
-		if (m_bStopped)
-		{
-			m_deltaTime = 0.0;
-			return;
-		}
-
-		__int64 tempCurTime = GetPerformanceCounter();
-		m_currTime = tempCurTime;
-		m_deltaTime = (m_currTime - m_prevTime) * m_secondsPerCount;
-		m_prevTime = m_currTime;
-		if (m_deltaTime < 0.0)
-		{
-			m_deltaTime = 0.0;
-		}
-	}
-
-private:
-	force_inline __int64 GetPerformanceFrequency() const
-	{
-		__int64 frequency;
-		QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
-		return frequency;
-	}
-
-	force_inline __int64 GetPerformanceCounter() const
-	{
-		__int64 counter;
-		QueryPerformanceCounter((LARGE_INTEGER*)&counter);
-		return counter;
-	}
-
-	bool	m_bStopped = false;
-
-	double	m_secondsPerCount = 0.0;
-	double	m_deltaTime = -1.0;
-
-	__int64	m_baseTime = 0;
-	__int64	m_pausedTime = 0;
-	__int64	m_stopTime = 0;
-	__int64	m_prevTime = 0;
-	__int64	m_currTime = 0;
-} g_timer;
+// C++ RunTime Header.
+#include <sstream>
+#include <Common.hpp>
 
 
 
@@ -130,6 +34,7 @@ D2DApp::D2DApp()
 	m_parameters.pDirtyRects = nullptr;
 	m_parameters.pScrollRect = nullptr;
 	m_parameters.pScrollOffset = nullptr;
+	m_textLayoutRect_FPS = D2D1::RectF();
 }
 
 D2DApp::~D2DApp()
@@ -143,14 +48,8 @@ void D2DApp::Draw(
 	unsigned int strides
 )
 {
-	if (m_pD2DDeviceContext && m_pD2DRenderTarget && !m_bWindowMinimum)
-	{
-		m_pD2DRenderTarget->CopyFromMemory(&m_rect, bits, strides);
-		m_pD2DDeviceContext->BeginDraw();
-		m_pD2DDeviceContext->DrawBitmap(m_pD2DRenderTarget.Get());
-		m_pD2DDeviceContext->EndDraw();
-		m_pSwapChain->Present(0, 0);
-	}
+	m_pD2DRenderTarget->CopyFromMemory(&m_rect, bits, strides);
+	m_pD2DDeviceContext->DrawBitmap(m_pD2DRenderTarget.Get());
 }
 
 HRESULT D2DApp::CreateDeviceIndependentResources()
@@ -161,6 +60,7 @@ HRESULT D2DApp::CreateDeviceIndependentResources()
 		__uuidof(ID2D1Factory1),
 		reinterpret_cast<void**>(m_pD2DFactory.GetAddressOf())
 	);
+
 	return hr;
 }
 
@@ -169,7 +69,6 @@ HRESULT D2DApp::CreateDeviceResources()
 	ComPtr<IDXGIDevice1> pDxgiDevice;
 	HRESULT hr = S_OK;
 
-	if (SUCCEEDED(hr))
 	{
 		UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #ifdef _DEBUG
@@ -328,31 +227,80 @@ void D2DApp::CreateWindowSizeDependentResources()
 	}
 }
 
-void D2DApp::CalculateFrameStats()
+HRESULT D2DApp::CreateDrawTextResources()
 {
-	static int frameCnt = 0;
-	static float timeElapsed = 0.0f;
-	frameCnt++;
+	HRESULT hr = S_OK;
 
-	if ((g_timer.TotalTime() - timeElapsed) >= 1.0f)
 	{
-		float fps = static_cast<float>(frameCnt); // fps = frameCnt / 1
-		float mspf = 1000.0f / fps;
-		std::ostringstream out;
-		out.precision(6);
-		out << m_wndCaption
-			<< " | " << "FPS: " << fps
-			<< " | " << "Frame Time: " << mspf << " ms";
-		SetWindowTextA(m_hWnd, out.str().c_str());
-		timeElapsed += 1.0f;
-		frameCnt = 0;
+		hr = DWriteCreateFactory(
+			DWRITE_FACTORY_TYPE_SHARED,
+			__uuidof(IDWriteFactory),
+			reinterpret_cast<IUnknown**>(m_pWriteFactory.GetAddressOf())
+		);
 	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pWriteFactory->CreateTextFormat(
+			L"Calibri",                      // Font family name
+			NULL,                             // Font collection(NULL sets it to the system font collection)
+			DWRITE_FONT_WEIGHT_REGULAR,       // Weight
+			DWRITE_FONT_STYLE_NORMAL,         // Style
+			DWRITE_FONT_STRETCH_NORMAL,       // Stretch
+			16.0f,                            // Size    
+			L"en-us",                         // Local
+			m_pWriteTextFormat.GetAddressOf() // Pointer to recieve the created object
+		);
+
+		m_textLayoutRect_FPS = D2D1::RectF(
+			static_cast<float>(12),
+			static_cast<float>(12),
+			static_cast<float>(152),
+			static_cast<float>(63)
+		);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = m_pD2DDeviceContext->CreateSolidColorBrush(
+			D2D1::ColorF(RGB(32, 137, 77)),
+			m_pBrush_FPS.GetAddressOf()
+		);
+	}
+
+	return hr;
 }
 
-void D2DApp::OnTick(const float& deltaTime)
+bool D2DApp::BeginDraw()
 {
-	Tick(deltaTime);
-	CalculateFrameStats();
+	if (m_pD2DDeviceContext && m_pD2DRenderTarget && !m_bWindowMinimum && !m_bDestory)
+	{
+		m_pD2DDeviceContext->BeginDraw();
+		return true;
+	}
+	return false;
+}
+
+void D2DApp::UpdateFrameStats(const float& deltaTime, const unsigned int& fps)
+{
+	std::wostringstream out;
+	out.precision(6);
+	out << "fps:\t" << fps << "\nmspf:\t" << deltaTime << " ms";
+
+	std::wstring stats = out.str();
+	m_pD2DDeviceContext->DrawText(
+		stats.c_str(),
+		(UINT32)stats.size(),
+		m_pWriteTextFormat.Get(),
+		m_textLayoutRect_FPS,
+		m_pBrush_FPS.Get()
+	);
+}
+
+void D2DApp::EndDraw()
+{
+	m_pD2DDeviceContext->EndDraw();
+	m_pSwapChain->Present(0, 0);
 }
 
 HRESULT D2DApp::OnCreate()
@@ -370,6 +318,11 @@ HRESULT D2DApp::OnCreate()
 	{
 		CreateWindowSizeDependentResources();
 		hr = HandleCreateEvent(m_width, m_height) ? S_OK : S_FALSE;
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = CreateDrawTextResources();
 	}
 
 	return hr;
@@ -426,9 +379,10 @@ LRESULT D2DApp::OnLeftMouseUp(const WPARAM& nFlags, const int& x, const int& y)
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-lbuttonup
 	HandleLeftMouseUpEvent(nFlags, x, y);
 	ReleaseCapture();
-	m_PressingMouseNum = std::max(0u, m_PressingMouseNum - 1);
-	if (0 == m_PressingMouseNum)
+	m_PressingMouseNum--;
+	if (m_PressingMouseNum <= 0)
 	{
+		m_PressingMouseNum = 0;
 		ReleaseCapture();
 	}
 	return FALSE;
@@ -441,6 +395,7 @@ LRESULT D2DApp::OnMiddleMouseDown(const WPARAM& nFlags, const int& x, const int&
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-mbuttondown
 	HandleMiddleMouseDownEvent(nFlags, x, y);
 	SetCapture(m_hWnd);
+	m_PressingMouseNum++;
 	return FALSE;
 }
 
@@ -453,9 +408,10 @@ LRESULT D2DApp::OnMiddleMouseUp(const WPARAM& nFlags, const int& x, const int& y
 	//     Because TrackPopupMenu is an asynchronous call and the WM_MBUTTONUP notification does not have a special flag indicating coordinate derivation,
 	//     an application cannot tell if the x,y coordinates contained in lParam are relative to the screen or the client area.
 	HandleMiddleMouseUpEvent(nFlags, x, y);
-	m_PressingMouseNum = std::max(0u, m_PressingMouseNum - 1);
-	if (0 == m_PressingMouseNum)
+	m_PressingMouseNum--;
+	if (m_PressingMouseNum <= 0)
 	{
+		m_PressingMouseNum = 0;
 		ReleaseCapture();
 	}
 	return FALSE;
@@ -468,6 +424,7 @@ LRESULT D2DApp::OnRightMouseDown(const WPARAM& nFlags, const int& x, const int& 
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttondown
 	HandleRightMouseDownEvent(nFlags, x, y);
 	SetCapture(m_hWnd);
+	m_PressingMouseNum++;
 	return FALSE;
 }
 
@@ -477,9 +434,10 @@ LRESULT D2DApp::OnRightMouseUp(const WPARAM& nFlags, const int& x, const int& y)
 	// An application should return zero if it processes this message.
 	// @see https://docs.microsoft.com/en-us/windows/win32/inputdev/wm-rbuttonup
 	HandleRightMouseUpEvent(nFlags, x, y);
-	m_PressingMouseNum = std::max(0u, m_PressingMouseNum - 1);
-	if (0 == m_PressingMouseNum)
+	m_PressingMouseNum--;
+	if (m_PressingMouseNum <= 0)
 	{
+		m_PressingMouseNum = 0;
 		ReleaseCapture();
 	}
 	return FALSE;
@@ -568,6 +526,7 @@ LRESULT D2DApp::OnDestroy()
 	// @see https://docs.microsoft.com/en-us/windows/win32/winmsg/wm-destroy
 	HandleDestroyEvent();
 	PostQuitMessage(0);
+	m_bDestory = true;
 	return FALSE;
 }
 
@@ -629,22 +588,34 @@ HRESULT D2DApp::Initialize(HINSTANCE hInstance, int nCmdShow)
 	return hr;
 }
 
-void D2DApp::Run()
+force_noinline void D2DApp::Run()
 {
-	g_timer.Reset();
+	WindowElapsedTimer elapsed {};
+	WindowTimer timer {};
+	MSG msg {};
 
-	MSG msg = {};
 	while (msg.message != WM_QUIT)
 	{
-		g_timer.Tick();
+		//elapsed.UpdateTime(timer);
+
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		else
+		else if (BeginDraw())
 		{
-			OnTick(g_timer.GetDeltaTime());
+			m_frameCount++;
+			timer.Tick();
+			elapsed.Update(timer);
+
+			//~ Begin Engine.
+			Tick(timer.GetDeltaTime());
+			//~ End Engine.
+			
+			UpdateFrameStats(timer.GetDeltaTime(), elapsed.GetFrameNumber());
+			EndDraw();
+			elapsed.Reset(1000.f);
 		}
 	}
 }
