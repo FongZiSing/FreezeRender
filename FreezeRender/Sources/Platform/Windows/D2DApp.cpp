@@ -590,7 +590,6 @@ HRESULT D2DApp::Initialize(HINSTANCE hInstance, int nCmdShow)
 
 force_noinline void D2DApp::Run()
 {
-	WindowElapsedTimer elapsed {};
 	WindowTimer timer {};
 	MSG msg {};
 
@@ -606,16 +605,15 @@ force_noinline void D2DApp::Run()
 		else if (BeginDraw())
 		{
 			m_frameCount++;
-			timer.Tick();
-			elapsed.Update(timer);
+			timer.BeginFrame();
 
-			//~ Begin Engine.
 			Tick(timer.GetDeltaTime());
-			//~ End Engine.
-			
-			UpdateFrameStats(timer.GetDeltaTime(), elapsed.GetFrameNumber());
+
+			UpdateFrameStats(timer.GetDeltaTime(), timer.GetFrameNumber());
+
 			EndDraw();
-			elapsed.Reset(1000.f);
+
+			timer.EndFrame();
 		}
 	}
 }
@@ -643,7 +641,7 @@ LRESULT D2DApp::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case WM_RBUTTONDOWN:    return pThis->OnRightMouseDown(wParam, LOWORD(lParam), HIWORD(lParam));
 
 		case WM_LBUTTONUP:      return pThis->OnLeftMouseUp(wParam, LOWORD(lParam), HIWORD(lParam));
-		case WM_MBUTTONUP:      return pThis->OnMiddleMouseDown(wParam, LOWORD(lParam), HIWORD(lParam));
+		case WM_MBUTTONUP:      return pThis->OnMiddleMouseUp(wParam, LOWORD(lParam), HIWORD(lParam));
 		case WM_RBUTTONUP:      return pThis->OnRightMouseUp(wParam, LOWORD(lParam), HIWORD(lParam));
 
 		case WM_MOUSEMOVE:      return pThis->OnMouseMove(wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));

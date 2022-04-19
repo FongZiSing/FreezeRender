@@ -37,9 +37,11 @@ private:
 
 public:
 	UniqueResource() noexcept = default;
+
 	~UniqueResource() = default;
 
 	UniqueResource(const UniqueResource&) = delete;
+
 	UniqueResource& operator = (const UniqueResource&) = delete;
 
 	constexpr Derived* operator -> () const noexcept { return &resource; }

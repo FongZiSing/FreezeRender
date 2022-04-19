@@ -1,7 +1,11 @@
 #pragma once
 
 #include <Common.hpp>
+#include <cmath>
 
+// Windows Header.
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <Windows.h>
 
 
@@ -30,7 +34,17 @@ public:
 		return static_cast<float>(m_deltaTime);
 	}
 
-	inline void Reset()
+	warn_nodiscard constexpr float GetElapsedTime() const
+	{
+		return static_cast<float>(m_timeElapsed);
+	}
+
+	warn_nodiscard constexpr unsigned int GetFrameNumber() const
+	{
+		return m_framePerElapsed;
+	}
+
+	force_inline void Reset()
 	{
 		__int64 tempCurTime = GetPerformanceCounter();
 		m_baseTime = tempCurTime;
@@ -39,9 +53,7 @@ public:
 		m_bStopped = false;
 	}
 
-
-
-	inline void Start()
+	force_inline void Start()
 	{
 		if (m_bStopped)
 		{
@@ -53,7 +65,7 @@ public:
 		}
 	}
 
-	inline void Stop()
+	force_inline void Stop()
 	{
 		if (!m_bStopped)
 		{
@@ -63,7 +75,7 @@ public:
 		}
 	}
 
-	void Tick()
+	inline void BeginFrame()
 	{
 		if (m_bStopped)
 		{
@@ -74,18 +86,21 @@ public:
 		__int64 tempCurTime = GetPerformanceCounter();
 		m_currTime = tempCurTime;
 		m_deltaTime = (m_currTime - m_prevTime) * m_secondsPerCount;
+		m_deltaTime = std::max(0.0, m_deltaTime);
 		m_prevTime = m_currTime;
-		if (m_deltaTime < 0.0)
-		{
-			m_deltaTime = 0.0;
-		}
 
-		constexpr double elapsed = 4000.0;
-		double totalTime = TotalTime();
-		if (totalTime - m_timeElapsed >= elapsed)
+		m_timeElapsed += m_deltaTime;
+		m_currFrame++;
+	}
+
+	inline void EndFrame()
+	{
+		constexpr double elapsed = 1000.0;
+		if (m_timeElapsed > elapsed)
 		{
-			m_secondsPerCount = 1000.0 / static_cast<double>(GetPerformanceFrequency());
-			m_timeElapsed = totalTime;
+			m_timeElapsed = 0;
+			m_framePerElapsed = m_currFrame - m_lastFrame;
+			m_lastFrame = m_currFrame;
 		}
 	}
 
@@ -107,52 +122,19 @@ private:
 
 
 
-	bool	m_bStopped = false;
+	bool m_bStopped = false;
 
-	double	m_secondsPerCount = 0;
-	double	m_deltaTime = -1.0;
-	double  m_timeElapsed = 0;
+	double m_secondsPerCount = 0;
+	double m_deltaTime = -1.0;
 
 	__int64	m_baseTime = 0;
 	__int64	m_pausedTime = 0;
 	__int64	m_stopTime = 0;
 	__int64	m_prevTime = 0;
 	__int64	m_currTime = 0;
-};
 
 
-
-class WindowElapsedTimer
-{
-public:
-	constexpr float GetDeltaTime()
-	{
-		return m_timeElapsed;
-	}
-
-	constexpr unsigned int GetFrameNumber()
-	{
-		return m_framePerElapsed;
-	}
-
-	constexpr void Update(const WindowTimer& timer)
-	{
-		m_timeElapsed += timer.GetDeltaTime();
-		m_currFrame++;
-	}
-
-	constexpr void Reset(const float&& elapsed)
-	{
-		if (m_timeElapsed > elapsed)
-		{
-			m_timeElapsed = 0;
-			m_framePerElapsed = m_currFrame - m_lastFrame;
-			m_lastFrame = m_currFrame;
-		}
-	}
-
-private:
-	float        m_timeElapsed = 0.f;
+	double m_timeElapsed = 0.0;
 	unsigned int m_lastFrame = 0;
 	unsigned int m_currFrame = 0;
 	unsigned int m_framePerElapsed = 0;
