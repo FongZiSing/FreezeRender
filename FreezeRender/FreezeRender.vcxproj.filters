@@ -116,6 +116,12 @@
     <Filter Include="Sources\Platform %28 Platform Layer %29\Windows\Utility">
       <UniqueIdentifier>{147d0dda-c9a8-4bd1-976c-4d6f420a85b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Engine %28 Function Layer %29\Renderer\RayTracing">
+      <UniqueIdentifier>{00a98784-7cdd-4d74-899e-f5be11431a88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Engine %28 Function Layer %29\Renderer\Raster">
+      <UniqueIdentifier>{09e90335-4be1-4a1d-b00a-11f11b8bc779}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Engine.hpp" />
@@ -219,9 +225,6 @@
     <ClInclude Include="Sources\Engine\Render\ShadingPolygon.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Engine\Renderer\Rasterizer.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
@@ -270,6 +273,9 @@
     <ClInclude Include="Sources\Asset\Light\Light.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\Light</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Engine\Renderer\Raster\Rasterizer.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Renderer\RayTracing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Engine.cpp" />
@@ -291,9 +297,6 @@
     </ClCompile>
     <ClCompile Include="Sources\Engine\World\RenderWorld.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\World</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\Engine\Renderer\Rasterizer.cpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
@@ -321,6 +324,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Platform\Windows\Timer.hpp">
       <Filter>Sources\Platform %28 Platform Layer %29\Windows\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Renderer\RayTracing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

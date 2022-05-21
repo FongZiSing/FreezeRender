@@ -54,7 +54,7 @@
     <ClInclude Include="Sources\Engine\Component\MeshletComponent.hpp" />
     <ClInclude Include="Sources\Engine\Component\PointLightComponent.hpp" />
     <ClInclude Include="Sources\Engine\Input\InputSystem.hpp" />
-    <ClInclude Include="Sources\Engine\Renderer\Rasterizer.hpp" />
+    <ClInclude Include="Sources\Engine\Renderer\Raster\Rasterizer.hpp" />
     <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp" />
     <ClInclude Include="Sources\Engine\Render\RenderVisibilityBuffer.hpp" />
     <ClInclude Include="Sources\Engine\Render\ShadingCamera.hpp" />
@@ -82,7 +82,7 @@
     <ClCompile Include="Sources\Engine\Component\MeshletComponent.cpp" />
     <ClCompile Include="Sources\Engine\Component\PointLightComponent.cpp" />
     <ClCompile Include="Sources\Engine\Input\InputSystem.cpp" />
-    <ClCompile Include="Sources\Engine\Renderer\Rasterizer.cpp" />
+    <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp" />
     <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp" />
     <ClCompile Include="Sources\Engine\Shader\FragmentShader.cpp" />
     <ClCompile Include="Sources\Engine\Shader\VertexShader.cpp" />
