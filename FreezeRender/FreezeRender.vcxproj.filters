@@ -274,7 +274,13 @@
       <Filter>Sources\Asset %28 Resource Layer %29\Light</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Engine\Renderer\Raster\Rasterizer.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Renderer\Raster</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Renderer\RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Renderer\Renderer.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -326,6 +332,9 @@
       <Filter>Sources\Platform %28 Platform Layer %29\Windows\Utility</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Renderer\Raster</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\Renderer\RayTracing</Filter>
     </ClCompile>
   </ItemGroup>

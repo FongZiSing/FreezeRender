@@ -2,6 +2,7 @@
 
 #include <Common.hpp>
 #include <type_traits>
+#include <atomic>
 
 
 
@@ -33,18 +34,40 @@ template <class Derived>
 class UniqueResource
 {
 private:
-	static Derived resource;
+	Derived* resource = nullptr;
+	std::atomic<bool> flag = false;
 
 public:
-	UniqueResource() noexcept = default;
-
-	~UniqueResource() = default;
-
 	UniqueResource(const UniqueResource&) = delete;
 
 	UniqueResource& operator = (const UniqueResource&) = delete;
 
-	constexpr Derived* operator -> () const noexcept { return &resource; }
-};
+	UniqueResource() noexcept = default;
 
-template<class Derived> inline_variable Derived UniqueResource<Derived>::resource;
+	~UniqueResource()
+	{
+		if (resource)
+		{
+			delete resource;
+		}
+		resource = nullptr;
+		flag = false;
+	}
+
+	template<class DerivedClass>
+	constexpr void Initialize(DerivedClass* derivedClass) noexcept
+	{
+		bool oldFlag = flag.load();
+		if (flag.compare_exchange_strong(oldFlag, true))
+		{
+			if (!resource)
+			{
+				resource = derivedClass;
+			}
+		}
+	}
+
+	constexpr Derived* operator -> () const noexcept { return resource; }
+	
+	constexpr Derived* operator * () const noexcept { return resource; }
+};

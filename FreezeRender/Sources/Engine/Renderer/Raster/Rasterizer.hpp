@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Renderer/Renderer.hpp>
 #include <Render/RenderGeometryBuffer.hpp>
 #include <Render/RenderVisibilityBuffer.hpp>
 #include <Render/ShadingCamera.hpp>
@@ -9,14 +10,13 @@
 #include <Math/Matrix.hpp>
 #include <Shader/VertexShader.hpp>
 #include <Shader/FragmentShader.hpp>
-#include <Pattern/Singleton.hpp>
 
 
 
 /**
  * @brief The core of multi-thread raster rendering.
  */
-class Rasterizer
+class Rasterizer final : public Renderer
 {
 private:
 	friend class Engine;
@@ -36,13 +36,13 @@ private:
 public:
 	Rasterizer();
 
-	void Startup(unsigned int screenWidth, unsigned int screenHeight) { ScreenResize(screenWidth, screenHeight); }
+	void Startup(unsigned int screenWidth, unsigned int screenHeight) override { ScreenResize(screenWidth, screenHeight); }
 
-	void Shutdown() {}
+	void Shutdown() override {}
 
-	void ScreenResize(int inWidth, int inHeight);
+	void ScreenResize(int inWidth, int inHeight) override;
 	
-	ColorRenderTarget& Render(const ShadingCamera& viewBuffer, const Array<ShadingMeshlet>& meshletBuffer, const Array<ShadingPointLight>& lightBuffer);
+	ColorRenderTarget& Render(const RenderWorld* Scene) override;
 
 
 protected:
@@ -53,5 +53,3 @@ protected:
 	bool BackFaceCulling(const ShadingTriangle& triangle);
 	void HomogeneousClipping(const ShadingTriangle& inTriangle, ShadingTriangle* outTriangles, int& triangleNum);
 };
-
-extern UniqueResource<Rasterizer> GRaster;

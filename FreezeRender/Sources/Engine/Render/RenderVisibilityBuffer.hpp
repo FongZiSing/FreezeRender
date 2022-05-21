@@ -1,4 +1,5 @@
 #pragma once
+
 #include "RenderTarget.hpp"
 #include <Render/ShadingMaterial.hpp>
 

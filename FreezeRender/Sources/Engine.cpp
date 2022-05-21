@@ -9,7 +9,7 @@
 /**
  * @brief Global InputSystem.
  */
-UniqueResource<Rasterizer> GRaster;
+UniqueResource<Renderer> GRenderer;
 UniqueResource<RenderWorld> GWorld;
 UniqueResource<InputSystem> GInput;
 
@@ -25,11 +25,11 @@ Engine::~Engine()
 
 bool Engine::HandleCreateEvent(UINT width, UINT height)
 {
-	//raster = std::make_unique<Rasterizer>();
-	//world = std::make_unique<RenderWorld>();
-	//input = std::make_unique<InputSystem>();
-	
-	GRaster->Startup(width, height);
+	GRenderer.Initialize(new Rasterizer());
+	GWorld.Initialize(new RenderWorld());
+	GInput.Initialize(new InputSystem());
+
+	GRenderer->Startup(width, height);
 	GWorld->Startup(width, height);
 	return true;
 }
@@ -86,13 +86,13 @@ void Engine::HandleMouseWheelEvent(UINT nFlags, short zDelta, int x, int y)
 
 void Engine::HandleResizeEvent(UINT width, UINT height)
 {
-	GWorld ->ScreenResize(width, height);
-	GRaster->ScreenResize(width, height);
+	GWorld->ScreenResize(width, height);
+	GRenderer->ScreenResize(width, height);
 }
 
 void Engine::HandleDestroyEvent()
 {
-	GRaster->Shutdown();
+	GRenderer->Shutdown();
 	GWorld->Shutdown();
 }
 
@@ -106,7 +106,7 @@ void Engine::Tick(const float deltaTime)
 	GWorld->Tick(deltaTime);
 
 	// Tick Render.
-	auto& result = GRaster->Render(GWorld->render.cameras[0], GWorld->render.meshlets, GWorld->render.pointlights);
+	ColorRenderTarget& result = GRenderer->Render(*GWorld);
 	Draw(result.Data(), (UINT)result.Width(), (UINT)result.Height(), result.Width() * 4u);
 	
 	// Reset input.

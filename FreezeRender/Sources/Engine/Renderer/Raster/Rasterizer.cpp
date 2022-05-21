@@ -146,8 +146,12 @@ void Rasterizer::ScreenResize(int inWidth, int inHeight)
 	scene.Resize(inWidth, inHeight);
 }
 
-ColorRenderTarget& Rasterizer::Render(const ShadingCamera& viewBuffer, const Array<ShadingMeshlet>& meshletBuffer, const Array<ShadingPointLight>& lightBuffer)
+ColorRenderTarget& Rasterizer::Render(const RenderWorld* Scene)
 {
+	const ShadingCamera& viewBuffer = Scene->render.cameras[0];
+	const Array<ShadingMeshlet>& meshletBuffer = Scene->render.meshlets;
+	const Array<ShadingPointLight>& lightBuffer = Scene->render.pointlights;
+
 	PrePass(viewBuffer, meshletBuffer);
 	BasePass(viewBuffer, lightBuffer);
 
