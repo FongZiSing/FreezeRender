@@ -122,6 +122,9 @@
     <Filter Include="Sources\Engine %28 Function Layer %29\Renderer\Raster">
       <UniqueIdentifier>{09e90335-4be1-4a1d-b00a-11f11b8bc779}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Engine %28 Function Layer %29\Render\RayTracing">
+      <UniqueIdentifier>{fb11e7c9-5d6c-47f5-90f1-f0763b96388d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Engine.hpp" />
@@ -281,6 +284,9 @@
     </ClInclude>
     <ClInclude Include="Sources\Engine\Renderer\Renderer.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\RayTracing\Ray.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\RayTracing</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

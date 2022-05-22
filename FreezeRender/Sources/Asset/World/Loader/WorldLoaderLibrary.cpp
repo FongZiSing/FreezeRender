@@ -21,10 +21,10 @@ void WorldLoaderLibrary::InitializeDefaultWorld(World& world)
 	//~ Init meshlet.
 	//--------------------------------
 	Meshlet& mesh = world.allMeshlet.Emplace();
-	const wchar_t* obj = L"../FreezeRender/Test/bull/spot_triangulated_good.OBJ";
-	const wchar_t* tex = L"../FreezeRender/Test/bull/spot_texture.png";
-	//const wchar_t* obj = L"../FreezeRender/Test/box/box.obj";
-	//const wchar_t* tex = L"../FreezeRender/Test/box/Herringbone_2x1.png";
+	//const wchar_t* obj = L"../FreezeRender/Test/bull/spot_triangulated_good.OBJ";
+	//const wchar_t* tex = L"../FreezeRender/Test/bull/spot_texture.png";
+	const wchar_t* obj = L"../FreezeRender/Test/box/box.obj";
+	const wchar_t* tex = L"../FreezeRender/Test/box/Herringbone_2x1.png";
 	if (Success(MeshLoaderLibrary::Load(obj, &mesh)))
 	{
 		const float Angle = Math::Degrees2Radians(140.f);

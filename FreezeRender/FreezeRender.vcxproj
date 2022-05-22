@@ -57,6 +57,7 @@
     <ClInclude Include="Sources\Engine\Renderer\Raster\Rasterizer.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\Renderer.hpp" />
+    <ClInclude Include="Sources\Engine\Render\RayTracing\Ray.hpp" />
     <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp" />
     <ClInclude Include="Sources\Engine\Render\RenderVisibilityBuffer.hpp" />
     <ClInclude Include="Sources\Engine\Render\ShadingCamera.hpp" />

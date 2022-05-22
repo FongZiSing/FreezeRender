@@ -1,5 +1,6 @@
 ﻿#include "Engine.hpp"
 
+#include <Renderer/RayTacing/RayTracingRenderer.hpp>
 #include <Renderer/Raster/Rasterizer.hpp>
 #include <World/RenderWorld.hpp>
 #include <Input/InputSystem.hpp>
@@ -25,7 +26,7 @@ Engine::~Engine()
 
 bool Engine::HandleCreateEvent(UINT width, UINT height)
 {
-	GRenderer.Initialize(new Rasterizer());
+	GRenderer.Initialize(new RayTracingRenderer());
 	GWorld.Initialize(new RenderWorld());
 	GInput.Initialize(new InputSystem());
 
