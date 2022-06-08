@@ -9,7 +9,7 @@
 /**
  * @brief Camera object.
  */
-struct Camera
+struct ACamera
 {
 	enum class Type : unsigned char
 	{

@@ -37,5 +37,5 @@ public:
 	
 	Status Verify() const override;
 
-	Status Load(Meshlet* result) override;
+	Status Load(AMeshlet* result) override;
 };

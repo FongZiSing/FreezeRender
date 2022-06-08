@@ -29,7 +29,7 @@ namespace LoaderDetail
 		GUID_WICPixelFormat128bppPRGBAFloat,
 	};
 
-	WICTextureLoader::Status Load(const wchar_t* const filepath, Texture* result, APixelFormat asformat)
+	WICTextureLoader::Status Load(const wchar_t* const filepath, ATexture* result, APixelFormat asformat)
 	{
 		using Status = WICTextureLoader::Status;
 
@@ -166,7 +166,7 @@ WICTextureLoader::Status WICTextureLoader::Verify() const
 	return Status::initSuccess;
 }
 
-WICTextureLoader::Status WICTextureLoader::Load(Texture* result, APixelFormat asformat)
+WICTextureLoader::Status WICTextureLoader::Load(ATexture* result, APixelFormat asformat)
 {
 	if (status == Status::initFailed)
 	{

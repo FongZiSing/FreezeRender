@@ -8,7 +8,7 @@
 /**
  * @brief The light object.
  */
-struct Light
+struct ALight
 {
 	float intensity;
 
@@ -20,7 +20,7 @@ struct Light
 /**
  * @brief The point light object.
  */
-struct PointLight final : public Light
+struct APointLight final : public ALight
 {
 	// TODO
 };

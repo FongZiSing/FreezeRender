@@ -3,12 +3,12 @@
 #include <Common.hpp>
 #include <Container/Bulkdata.hpp>
 #include <Container/String.hpp>
-#include <Engine/Render/ShadingPixel.hpp>
+#include <Engine/Render/RenderPixelFormat.hpp>
 #include <Math/Color.hpp>
 
 
 
-constexpr unsigned int TEXTURE_MAX_WIDTH  = 16 * 1024; // limit of cols.
+constexpr unsigned int TEXTURE_MAX_WIDTH = 16 * 1024;  // limit of cols.
 constexpr unsigned int TEXTURE_MAX_HEIGHT = 16 * 1024; // limit of rows.
 
 
@@ -16,7 +16,7 @@ constexpr unsigned int TEXTURE_MAX_HEIGHT = 16 * 1024; // limit of rows.
 /**
  * @brief Texture object.
  */
-struct Texture
+struct ATexture
 {
 	/**
 	 * @brief Specifies filtering options during texture sampling.
@@ -61,8 +61,8 @@ struct Texture
 	
 
 
-	Texture() = default;
-	~Texture() = default;
-	Texture(const Texture&) = delete;
-	Texture& operator = (const Texture&) = delete;
+	ATexture() = default;
+	~ATexture() = default;
+	ATexture(const ATexture&) = delete;
+	ATexture& operator = (const ATexture&) = delete;
 };

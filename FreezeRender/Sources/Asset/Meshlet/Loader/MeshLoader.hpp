@@ -70,5 +70,5 @@ struct interface_as MeshLoader
 	/**
 	 * @brief Try to load the specified mesh file.
 	 */
-	virtual Status Load(Meshlet* result) = 0;
+	virtual Status Load(AMeshlet* result) = 0;
 };

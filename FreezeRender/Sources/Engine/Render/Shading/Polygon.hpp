@@ -6,14 +6,27 @@
 #include <Math/Color.hpp>
 #include <Asset/Meshlet/Meshlet.hpp>
 
-#include "ShadingMaterial.hpp"
+#include "Material.hpp"
+
+
+
+/**
+ * @brief 2d axis-aligned bounding box.
+ */
+struct alignas(16) BoundingBox
+{
+	int minX;
+	int maxX;
+	int minY;
+	int maxY;
+};
 
 
 
 /**
  * @brief The interpolation coefficient of shading point.
  */
-struct alignas(16) ShadingInterpolation
+struct alignas(16) Interpolation
 {
 	float oneOverDepth;
 	float gamma;
@@ -83,19 +96,6 @@ force_inline ShadingVertex Lerp(const float& alpha, const ShadingVertex& vertex1
 
 
 /**
- * @brief 2d axis-aligned bounding box.
- */
-struct alignas(16) ShadingBoundingBox
-{
-	int minX;
-	int maxX;
-	int minY;
-	int maxY;
-};
-
-
-
-/**
  * @brief Triangle data for interpolating a shading point.
  */
 struct ShadingTriangle
@@ -104,7 +104,7 @@ struct ShadingTriangle
 	ShadingVertex vertices[3];
 
 	// Target sampling material.
-	const ShadingMaterial* materialEntity;
+	const Material* material;
 
 
 	ShadingTriangle() = default;
@@ -118,7 +118,7 @@ struct ShadingTriangle
 		vertices[2] = vertex3;
 	}
 
-	inline ShadingTriangle(const Vertex* scope_restrict vertex1, const Vertex* scope_restrict vertex2, const Vertex* scope_restrict vertex3, const ShadingMaterial* material)
+	inline ShadingTriangle(const AVertex* scope_restrict vertex1, const AVertex* scope_restrict vertex2, const AVertex* scope_restrict vertex3, const Material* target)
 	{
 		Register8Copy(vertex1, vertices + 0);
 		Register8Copy(vertex2, vertices + 1);
@@ -128,25 +128,25 @@ struct ShadingTriangle
 		vertices[1].screenspace.position = { vertex2->position, 1.f };
 		vertices[2].screenspace.position = { vertex3->position, 1.f };
 
-		materialEntity = material;
+		material = target;
 	}
 
-	warn_nodiscard inline ShadingBoundingBox BoundingBox(const int& width, const int& height) const
+	warn_nodiscard inline BoundingBox GetBoundingBox(const int& width, const int& height) const
 	{
 		const Vector4& v1 = vertices[0].screenspace.position;
 		const Vector4& v2 = vertices[1].screenspace.position;
 		const Vector4& v3 = vertices[2].screenspace.position;
 
-		ShadingBoundingBox box;
-		box.minX = (int)std::floor( std::min( { v1.x, v2.x, v3.x } ) );
-		box.maxX = (int)std::ceil( std::max( { v1.x, v2.x, v3.x } ) );
-		box.minY = (int)std::floor( std::min( { v1.y, v2.y, v3.y } ) );
-		box.maxY = (int)std::ceil( std::max( { v1.y, v2.y, v3.y } ) );
+		BoundingBox box;
+		box.minX = (int)std::floor( std::min({ v1.x, v2.x, v3.x }) );
+		box.maxX = (int)std::ceil( std::max( { v1.x, v2.x, v3.x }) );
+		box.minY = (int)std::floor( std::min({ v1.y, v2.y, v3.y }) );
+		box.maxY = (int)std::ceil( std::max( { v1.y, v2.y, v3.y }) );
 
-		box.minX = std::max(0,          box.minX);
-		box.maxX = std::min(width - 1,  box.maxX);
-		box.minY = std::max(0,          box.minY);
-		box.maxY = std::min(height - 1, box.maxY);
+		box.minX = std::max( 0,          box.minX );
+		box.maxX = std::min( width - 1,  box.maxX );
+		box.minY = std::max( 0,          box.minY );
+		box.maxY = std::min( height - 1, box.maxY );
 		return box;
 	}
 

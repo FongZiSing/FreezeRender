@@ -5,7 +5,7 @@
 
 
 
-struct Vertex
+struct AVertex
 {
 	Vector3 position;
 	Vector3 normal;
@@ -15,15 +15,15 @@ struct Vertex
 
 
 
-struct VertexIndex
+struct AVertexIndex
 {
 	unsigned int index = 0;
-	Vertex* ptr        = nullptr;
+	AVertex* ptr = nullptr;
 };
 
 
 
-struct VertexCluster
+struct AVertexCluster
 {
 	unsigned int beginVertexIndex = 0;
 	unsigned int endVertexIndex   = 0;
@@ -33,7 +33,7 @@ struct VertexCluster
 
 
 
-inline bool operator == (const Vertex& lhs, const Vertex& rhs)
+inline bool operator == (const AVertex& lhs, const AVertex& rhs)
 {
 	return
 		(lhs.position - rhs.position).LengthSquared() < Number::SMALL_NUMBER &&

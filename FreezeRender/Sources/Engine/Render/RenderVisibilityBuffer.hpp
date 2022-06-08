@@ -1,7 +1,8 @@
 #pragma once
 
 #include "RenderTarget.hpp"
-#include <Render/ShadingMaterial.hpp>
+#include "Shading/Polygon.hpp"
+#include "Shading/Material.hpp"
 
 
 
@@ -20,7 +21,7 @@ struct ShadingPointBufferPixelTraits
 
 struct InterpolationBufferDescriptorPixelTraits
 {
-	using Type = ShadingInterpolation;
+	using Type = Interpolation;
 	inline static const Type defaultPixelValue = {
 		Number::FLOAT_INF,
 		Number::FLOAT_INF,
@@ -34,7 +35,7 @@ struct InterpolationBufferDescriptorPixelTraits
 struct MaterialIdBufferPixelTraits
 {
 	// Using pointer of material as material id.
-	using Type = ShadingMaterial*;
+	using Type = Material*;
 	inline static const Type defaultPixelValue = { nullptr };
 }; typedef RenderTarget<MaterialIdBufferPixelTraits> MaterialIdBufferRenderTarget;
 
@@ -75,7 +76,7 @@ struct VisibilityBuffer
 		Register8Copy(&triangle.vertices[1], &vertex2.GetPixel(index));
 		Register8Copy(&triangle.vertices[2], &vertex3.GetPixel(index));
 		RegisterStoreAligned(zInverseAndInterpolation, &interpolation.GetPixel(index));
-		materialid.SetPixel(index, triangle.materialEntity);
+		materialid.SetPixel(index, triangle.material);
 	}
 };
 

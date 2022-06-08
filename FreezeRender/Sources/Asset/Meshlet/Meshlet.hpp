@@ -10,17 +10,17 @@
 /**
  * @brief The model object.
  */
-struct Meshlet
+struct AMeshlet
 {
 	WideString id;
 	WideString name;
 
 	Matrix transform = Matrix::Identity;
 
-	Array<Material> materials;
-	Array<Vertex> vertices;
-	Array<VertexIndex> indices;
-	Array<VertexCluster> clusters;
+	Array<AMaterial> materials;
+	Array<AVertex> vertices;
+	Array<AVertexIndex> indices;
+	Array<AVertexCluster> clusters;
 
 
 	warn_nodiscard bool IsValid() const
@@ -28,7 +28,7 @@ struct Meshlet
 		return !vertices.IsEmpty() && !indices.IsEmpty() && !materials.IsEmpty() && !clusters.IsEmpty();
 	}
 
-	unsigned int GetMaterialIndex(const VertexIndex& target)
+	unsigned int GetMaterialIndex(const AVertexIndex& target)
 	{
 		for (auto& cluster : clusters)
 		{

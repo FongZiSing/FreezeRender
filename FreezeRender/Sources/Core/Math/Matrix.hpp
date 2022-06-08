@@ -156,7 +156,6 @@ struct Vector3
 	force_inline Vector3 operator ^ (const Vector3& rhs) const;
 	force_inline float operator | (const Vector3& rhs) const;
 	force_inline void CrossProducted(const Vector3& rhs);
-	force_inline void DotProducted(const Vector3& rhs);
 	warn_nodiscard force_inline Vector3 CrossProduct(const Vector3& rhs) const;
 	warn_nodiscard force_inline float DotProduct(const Vector3& rhs) const;
 	warn_nodiscard force_inline float Length() const;
@@ -246,7 +245,6 @@ struct alignas(16) Vector4
 	//~ Begin vector operations.
 
 	force_inline float operator | (const Vector4& rhs) const;
-	force_inline void DotProducted(const Vector4& rhs);
 	force_inline float DotProduct(const Vector4& rhs) const;
 	warn_nodiscard force_inline float Length() const;
 	warn_nodiscard force_inline float LengthSquared() const;

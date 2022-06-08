@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Render/ShadingPolygon.hpp>
+#include <Render/Shading/Polygon.hpp>
 
 
 

@@ -2,7 +2,7 @@
 
 #include <Container/Array.hpp>
 #include <Pattern/Singleton.hpp>
-#include <Render/ShadingLight.hpp>
+#include <Render/Shading/Light.hpp>
 #include <Component/CameraComponent.hpp>
 #include <Component/MeshletComponent.hpp>
 #include <Component/PointLightComponent.hpp>
@@ -18,11 +18,11 @@ public:
 
 	struct
 	{
-		Array<ShadingCamera> cameras;
+		Array<Camera> cameras;
 
-		Array<ShadingMeshlet> meshlets;
+		Array<Meshlet> meshlets;
 
-		Array<ShadingPointLight> pointlights;
+		Array<PointLight> pointlights;
 
 	} render;
 	

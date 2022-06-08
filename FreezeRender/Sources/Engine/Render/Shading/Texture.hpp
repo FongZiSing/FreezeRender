@@ -9,15 +9,16 @@
  */
 namespace TextureSamplerDetail
 {
-	using AddressMode = Texture::AddressMode;
-	using FilterMode = Texture::FilterMode;
-	using Sampler = Color(*)(const Texture* target, const float& u, const float& v);
+	using AssetTexture = ATexture;
+	using AddressMode = AssetTexture::AddressMode;
+	using FilterMode = AssetTexture::FilterMode;
+	using Sampler = Color(*)(const AssetTexture* target, const float& u, const float& v);
 
 	/**
 	 * @brief The root entry of nearest-sampler.
 	 */
 	template<AddressMode AddressX, AddressMode AddressY = AddressX>
-	Color NearestSampler(const Texture* target, const float& u, const float& v)
+	Color NearestSampler(const AssetTexture* target, const float& u, const float& v)
 	{
 		float fixedu, fixedv;
 		if constexpr (AddressX == AddressMode::Warp)
@@ -99,7 +100,7 @@ namespace TextureSamplerDetail
 		* @brief The root entry of bilinear-sampler.
 		*/
 	template<AddressMode AddressX, AddressMode AddressY = AddressX>
-	Color BilinearSampler(const Texture* target, const float& u, const float& v)
+	Color BilinearSampler(const AssetTexture* target, const float& u, const float& v)
 	{
 		R128 alphax, alphay;
 		int x0, x1, y0, y1;
@@ -357,7 +358,7 @@ namespace TextureSamplerDetail
  */
 struct TextureSampler
 {
-	const Texture* target;
+	const ATexture* target;
 
 	TextureSamplerDetail::Sampler sampler;
 
@@ -365,16 +366,16 @@ public:
 	TextureSampler() = delete;
 	~TextureSampler() = default;
 
-	explicit TextureSampler(const Texture* inTarget) : target(inTarget)
+	explicit TextureSampler(const ATexture* inTarget) : target(inTarget)
 	{
 		if (inTarget)
 		{
 			int entry = TextureSamplerDetail::CalculateEntryIndex(inTarget->xAddressMode, inTarget->yAddressMode);
-			if (Texture::FilterMode::Nearest == inTarget->filterMode)
+			if (ATexture::FilterMode::Nearest == inTarget->filterMode)
 			{
 				sampler = TextureSamplerDetail::Nearest[entry];
 			}
-			else if (Texture::FilterMode::Bilinear == inTarget->filterMode)
+			else if (ATexture::FilterMode::Bilinear == inTarget->filterMode)
 			{
 				sampler = TextureSamplerDetail::Biilinear[entry];
 			}
@@ -396,16 +397,16 @@ public:
 
 
 /**
- * @brief Texture. 
+ * @brief Texture.
  */
-struct ShadingTexture
+struct Texture
 {
-	const Texture* texture;
+	const ATexture* data;
 	const TextureSampler sampler;
 
 
-	ShadingTexture(const Texture* target)
-		: texture(target)
+	Texture(const ATexture* target)
+		: data(target)
 		, sampler(target)
 	{}
 };

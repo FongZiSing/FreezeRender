@@ -6,5 +6,5 @@
 
 struct WorldLoaderLibrary
 {
-	static void InitializeDefaultWorld(World& world);
+	static void InitializeDefaultWorld(AWorld& world);
 };

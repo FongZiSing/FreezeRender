@@ -1,28 +1,28 @@
 #pragma once
 
-#include <Render/ShadingCamera.hpp>
+#include <Render/Shading/Camera.hpp>
 
 
 
 class CameraComponent
 {
 private:
-	Camera& entity;
-	ShadingCamera& camera;
+	ACamera& data;
+	Camera& camera;
 
 	const float speed = 0.05f;
 
 public:
-	explicit CameraComponent(Camera& targetEntity, ShadingCamera& targetCamera)
-		: entity(targetEntity)
-		, camera(targetCamera)
+	explicit CameraComponent(ACamera& asset, Camera& target)
+		: data(asset)
+		, camera(target)
 	{}
 
 	inline void UpdateView(const int& width, const int& height)
 	{
-		entity.resolutionX = width;
-		entity.resolutionY = height;
-		entity.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+		data.resolutionX = width;
+		data.resolutionY = height;
+		data.aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 		camera.UpdateView();
 	}
 

@@ -4,9 +4,9 @@
 
 #include <Render/RenderGeometryBuffer.hpp>
 #include <Render/RenderVisibilityBuffer.hpp>
-#include <Render/ShadingCamera.hpp>
-#include <Render/ShadingMeshlet.hpp>
-#include <Render/ShadingLight.hpp>
+#include <Render/Shading/Camera.hpp>
+#include <Render/Shading/Meshlet.hpp>
+#include <Render/Shading/Light.hpp>
 #include <Render/RenderTarget.hpp>
 #include <Math/Matrix.hpp>
 #include <Shader/VertexShader.hpp>
@@ -47,9 +47,9 @@ public:
 
 
 protected:
-	void PrePass(const ShadingCamera& viewBuffer, const Array<ShadingMeshlet>& meshletBuffer);
+	void PrePass(const Camera& viewBuffer, const Array<Meshlet>& meshletBuffer);
 	
-	void BasePass(const ShadingCamera& viewBuffer, const Array<ShadingPointLight>& lightBuffer);
+	void BasePass(const Camera& viewBuffer, const Array<PointLight>& lightBuffer);
 
 	void RasterizeTriangle(const ShadingTriangle& payload);
 	

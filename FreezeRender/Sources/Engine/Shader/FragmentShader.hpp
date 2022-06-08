@@ -1,8 +1,8 @@
 #pragma once
 
 #include <Container/Array.hpp>
-#include <Render/ShadingMaterial.hpp>
-#include <Render/ShadingLight.hpp>
+#include <Render/Shading/Material.hpp>
+#include <Render/Shading/Light.hpp>
 
 
 
@@ -13,7 +13,7 @@ namespace Shader
 	 */
 	struct DeferredFragmentPayload
 	{
-		const Array<ShadingPointLight>* pointlights;
+		const Array<PointLight>* pointlights;
 		Vector3 viewpoint;
 		Vector3 shadingpoint;
 

@@ -6,6 +6,7 @@
 #include <Render/RayTracing/Ray.hpp>
 
 
+
 class RayTracingRenderer : public Renderer
 {
 private:

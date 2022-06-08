@@ -7,13 +7,13 @@
 /**
  * @brief Material object.
  */
-struct Material
+struct AMaterial
 {
-	using TextureReference = std::unique_ptr<Texture>;
+	using TextureReference = std::unique_ptr<ATexture>;
 
-	WideString id            { L"Native" };
-	WideString name          { L"Native" };
+	WideString id { L"Native" };
+	WideString name { L"Native" };
 
 	TextureReference diffuse { nullptr };
-	TextureReference normal  { nullptr };
+	TextureReference normal { nullptr };
 };

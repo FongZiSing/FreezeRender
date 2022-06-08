@@ -9,5 +9,5 @@ struct MeshLoaderLibrary
 	/**
 	 * @biref Load meshlet according to the specified filename.
 	 */
-	static MeshLoader::Status Load(const wchar_t* const filename, Meshlet* result);
+	static MeshLoader::Status Load(const wchar_t* const filename, AMeshlet* result);
 };

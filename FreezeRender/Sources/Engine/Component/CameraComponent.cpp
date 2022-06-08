@@ -11,37 +11,37 @@ void CameraComponent::TickComponent(float deltaTime)
 	
 	if (GInput->IsKeyPressing(InputSystem::VK_W))
 	{
-		deltaLocation += entity.rotation.GetForwardVector() * speed;
+		deltaLocation += data.rotation.GetForwardVector() * speed;
 		bMoving = true;
 	}
 
 	if (GInput->IsKeyPressing(InputSystem::VK_S))
 	{
-		deltaLocation -= entity.rotation.GetForwardVector()* speed;
+		deltaLocation -= data.rotation.GetForwardVector()* speed;
 		bMoving = true;
 	}
 
 	if (GInput->IsKeyPressing(InputSystem::VK_A))
 	{
-		deltaLocation -= entity.rotation.GetRightVector() * speed;
+		deltaLocation -= data.rotation.GetRightVector() * speed;
 		bMoving = true;
 	}
 
 	if (GInput->IsKeyPressing(InputSystem::VK_D))
 	{
-		deltaLocation += entity.rotation.GetRightVector() * speed;
+		deltaLocation += data.rotation.GetRightVector() * speed;
 		bMoving = true;
 	}
 
 	if (GInput->IsKeyPressing(InputSystem::VK_Q))
 	{
-		deltaLocation += entity.rotation.GetUpVector() * speed;
+		deltaLocation += data.rotation.GetUpVector() * speed;
 		bMoving = true;
 	}
 
 	if (GInput->IsKeyPressing(InputSystem::VK_E))
 	{
-		deltaLocation -= entity.rotation.GetUpVector() * speed;
+		deltaLocation -= data.rotation.GetUpVector() * speed;
 		bMoving = true;
 	}
 
@@ -49,7 +49,7 @@ void CameraComponent::TickComponent(float deltaTime)
 	if (GInput->IsWheelingMouse(mouseX, mouseY, zDelta))
 	{
 		float direction = float((zDelta > 0) * 2 - 1);
-		deltaLocation += entity.rotation.GetForwardVector() * speed * direction;
+		deltaLocation += data.rotation.GetForwardVector() * speed * direction;
 		bMoving = true;
 	}
 
@@ -60,20 +60,20 @@ void CameraComponent::TickComponent(float deltaTime)
 	{
 		cacheMouseX = mouseX;
 		cacheMouseY = mouseY;
-		cacheRotattion = entity.rotation;
+		cacheRotattion = data.rotation;
 	}
 
 	else if (GInput->IsMousePressing(InputSystem::VM_L, mouseX, mouseY) && GInput->IsMovingMouse(mouseX, mouseY) && !GInput->WindowState().Resizing)
 	{
-		float offsetX = (cacheMouseX - mouseX) * (entity.fieldOfView / entity.resolutionX);
-		float offsetY = (cacheMouseY - mouseY) * (entity.fieldOfView / entity.resolutionY);
-		entity.rotation = cacheRotattion + Rotator(offsetX, offsetY).Normalize();
+		float offsetX = (cacheMouseX - mouseX) * (data.fieldOfView / data.resolutionX);
+		float offsetY = (cacheMouseY - mouseY) * (data.fieldOfView / data.resolutionY);
+		data.rotation = cacheRotattion + Rotator(offsetX, offsetY).Normalize();
 		camera.UpdateViewMatrix();
 	}
 
 	if (bMoving)
 	{
-		entity.location += deltaLocation;
+		data.location += deltaLocation;
 		camera.UpdateViewMatrix();
 	}
 }

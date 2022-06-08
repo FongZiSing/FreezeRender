@@ -148,9 +148,9 @@ void Rasterizer::ScreenResize(int inWidth, int inHeight)
 
 ColorRenderTarget& Rasterizer::Render(const RenderWorld* Scene)
 {
-	const ShadingCamera& viewBuffer = Scene->render.cameras[0];
-	const Array<ShadingMeshlet>& meshletBuffer = Scene->render.meshlets;
-	const Array<ShadingPointLight>& lightBuffer = Scene->render.pointlights;
+	const Camera& viewBuffer = Scene->render.cameras[0];
+	const Array<Meshlet>& meshletBuffer = Scene->render.meshlets;
+	const Array<PointLight>& lightBuffer = Scene->render.pointlights;
 
 	PrePass(viewBuffer, meshletBuffer);
 	BasePass(viewBuffer, lightBuffer);
@@ -158,7 +158,7 @@ ColorRenderTarget& Rasterizer::Render(const RenderWorld* Scene)
 	return scene;
 }
 
-void Rasterizer::PrePass(const ShadingCamera& viewBuffer, const Array<ShadingMeshlet>& meshletBuffer)
+void Rasterizer::PrePass(const Camera& viewBuffer, const Array<Meshlet>& meshletBuffer)
 {
 	// Clear last frame.
 	DoubleBufferingTask::Get().TrySync(&VBuffer, &GBuffer, &scene);
@@ -175,19 +175,19 @@ void Rasterizer::PrePass(const ShadingCamera& viewBuffer, const Array<ShadingMes
 	const Matrix vp = projection * view;
 	const Vector2 ndc2screen = viewBuffer.GetNdcToScreen();
 
-	for (auto& meshletEntity : meshletBuffer)
+	for (auto& perMeshlet : meshletBuffer)
 	{
-		branch_unlikely if (!meshletEntity.IsValid())
+		branch_unlikely if (!perMeshlet.IsValid())
 		{
 			continue;
 		}
 
-		Meshlet& meshlet = meshletEntity.meshlet;
+		AMeshlet& meshlet = perMeshlet.data;
 		const Matrix mvp = vp * meshlet.transform;
 		const Matrix mv = view * meshlet.transform;
 		const Matrix _mv = mv.Inverse().Transpose();
 
-		for (ShadingMeshlet::Iterator It = meshletEntity.CreateIterator(); It; ++It)
+		for (Meshlet::Iterator It = perMeshlet.CreateIterator(); It; ++It)
 		{
 			// Init triangle.
 			ShadingTriangle triangle = It.Assembly();
@@ -240,7 +240,7 @@ void Rasterizer::PrePass(const ShadingCamera& viewBuffer, const Array<ShadingMes
 					continue;
 				}
 
-				clippedTriangle.materialEntity = triangle.materialEntity;
+				clippedTriangle.material = triangle.material;
 				RasterizeTriangle(clippedTriangle);
 			}
 		}
@@ -289,7 +289,7 @@ void Rasterizer::PrePass(const ShadingCamera& viewBuffer, const Array<ShadingMes
 		});
 }
 
-void Rasterizer::BasePass(const ShadingCamera& viewBuffer, const Array<ShadingPointLight>& lightBuffer)
+void Rasterizer::BasePass(const Camera& viewBuffer, const Array<PointLight>& lightBuffer)
 {
 	//****************************************************************
 	// stage 4: Parallel shading.
@@ -300,7 +300,7 @@ void Rasterizer::BasePass(const ShadingCamera& viewBuffer, const Array<ShadingPo
 			Shader::DeferredFragmentPayload payload;
 
 			payload.pointlights = &lightBuffer;
-			payload.viewpoint = viewBuffer.camera.location;
+			payload.viewpoint = viewBuffer.data.location;
 			payload.shadingpoint = GBuffer.position.GetPixel(screenIndex).XYZRef();
 			payload.normal = GBuffer.normal.GetPixel(screenIndex).XYZRef();
 			payload.diffuse = GBuffer.diffuse.GetPixel(screenIndex);
@@ -327,7 +327,7 @@ void Rasterizer::RasterizeTriangle(const ShadingTriangle& triangle)
 	const auto&& [n1, n2, n3] = triangle.ViewspaceNormal();
 	const auto&& [uv1, uv2, uv3] = triangle.LocalspaceUV();
 
-	const auto&& [minx, maxx, miny, maxy] = triangle.BoundingBox(width, height);
+	const auto&& [minx, maxx, miny, maxy] = triangle.GetBoundingBox(width, height);
 	R128 startx = MakeRegister(minx + 0.5f);
 	R128 starty = MakeRegister(miny + 0.5f);
 
@@ -559,7 +559,7 @@ void Rasterizer::RasterizeTriangle(const ShadingTriangle& triangle)
 						Register8Copy(&triangle.vertices[1], &VBuffer.vertex2.GetPixel(index));
 						Register8Copy(&triangle.vertices[2], &VBuffer.vertex3.GetPixel(index));
 						RegisterStoreAligned(RegisterMultiply(zInverseAndInterpolation, invZ), &VBuffer.interpolation.GetPixel(index));
-						VBuffer.materialid.SetPixel(index, triangle.materialEntity);
+						VBuffer.materialid.SetPixel(index, triangle.material);
 					}
 				}
 				cx = RegisterAdd(cx, i);

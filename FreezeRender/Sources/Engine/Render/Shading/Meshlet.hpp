@@ -1,18 +1,18 @@
 #pragma once
 
 #include <Asset/Meshlet/Meshlet.hpp>
-#include "ShadingPolygon.hpp"
+#include "Polygon.hpp"
 
 
 
-struct ShadingMeshlet
+struct Meshlet
 {
-	Meshlet& meshlet;
-	Array<ShadingMaterial> materials;
+	AMeshlet& data;
+	Array<Material> materials;
 
 
-	explicit ShadingMeshlet(Meshlet& target)
-		: meshlet(target)
+	explicit Meshlet(AMeshlet& target)
+		: data(target)
 	{
 		materials.Clear();
 		for (auto& perMaterial : target.materials)
@@ -23,20 +23,20 @@ struct ShadingMeshlet
 
 	force_inline bool IsValid() const noexcept
 	{
-		return meshlet.IsValid();
+		return data.IsValid();
 	}
 
 	class Iterator
 	{
-		const ShadingMeshlet& entity;
-		const VertexIndex* begin;
-		const VertexIndex* end;
+		const Meshlet& mesh;
+		const AVertexIndex* begin;
+		const AVertexIndex* end;
 
 	public:
-		explicit Iterator(const ShadingMeshlet& target)
-			: entity(target)
-			, begin(target.meshlet.indices.Data())
-			, end(target.meshlet.indices.Data() + target.meshlet.indices.Size())
+		explicit Iterator(const Meshlet& target)
+			: mesh(target)
+			, begin(target.data.indices.Data())
+			, end(target.data.indices.Data() + target.data.indices.Size())
 		{}
 
 		force_inline void operator++ () { begin += 3; }
@@ -49,7 +49,7 @@ struct ShadingMeshlet
 				begin[0].ptr,
 				begin[1].ptr,
 				begin[2].ptr,
-				&entity.materials[entity.meshlet.GetMaterialIndex(*begin)]
+				&mesh.materials[mesh.data.GetMaterialIndex(*begin)]
 			);
 		}
 	};

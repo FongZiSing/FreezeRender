@@ -37,5 +37,5 @@ public:
 
 	Status Verify() const override;
 
-	Status Load(Texture* result, APixelFormat asformat = APixelFormat::FLOAT_RGBA) override;
+	Status Load(ATexture* result, APixelFormat asformat = APixelFormat::FLOAT_RGBA) override;
 };

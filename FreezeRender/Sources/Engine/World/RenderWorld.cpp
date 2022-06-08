@@ -10,7 +10,7 @@
  */
 inline namespace RenderWorldData
 {
-	std::unique_ptr<World> world;
+	std::unique_ptr<AWorld> world;
 }
 
 
@@ -25,14 +25,14 @@ RenderWorld::~RenderWorld()
 
 void RenderWorld::Load()
 {
-	world = std::make_unique<World>();
-	WorldLoaderLibrary::InitializeDefaultWorld(*world);
+	//world = std::make_unique<AWorld>();
+	//WorldLoaderLibrary::InitializeDefaultWorld(*world);
 }
 
 
 void RenderWorld::Startup(unsigned int screenWidth, unsigned int screenHeight)
 {
-	world = std::make_unique<World>();
+	world = std::make_unique<AWorld>();
 	WorldLoaderLibrary::InitializeDefaultWorld(*world);
 
 

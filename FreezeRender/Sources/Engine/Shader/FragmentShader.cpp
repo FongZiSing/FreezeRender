@@ -18,9 +18,9 @@ namespace Shader::DeferredFragment
 		const Vector3& normal = payload.normal;
 		Vector3 result = { 0, 0, 0 };
 
-		for (const ShadingPointLight& perPointLight : *(payload.pointlights))
+		for (const PointLight& perPointLight : *(payload.pointlights))
 		{
-			PointLight& perLight = perPointLight.pointLight;
+			APointLight& perLight = perPointLight.data;
 			const Vector3 lightAt = perLight.location - shadingpoint;
 			const Vector3 viewAt = viewpoint - shadingpoint;
 			const float distance = lightAt.LengthSquared();

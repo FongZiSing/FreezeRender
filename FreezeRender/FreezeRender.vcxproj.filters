@@ -125,6 +125,12 @@
     <Filter Include="Sources\Engine %28 Function Layer %29\Render\RayTracing">
       <UniqueIdentifier>{fb11e7c9-5d6c-47f5-90f1-f0763b96388d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Engine %28 Function Layer %29\Render\Shading">
+      <UniqueIdentifier>{a8aa693e-9d25-4c5a-9a08-1f44486aaa30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Asset %28 Resource Layer %29\Camera\Loader">
+      <UniqueIdentifier>{23dfe47c-d056-44c3-b05f-af27c42d707a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Engine.hpp" />
@@ -177,20 +183,8 @@
     <ClInclude Include="Sources\Asset\Texture\Loader\WICTextureLoader.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\Texture\Loader</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingTexture.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingPixel.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Asset\Utility\LoaderUitlity.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingMaterial.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingMeshlet.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Asset\Meshlet\Meshlet.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\Meshlet</Filter>
@@ -210,9 +204,6 @@
     <ClInclude Include="Sources\Asset\Material\Material.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\Material</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingLight.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Sources\Asset\World\World.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\World</Filter>
     </ClInclude>
@@ -224,9 +215,6 @@
     </ClInclude>
     <ClInclude Include="Sources\Asset\World\Loader\WorldLoaderLibrary.hpp">
       <Filter>Sources\Asset %28 Resource Layer %29\World\Loader</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingPolygon.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
@@ -248,9 +236,6 @@
     </ClInclude>
     <ClInclude Include="Sources\Engine\Component\CameraComponent.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\ShadingCamera.hpp">
-      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Engine\Component\PointLightComponent.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Component</Filter>
@@ -287,6 +272,27 @@
     </ClInclude>
     <ClInclude Include="Sources\Engine\Render\RayTracing\Ray.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render\RayTracing</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Camera.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Light.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Material.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Meshlet.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Polygon.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Texture.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\RenderPixelFormat.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

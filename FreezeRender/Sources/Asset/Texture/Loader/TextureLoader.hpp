@@ -75,5 +75,5 @@ struct interface_as TextureLoader
 	/**
 	 * @brief Try to load the specified image file.
 	 */
-	virtual Status Load(Texture* result, APixelFormat asformat = APixelFormat::FLOAT_RGBA) = 0;
+	virtual Status Load(ATexture* result, APixelFormat asformat = APixelFormat::FLOAT_RGBA) = 0;
 };

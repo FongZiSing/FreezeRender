@@ -20,7 +20,7 @@ namespace Utility
 
 
 
-MeshLoader::Status MeshLoaderLibrary::Load(const wchar_t* const filename, Meshlet* result)
+MeshLoader::Status MeshLoaderLibrary::Load(const wchar_t* const filename, AMeshlet* result)
 {
 	using namespace Utility;
 

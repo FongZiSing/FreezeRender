@@ -96,12 +96,12 @@ namespace Detail
 		}
 
 		// This function is only focus on parsing mesh file, manually clean up the wrong data if parse failed.
-		OBJMeshLoader::Status Load(std::ifstream* pStream, Meshlet* result)
+		OBJMeshLoader::Status Load(std::ifstream* pStream, AMeshlet* result)
 		{
 			using Status = OBJMeshLoader::Status;
 
 			std::ifstream& stream = *pStream;
-			Meshlet& mesh = *result;
+			AMeshlet& mesh = *result;
 
 			// All supported data.
 			Array<Array<VertexAttributeIndex>> polygons;
@@ -226,7 +226,7 @@ namespace Detail
 
 			// Target mesh data.
 			Array<unsigned int> positionIndices;
-			Array<Vertex> vertices;
+			Array<AVertex> vertices;
 			positionIndices.Reserve(polygons.Size() * polygons[0].Size());
 			vertices.Reserve(positions.Size());
 
@@ -236,7 +236,7 @@ namespace Detail
 				VertexAssembler assembler(positionIndices);
 				for (const VertexAttributeIndex& corner : wedges)
 				{
-					Vertex vertex;
+					AVertex vertex;
 					vertex.position = positions[corner.position];
 					vertex.uv = uvs[corner.uv];
 					vertex.normal = normals[corner.normal];
@@ -247,7 +247,7 @@ namespace Detail
 					for (const unsigned int& index : remapper)
 					{
 						// If it exists, only the index buffer is considered.
-						const Vertex& target = vertices[index];
+						const AVertex& target = vertices[index];
 						if (target == vertex)
 						{
 							assembler.push(index);
@@ -269,7 +269,7 @@ namespace Detail
 
 			// Fill meshlet.
 			mesh.vertices.Swap(vertices);
-			Vertex* vertex = mesh.vertices.Data();
+			AVertex* vertex = mesh.vertices.Data();
 			for (auto& index : positionIndices)
 			{
 				mesh.indices.Push({ index, vertex + index });
@@ -299,7 +299,7 @@ OBJMeshLoader::Status OBJMeshLoader::Verify() const
 	return Status::initSuccess;
 }
 
-OBJMeshLoader::Status OBJMeshLoader::Load(Meshlet* result)
+OBJMeshLoader::Status OBJMeshLoader::Load(AMeshlet* result)
 {
 	if (status == Status::initFailed)
 	{

@@ -7,9 +7,9 @@
 
 
 
-struct World
+struct AWorld
 {
-	Array<Camera> allCamera;
-	Array<Meshlet> allMeshlet;
-	Array<PointLight> allPointLight;
+	Array<ACamera> allCamera;
+	Array<AMeshlet> allMeshlet;
+	Array<APointLight> allPointLight;
 };

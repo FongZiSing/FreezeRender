@@ -1,20 +1,20 @@
 #pragma once
 
-#include <Render/ShadingLight.hpp>
+#include <Render/Shading/Light.hpp>
 
 
 
 class PointLightComponent
 {
 private:
-	PointLight& entity;
-	ShadingPointLight& light;
+	APointLight& data;
+	PointLight& light;
 
 
 public:
-	explicit PointLightComponent(PointLight& targetEntity, ShadingPointLight& pointLight)
-		: entity(targetEntity)
-		, light(pointLight)
+	explicit PointLightComponent(APointLight& asset, PointLight& target)
+		: data(asset)
+		, light(target)
 	{}
 
 	void TickComponent(float deltaTime);

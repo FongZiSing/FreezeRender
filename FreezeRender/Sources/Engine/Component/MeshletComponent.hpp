@@ -1,20 +1,20 @@
 #pragma once
 
-#include <Render/ShadingMeshlet.hpp>
+#include <Render/Shading/Meshlet.hpp>
 
 
 
 class MeshletComponent
 {
 private:
-	Meshlet& entity;
-	ShadingMeshlet& meshlet;
+	AMeshlet& data;
+	Meshlet& meshlet;
 
 
 public:
-	MeshletComponent(Meshlet& targetEntity, ShadingMeshlet& meshlet)
-		: entity(targetEntity)
-		, meshlet(meshlet)
+	MeshletComponent(AMeshlet& asset, Meshlet& target)
+		: data(asset)
+		, meshlet(target)
 	{
 	}
 

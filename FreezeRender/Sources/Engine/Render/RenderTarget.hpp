@@ -2,9 +2,9 @@
 
 #include <Common.hpp>
 #include <Container/Bulkdata.hpp>
-#include "ShadingPolygon.hpp"
-#include <Math/Math.hpp>
 #include <Math/Matrix.hpp>
+#include <Math/Color.hpp>
+#include <Math/Math.hpp>
 
 
 

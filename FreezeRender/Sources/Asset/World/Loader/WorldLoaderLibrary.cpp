@@ -4,7 +4,7 @@
 
 
 
-void WorldLoaderLibrary::InitializeDefaultWorld(World& world)
+void WorldLoaderLibrary::InitializeDefaultWorld(AWorld& world)
 {
 	world.allCamera.Clear();
 	world.allMeshlet.Clear();
@@ -20,7 +20,7 @@ void WorldLoaderLibrary::InitializeDefaultWorld(World& world)
 	//--------------------------------
 	//~ Init meshlet.
 	//--------------------------------
-	Meshlet& mesh = world.allMeshlet.Emplace();
+	AMeshlet& mesh = world.allMeshlet.Emplace();
 	//const wchar_t* obj = L"../FreezeRender/Test/bull/spot_triangulated_good.OBJ";
 	//const wchar_t* tex = L"../FreezeRender/Test/bull/spot_texture.png";
 	const wchar_t* obj = L"../FreezeRender/Test/box/box.obj";
@@ -40,7 +40,7 @@ void WorldLoaderLibrary::InitializeDefaultWorld(World& world)
 		mesh.transform = Translate * Rotation * Scale;
 
 		auto& material = mesh.materials.Emplace();
-		material.diffuse = std::make_unique<Texture>();
+		material.diffuse = std::make_unique<ATexture>();
 		TextureLoaderLibrary::Load(tex, material.diffuse.get());
 
 		auto& cluster = mesh.clusters.Emplace();
@@ -55,6 +55,6 @@ void WorldLoaderLibrary::InitializeDefaultWorld(World& world)
 	//--------------------------------
 	//~ Init light.
 	//--------------------------------
-	world.allPointLight.Emplace(PointLight{ 500, { 20, 20, 20 } });
-	world.allPointLight.Emplace(PointLight{ 500, { -20, 20, 0 } });
+	world.allPointLight.Emplace(APointLight{ 500, { 20, 20, 20 } });
+	world.allPointLight.Emplace(APointLight{ 500, { -20, 20, 0 } });
 }

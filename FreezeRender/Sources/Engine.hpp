@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <Platform/Windows/D2DApp.hpp>
-#include <memory>
 
 
 
