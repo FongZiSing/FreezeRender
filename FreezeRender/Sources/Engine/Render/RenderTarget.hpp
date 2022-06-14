@@ -65,6 +65,14 @@ struct FloatPixelTraits
 
 
 
+struct PosFloatPixelTraits
+{
+	using Type = float;
+	inline static const Type defaultPixelValue = Number::FLOAT_INF;
+}; typedef RenderTarget<PosFloatPixelTraits> PosFloatRenderTarget;
+
+
+
 struct Float2PixelTraits
 {
 	using Type = Vector2;

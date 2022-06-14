@@ -32,7 +32,8 @@ public:
 	~Bulkdata() { Deallocate(); }
 	constexpr explicit operator bool() const noexcept { return ptr != nullptr; }
 	constexpr bool operator ! () const noexcept { return ptr == nullptr; }
-	constexpr Type& operator [] (const int& index) const { return ptr[index]; }
+	constexpr Type& operator [] (const int& index) { return ptr[index]; }
+	constexpr const Type& operator [] (const int& index) const { return ptr[index]; }
 	constexpr unsigned long long Size() const noexcept { return count; }
 	constexpr Type* Get() const noexcept { return ptr; }
 	constexpr Type* Get(long long offset) const noexcept { assert((signed)count > offset); return ptr + offset; }

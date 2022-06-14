@@ -13,7 +13,7 @@
 /**
  * @brief 2d axis-aligned bounding box.
  */
-struct alignas(16) BoundingBox
+struct alignas(16) ShadingBoundingBox
 {
 	int minX;
 	int maxX;
@@ -26,7 +26,7 @@ struct alignas(16) BoundingBox
 /**
  * @brief The interpolation coefficient of shading point.
  */
-struct alignas(16) Interpolation
+struct alignas(16) ShadingInterpolation
 {
 	float oneOverDepth;
 	float gamma;
@@ -131,13 +131,13 @@ struct ShadingTriangle
 		material = target;
 	}
 
-	warn_nodiscard inline BoundingBox GetBoundingBox(const int& width, const int& height) const
+	warn_nodiscard inline ShadingBoundingBox GetBoundingBox(const int& width, const int& height) const
 	{
 		const Vector4& v1 = vertices[0].screenspace.position;
 		const Vector4& v2 = vertices[1].screenspace.position;
 		const Vector4& v3 = vertices[2].screenspace.position;
 
-		BoundingBox box;
+		ShadingBoundingBox box;
 		box.minX = (int)std::floor( std::min({ v1.x, v2.x, v3.x }) );
 		box.maxX = (int)std::ceil( std::max( { v1.x, v2.x, v3.x }) );
 		box.minY = (int)std::floor( std::min({ v1.y, v2.y, v3.y }) );

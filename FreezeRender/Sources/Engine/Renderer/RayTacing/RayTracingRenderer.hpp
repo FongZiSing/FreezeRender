@@ -14,7 +14,7 @@ private:
 	int height;
 
 	ColorRenderTarget scene;
-
+	PosFloatRenderTarget depth;
 	PrimitiveRay primitiveRay;
 	bool bRegeneratePrimitiveRay;
 

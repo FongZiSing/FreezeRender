@@ -21,7 +21,7 @@ struct ShadingPointBufferPixelTraits
 
 struct InterpolationBufferDescriptorPixelTraits
 {
-	using Type = Interpolation;
+	using Type = ShadingInterpolation;
 	inline static const Type defaultPixelValue = {
 		Number::FLOAT_INF,
 		Number::FLOAT_INF,
