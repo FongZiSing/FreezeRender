@@ -107,6 +107,7 @@ protected:
 	Bulkdata<Ray> data;
 	int width = 0;
 	int height = 0;
+	bool bDirty = false;
 
 public:
 	explicit PrimitiveRay(const int& inWidth, const int& inHeight)
@@ -121,29 +122,38 @@ public:
 			width = inWidth;
 			height = inHeight;
 			data.Reallocate(1LL * inWidth * inHeight);
-			data.Initialize(Ray{});
 		}
 	}
 
-	inline void Reset()
-	{
-		data.Initialize(Ray{});
-	}
-
-	force_inline void Swap(PrimitiveRay& rhs)
-	{
-		std::swap(width, rhs.width);
-		std::swap(height, rhs.height);
-		data.Swap(rhs.data);
-	}
-	constexpr Ray& operator [] (const int& index)
-	{
-		return data[index];
-	}
-		
 	constexpr const Ray& operator [] (const int& index) const
 	{
 		return data[index];
+	}
+
+	force_inline void Invalidate(const int& inWidth, const int& inHeight)
+	{
+		bDirty = true;
+		Reallocate(inWidth, inHeight);
+	}
+
+	inline void TryRegenerateRay(const float& halfFOV, const float& aspectRatio)
+	{
+		if (bDirty)
+		{
+			int index = 0;
+			float scale = std::tan(halfFOV);
+			for (int h = 0; h < height; ++h)
+			{
+				for (int w = 0; w < width; ++w)
+				{
+					float x = (2.f * (w + 0.5f) / (float)width - 1.f) * aspectRatio * scale;
+					float y = (1.f - 2 * (h + 0.5f) / (float)height) * scale;
+					data[index++] = { Vector3::Zero, Vector3(x, y, -1).Normalize() };
+				}
+			}
+
+			bDirty = false;
+		}
 	}
 };
 

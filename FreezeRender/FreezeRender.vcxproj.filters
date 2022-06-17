@@ -131,6 +131,9 @@
     <Filter Include="Sources\Asset %28 Resource Layer %29\Camera\Loader">
       <UniqueIdentifier>{23dfe47c-d056-44c3-b05f-af27c42d707a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Engine %28 Function Layer %29\Output">
+      <UniqueIdentifier>{2c8bbd35-8104-4413-b31f-b6a110bca87b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Engine.hpp" />
@@ -294,6 +297,12 @@
     <ClInclude Include="Sources\Engine\Render\RenderPixelFormat.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Core\Base\Container\UnrolledLinkList.hpp">
+      <Filter>Sources\Core %28 Core Layer %29\Base\Container</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Output\OutputSystem.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Output</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Engine.cpp" />
@@ -348,6 +357,9 @@
     </ClCompile>
     <ClCompile Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\Renderer\RayTracing</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Engine\Output\OutputSystem.cpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Output</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

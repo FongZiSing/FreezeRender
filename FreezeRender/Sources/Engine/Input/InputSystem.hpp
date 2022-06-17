@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Math/SIMD.hpp>
-#include <Pattern/Singleton.hpp>
 
 
 

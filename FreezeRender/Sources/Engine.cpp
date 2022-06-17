@@ -4,6 +4,7 @@
 #include <Renderer/Raster/Rasterizer.hpp>
 #include <World/RenderWorld.hpp>
 #include <Input/InputSystem.hpp>
+#include <sstream>
 
 
 
@@ -38,6 +39,16 @@ bool Engine::HandleCreateEvent(UINT width, UINT height)
 void Engine::HandleKeyDownEvent(WPARAM nKey)
 {
 	GInput->PressedKey(static_cast<unsigned char>(nKey));
+	if (nKey == InputSystem::VK_Z)
+	{
+		GRenderer.Initialize(new Rasterizer());
+		GRenderer->Startup(m_width, m_height);
+	}
+	else if (nKey == InputSystem::VK_X)
+	{
+		GRenderer.Initialize(new RayTracingRenderer());
+		GRenderer->Startup(m_width, m_height);
+	}
 }
 
 void Engine::HandleKeyUpEvent(WPARAM nKey)
@@ -110,6 +121,13 @@ void Engine::Tick(const float deltaTime)
 	ColorRenderTarget& result = GRenderer->Render(*GWorld);
 	Draw(result.Data(), (UINT)result.Width(), (UINT)result.Height(), result.Width() * 4u);
 	
+	Vector3 location = GWorld->render.cameras[0].data.location;
+	std::wostringstream out;
+	out.precision(6);
+	out << "camera location { " << location.x << ", " << location.y << ", " << location.z << " }";
+	std::wstring text = out.str();
+	DebugDraw(text.data(), text.size(), 12, 50, 561, 63);
+
 	// Reset input.
 	GInput->Reset();
 }

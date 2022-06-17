@@ -10,7 +10,6 @@ RayTracingRenderer::RayTracingRenderer()
 	, scene(2, 2)
 	, depth(2, 2)
 	, primitiveRay(2, 2)
-	, bRegeneratePrimitiveRay(false)
 {
 }
 
@@ -21,8 +20,7 @@ void RayTracingRenderer::ScreenResize(int inWidth, int inHeight)
 
 	scene.Resize(inWidth, inHeight);
 	depth.Resize(inWidth, inHeight);
-	primitiveRay.Reallocate(inWidth, inHeight);
-	bRegeneratePrimitiveRay = true;
+	primitiveRay.Invalidate(inWidth, inHeight);
 }
 
 ColorRenderTarget& RayTracingRenderer::Render(const RenderWorld* Scene)
@@ -31,29 +29,14 @@ ColorRenderTarget& RayTracingRenderer::Render(const RenderWorld* Scene)
 	const Array<Meshlet>& meshletBuffer = Scene->render.meshlets;
 	const Array<PointLight>& lightBuffer = Scene->render.pointlights;
 
-	if (bRegeneratePrimitiveRay)
-	{
-		int c = 0;
-		float scale = std::tan(viewBuffer.halfFOV);
-		float aspectRatio = viewBuffer.data.aspectRatio;
-		for (int h = 0; h < height; ++h)
-		{
-			for (int w = 0; w < width; ++w)
-			{
-				float x = (2.f * (w + 0.5f) / (float)width - 1.f) * aspectRatio * scale;
-				float y = (1 - 2 * (h + 0.5f) / (float)height) * scale;
-				primitiveRay[c++] = { viewBuffer.data.location, Vector3(x, y, -1).Normalize() };
-			}
-		}
-		bRegeneratePrimitiveRay = false;
-	}
-
+	primitiveRay.TryRegenerateRay(viewBuffer.halfFOV, viewBuffer.data.aspectRatio);
 	scene.Clear();
 	depth.Clear();
+
 	ParallelFor(0u, (unsigned int)width * height, [&](const unsigned int& worklistIndex)
 	{
 		const Matrix& view = viewBuffer.view;
-		Ray& ray = primitiveRay[worklistIndex];
+		const Ray& ray = primitiveRay[worklistIndex];
 
 		for (auto& perMeshlet : meshletBuffer)
 		{
@@ -83,7 +66,7 @@ ColorRenderTarget& RayTracingRenderer::Render(const RenderWorld* Scene)
 
 					const float rayLength = (ray.direction * neark).Length();
 
-					if (depth.GetPixel(worklistIndex) > rayLength)
+					if (rayLength > 0 && depth.GetPixel(worklistIndex) > rayLength)
 					{
 						depth.SetPixel(worklistIndex, rayLength);
 						const float& beta = result.beta;

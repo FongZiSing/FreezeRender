@@ -1,8 +1,6 @@
 #pragma once
-#pragma once
 
 #include "../Renderer.hpp"
-
 #include <Render/RayTracing/Ray.hpp>
 
 
@@ -16,8 +14,6 @@ private:
 	ColorRenderTarget scene;
 	PosFloatRenderTarget depth;
 	PrimitiveRay primitiveRay;
-	bool bRegeneratePrimitiveRay;
-
 
 public:
 	RayTracingRenderer();
@@ -31,5 +27,4 @@ public:
 	virtual ColorRenderTarget& Render(const RenderWorld* Scene) override;
 
 protected:
-
 };

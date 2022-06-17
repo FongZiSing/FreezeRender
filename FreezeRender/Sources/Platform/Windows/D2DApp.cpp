@@ -22,8 +22,13 @@
 // C++ RunTime Header.
 #include <sstream>
 #include <Common.hpp>
+#include <concurrent_queue.h>
 
 
+
+////////////////////////////////////////////////////////////////
+//
+concurrency::concurrent_queue<std::function<void(void)>> g_debugTask;
 
 ////////////////////////////////////////////////////////////////
 //
@@ -50,6 +55,35 @@ void D2DApp::Draw(
 {
 	m_pD2DRenderTarget->CopyFromMemory(&m_rect, bits, strides);
 	m_pD2DDeviceContext->DrawBitmap(m_pD2DRenderTarget.Get());
+}
+
+void D2DApp::DebugDraw(const wchar_t* text, int length, int offsetx, int offsety, int width, int height)
+{
+	std::wstring targetText = text;
+	g_debugTask.push(
+		[text = std::move(targetText),
+		 offsetx,
+		 offsety,
+		 height,
+		 width,
+		 deviceContext = m_pD2DDeviceContext.Get(),
+		 writeTextFormat = m_pWriteTextFormat.Get(),
+		 brush = m_pBrush.Get()
+		]()
+		{
+			deviceContext->DrawText(
+				text.c_str(),
+				(UINT32)text.size(),
+				writeTextFormat,
+				D2D1::RectF(
+				static_cast<float>(offsetx),
+				static_cast<float>(offsety),
+				static_cast<float>(width),
+				static_cast<float>(height)),
+				brush
+			);
+		}
+	);
 }
 
 HRESULT D2DApp::CreateDeviceIndependentResources()
@@ -252,19 +286,14 @@ HRESULT D2DApp::CreateDrawTextResources()
 			m_pWriteTextFormat.GetAddressOf() // Pointer to recieve the created object
 		);
 
-		m_textLayoutRect_FPS = D2D1::RectF(
-			static_cast<float>(12),
-			static_cast<float>(12),
-			static_cast<float>(152),
-			static_cast<float>(63)
-		);
+		m_textLayoutRect_FPS = D2D1::RectF(12.f, 12.f, 152.f, 63.f);
 	}
 
 	if (SUCCEEDED(hr))
 	{
 		hr = m_pD2DDeviceContext->CreateSolidColorBrush(
 			D2D1::ColorF(RGB(32, 137, 77)),
-			m_pBrush_FPS.GetAddressOf()
+			m_pBrush.GetAddressOf()
 		);
 	}
 
@@ -293,8 +322,21 @@ void D2DApp::UpdateFrameStats(const float& deltaTime, const unsigned int& fps)
 		(UINT32)stats.size(),
 		m_pWriteTextFormat.Get(),
 		m_textLayoutRect_FPS,
-		m_pBrush_FPS.Get()
+		m_pBrush.Get()
 	);
+}
+
+void D2DApp::ExecuteDebugDrawTask()
+{
+	if (!g_debugTask.empty())
+	{
+		std::function<void(void)> task;
+		while (g_debugTask.try_pop(task) && task)
+		{
+			task();
+			task = nullptr;
+		}
+	}
 }
 
 void D2DApp::EndDraw()
@@ -558,9 +600,9 @@ HRESULT D2DApp::Initialize(HINSTANCE hInstance, int nCmdShow)
 		windowRect.bottom -= windowRect.top;
 		windowRect.left = (::GetSystemMetrics(SM_CXFULLSCREEN) - windowRect.right) / 2;
 		windowRect.top = (::GetSystemMetrics(SM_CYFULLSCREEN) - windowRect.bottom) / 2;
-		m_hWnd = CreateWindowExA(
+		m_hWnd = CreateWindowEx(
 			0,
-			"D2D1WndClass",
+			L"D2D1WndClass",
 			m_wndCaption,
 			windowStyle,
 			windowRect.left,
@@ -610,6 +652,8 @@ force_noinline void D2DApp::Run()
 			Tick(timer.GetDeltaTime());
 
 			UpdateFrameStats(timer.GetDeltaTime(), timer.GetFrameNumber());
+
+			ExecuteDebugDrawTask();
 
 			EndDraw();
 

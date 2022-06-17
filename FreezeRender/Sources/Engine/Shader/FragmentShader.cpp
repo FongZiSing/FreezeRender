@@ -6,7 +6,9 @@ namespace Shader::DeferredFragment
 {
 	Color PhongShader(const DeferredFragmentPayload& payload)
 	{
+		return payload.diffuse;
 		Vector3 diffuse = { (float)payload.diffuse.r, (float)payload.diffuse.g, (float)payload.diffuse.b };
+
 		static const Vector3 ambientLightIntensity = { 10, 10, 10 };
 		const Vector3 Kd = diffuse / 255.f;
 		static const Vector3 Ks = { 0.7937f, 0.7937f, 0.7937f };

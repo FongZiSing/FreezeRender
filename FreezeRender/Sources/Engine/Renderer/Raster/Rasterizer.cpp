@@ -14,7 +14,7 @@ inline namespace ParallelRaster
 	{
 		static constexpr const bool bEnableVertexShader = false;
 		static constexpr const bool bEnableHomogeneousClipping = true;
-		static constexpr const bool bEnableBackFaceCulling = true;
+		static constexpr const bool bEnableBackFaceCulling = false;
 		static constexpr const bool bEnableAdaptiveHalfSpaceRaster = true;
 	}
 

@@ -14,6 +14,8 @@
 #include <wrl/client.h>
 using Microsoft::WRL::ComPtr;
 
+#include<functional>
+
 
 
 /**
@@ -72,6 +74,8 @@ protected:
 		unsigned int strides
 	);
 
+	void DebugDraw(const wchar_t* text, int length, int offsetx, int offsety, int width, int height);
+
 	//~ End Engine.
 
 	bool IsResizing() const noexcept { return m_bResizing; }
@@ -96,6 +100,9 @@ private:
 
 	// Update frames info.
 	void UpdateFrameStats(const float& deltaTime, const unsigned int& elapsedTime);
+
+	// Called every frames.
+	void ExecuteDebugDrawTask();
 
 	// Called every frames.
 	void EndDraw();
@@ -154,7 +161,7 @@ protected:
 
 	HWND                        m_hWnd = nullptr;
 
-	const char* const           m_wndCaption = "D2DApp";
+	const wchar_t* const        m_wndCaption = L"FreezeRender";
 
 	UINT                        m_width = 700;
 	
@@ -189,7 +196,7 @@ private:
 
 	D2D1_RECT_F                 m_textLayoutRect_FPS;
 
-	ComPtr<ID2D1SolidColorBrush> m_pBrush_FPS;
+	ComPtr<ID2D1SolidColorBrush> m_pBrush;
 
 	D3D_FEATURE_LEVEL           m_featureLevel;
 

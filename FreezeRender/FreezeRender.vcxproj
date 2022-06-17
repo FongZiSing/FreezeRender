@@ -40,6 +40,7 @@
     <ClInclude Include="Sources\Core\Base\Container\Bulkdata.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\Detail\String.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\String.hpp" />
+    <ClInclude Include="Sources\Core\Base\Container\UnrolledLinkList.hpp" />
     <ClInclude Include="Sources\Core\Base\Pattern\Delegate.hpp" />
     <ClInclude Include="Sources\Core\Base\Pattern\Singleton.hpp" />
     <ClInclude Include="Sources\Core\Base\Thread\ParallelFor.hpp" />
@@ -54,6 +55,7 @@
     <ClInclude Include="Sources\Engine\Component\MeshletComponent.hpp" />
     <ClInclude Include="Sources\Engine\Component\PointLightComponent.hpp" />
     <ClInclude Include="Sources\Engine\Input\InputSystem.hpp" />
+    <ClInclude Include="Sources\Engine\Output\OutputSystem.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\Raster\Rasterizer.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\Renderer.hpp" />
@@ -85,6 +87,7 @@
     <ClCompile Include="Sources\Engine\Component\MeshletComponent.cpp" />
     <ClCompile Include="Sources\Engine\Component\PointLightComponent.cpp" />
     <ClCompile Include="Sources\Engine\Input\InputSystem.cpp" />
+    <ClCompile Include="Sources\Engine\Output\OutputSystem.cpp" />
     <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp" />
     <ClCompile Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.cpp" />
     <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp" />

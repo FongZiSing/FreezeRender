@@ -29,12 +29,13 @@ public:
 };
 
 
-
+#include <memory>
 template <class Derived>
 class UniqueResource
 {
 private:
-	Derived* resource = nullptr;
+	std::unique_ptr<Derived> resource;
+	//Derived* resource = nullptr;
 	std::atomic<bool> flag = false;
 
 public:
@@ -46,28 +47,29 @@ public:
 
 	~UniqueResource()
 	{
-		if (resource)
-		{
-			delete resource;
-		}
-		resource = nullptr;
-		flag = false;
+		//if (resource)
+		//{
+		//	delete resource;
+		//}
+		//resource = nullptr;
+		//flag.store(false);
 	}
 
 	template<class DerivedClass>
 	constexpr void Initialize(DerivedClass* derivedClass) noexcept
 	{
-		bool oldFlag = flag.load();
-		if (flag.compare_exchange_strong(oldFlag, true))
-		{
-			if (!resource)
-			{
-				resource = derivedClass;
-			}
-		}
+		resource.reset(derivedClass);
+		//bool bNotInit = false;
+		//if (flag.compare_exchange_strong(bNotInit, true))
+		//{
+		//	if (!resource)
+		//	{
+		//		resource = derivedClass;
+		//	}
+		//}
 	}
 
-	constexpr Derived* operator -> () const noexcept { return resource; }
+	constexpr Derived* operator -> () const noexcept { return resource.get(); }
 	
-	constexpr Derived* operator * () const noexcept { return resource; }
+	constexpr Derived* operator * () const noexcept { return resource.get(); }
 };
