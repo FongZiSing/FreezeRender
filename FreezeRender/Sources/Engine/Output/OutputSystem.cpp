@@ -1,7 +1,16 @@
 #include "OutputSystem.hpp"
+#include <concurrent_queue.h>
 
 
 
-void OutputSystem::DrawText(const wchar_t* text, int length, int offsetX, int offsetY, int rectWidth, int rectHeight)
+Concurrency::concurrent_queue<OutputSystem::Text> textQueue;
+
+void OutputSystem::PrintText(Text text)
 {
+	textQueue.push(std::move(text));
+}
+
+bool OutputSystem::PopTextImpl(Text& text)
+{
+	return textQueue.try_pop(text);
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Common.hpp>
+#include <Container/String.hpp>
+#include <Pattern/Singleton.hpp>
 
 
 
@@ -12,20 +14,31 @@ class OutputSystem final
 public:
 	struct Text
 	{
-		const wchar_t* data;
-		int length;
+		WideString context;
 		int offsetX;
 		int offsetY;
 		int rectWidth;
 		int rectHeight;
 	};
 
-	void PushText(const Text& text);
+	void PrintText(Text text);
 
-	decltype(PushText) DrawText = PushText;
+//~ End define DrawText
 
 private:
-	void PopText();
+	template <typename Predicate>
+	void PopText(Predicate pred)
+	{
+		Text text;
+		while (PopTextImpl(text))
+		{
+			pred(std::move(text));
+		}
+	}
+
+	bool PopTextImpl(Text& text);
 
 	//~ End Draw Text
 };
+
+extern UniqueResource<OutputSystem> GOutput;

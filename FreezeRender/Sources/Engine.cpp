@@ -4,6 +4,7 @@
 #include <Renderer/Raster/Rasterizer.hpp>
 #include <World/RenderWorld.hpp>
 #include <Input/InputSystem.hpp>
+#include <Output/OutputSystem.hpp>
 #include <sstream>
 
 
@@ -14,6 +15,7 @@
 UniqueResource<Renderer> GRenderer;
 UniqueResource<RenderWorld> GWorld;
 UniqueResource<InputSystem> GInput;
+UniqueResource<OutputSystem> GOutput;
 
 
 
@@ -27,9 +29,10 @@ Engine::~Engine()
 
 bool Engine::HandleCreateEvent(UINT width, UINT height)
 {
-	GRenderer.Initialize(new RayTracingRenderer());
-	GWorld.Initialize(new RenderWorld());
-	GInput.Initialize(new InputSystem());
+	GRenderer.Initialize<RayTracingRenderer>();
+	GWorld.Initialize<RenderWorld>();
+	GInput.Initialize<InputSystem>();
+	GOutput.Initialize<OutputSystem>();
 
 	GRenderer->Startup(width, height);
 	GWorld->Startup(width, height);
@@ -41,12 +44,16 @@ void Engine::HandleKeyDownEvent(WPARAM nKey)
 	GInput->PressedKey(static_cast<unsigned char>(nKey));
 	if (nKey == InputSystem::VK_Z)
 	{
-		GRenderer.Initialize(new Rasterizer());
+		UniqueResource<Renderer> renderer;
+		renderer.Initialize<Rasterizer>();
+		GRenderer.Swap(renderer);
 		GRenderer->Startup(m_width, m_height);
 	}
 	else if (nKey == InputSystem::VK_X)
 	{
-		GRenderer.Initialize(new RayTracingRenderer());
+		UniqueResource<Renderer> renderer;
+		renderer.Initialize<RayTracingRenderer>();
+		GRenderer.Swap(renderer);
 		GRenderer->Startup(m_width, m_height);
 	}
 }
@@ -120,14 +127,24 @@ void Engine::Tick(const float deltaTime)
 	// Tick Render.
 	ColorRenderTarget& result = GRenderer->Render(*GWorld);
 	Draw(result.Data(), (UINT)result.Width(), (UINT)result.Height(), result.Width() * 4u);
-	
-	Vector3 location = GWorld->render.cameras[0].data.location;
-	std::wostringstream out;
-	out.precision(6);
-	out << "camera location { " << location.x << ", " << location.y << ", " << location.z << " }";
-	std::wstring text = out.str();
-	DebugDraw(text.data(), text.size(), 12, 50, 561, 63);
 
 	// Reset input.
 	GInput->Reset();
+}
+
+void Engine::ExecuteSlateDraw()
+{
+	GOutput->PopText(
+		[this](OutputSystem::Text text)
+		{
+			SlateDrawText(
+				text.context.Data(),
+				(int)text.context.Size(),
+				text.offsetX,
+				text.offsetY,
+				text.rectWidth,
+				text.rectHeight
+			);
+		}
+	);
 }

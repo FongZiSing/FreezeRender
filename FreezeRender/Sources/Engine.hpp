@@ -37,5 +37,7 @@ protected:
 	 * @brief The root entry of tick system, call every frame.
 	 */
 	virtual void Tick(const float deltaTime) override;
+
+	virtual void ExecuteSlateDraw() override;
 };
 

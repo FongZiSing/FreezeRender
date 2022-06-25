@@ -74,7 +74,9 @@ protected:
 		unsigned int strides
 	);
 
-	void DebugDraw(const wchar_t* text, int length, int offsetx, int offsety, int width, int height);
+	void SlateDrawText(const wchar_t* text, int length, int offsetx, int offsety, int width, int height);
+	
+	virtual void ExecuteSlateDraw() {}
 
 	//~ End Engine.
 
@@ -100,9 +102,6 @@ private:
 
 	// Update frames info.
 	void UpdateFrameStats(const float& deltaTime, const unsigned int& elapsedTime);
-
-	// Called every frames.
-	void ExecuteDebugDrawTask();
 
 	// Called every frames.
 	void EndDraw();

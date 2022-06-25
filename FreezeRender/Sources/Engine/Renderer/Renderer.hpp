@@ -2,6 +2,7 @@
 
 #include <Pattern/Singleton.hpp>
 #include <Render/RenderTarget.hpp>
+#include <Pattern/Singleton.hpp>
 
 
 

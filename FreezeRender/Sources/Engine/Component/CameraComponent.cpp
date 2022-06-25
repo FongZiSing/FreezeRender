@@ -1,6 +1,8 @@
 #include "CameraComponent.hpp"
 
 #include <Input/InputSystem.hpp>
+#include <Output/OutputSystem.hpp>
+#include <sstream>
 
 
 
@@ -76,4 +78,13 @@ void CameraComponent::TickComponent(float deltaTime)
 		data.location += deltaLocation;
 		camera.UpdateViewMatrix();
 	}
+
+	std::wostringstream out;
+	out.precision(6);
+	out << "camera location { " << data.location.x << ", " << data.location.y << ", " << data.location.z << " }";
+	std::wstring text = out.str();
+	GOutput->PrintText({
+		text,
+		12, 50, 561, 63
+	});
 }

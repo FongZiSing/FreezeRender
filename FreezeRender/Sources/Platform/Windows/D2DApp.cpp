@@ -28,10 +28,6 @@
 
 ////////////////////////////////////////////////////////////////
 //
-concurrency::concurrent_queue<std::function<void(void)>> g_debugTask;
-
-////////////////////////////////////////////////////////////////
-//
 D2DApp::D2DApp()
 {
 	m_featureLevel = D3D_FEATURE_LEVEL_1_0_CORE; // just default value, not be used.
@@ -57,32 +53,14 @@ void D2DApp::Draw(
 	m_pD2DDeviceContext->DrawBitmap(m_pD2DRenderTarget.Get());
 }
 
-void D2DApp::DebugDraw(const wchar_t* text, int length, int offsetx, int offsety, int width, int height)
+void D2DApp::SlateDrawText(const wchar_t* text, int length, int offsetx, int offsety, int width, int height)
 {
-	std::wstring targetText = text;
-	g_debugTask.push(
-		[text = std::move(targetText),
-		 offsetx,
-		 offsety,
-		 height,
-		 width,
-		 deviceContext = m_pD2DDeviceContext.Get(),
-		 writeTextFormat = m_pWriteTextFormat.Get(),
-		 brush = m_pBrush.Get()
-		]()
-		{
-			deviceContext->DrawText(
-				text.c_str(),
-				(UINT32)text.size(),
-				writeTextFormat,
-				D2D1::RectF(
-				static_cast<float>(offsetx),
-				static_cast<float>(offsety),
-				static_cast<float>(width),
-				static_cast<float>(height)),
-				brush
-			);
-		}
+	m_pD2DDeviceContext->DrawText(
+		text,
+		length,
+		m_pWriteTextFormat.Get(),
+		D2D1::RectF((float)offsetx, (float)offsety, (float)width, (float)height),
+		m_pBrush.Get()
 	);
 }
 
@@ -324,19 +302,6 @@ void D2DApp::UpdateFrameStats(const float& deltaTime, const unsigned int& fps)
 		m_textLayoutRect_FPS,
 		m_pBrush.Get()
 	);
-}
-
-void D2DApp::ExecuteDebugDrawTask()
-{
-	if (!g_debugTask.empty())
-	{
-		std::function<void(void)> task;
-		while (g_debugTask.try_pop(task) && task)
-		{
-			task();
-			task = nullptr;
-		}
-	}
 }
 
 void D2DApp::EndDraw()
@@ -653,7 +618,7 @@ force_noinline void D2DApp::Run()
 
 			UpdateFrameStats(timer.GetDeltaTime(), timer.GetFrameNumber());
 
-			ExecuteDebugDrawTask();
+			ExecuteSlateDraw();
 
 			EndDraw();
 
