@@ -84,6 +84,7 @@
     <ClCompile Include="Sources\Asset\Texture\Loader\TextureLoaderLibrary.cpp" />
     <ClCompile Include="Sources\Asset\Texture\Loader\WICTextureLoader.cpp" />
     <ClCompile Include="Sources\Asset\World\Loader\WorldLoaderLibrary.cpp" />
+    <ClCompile Include="Sources\Core\Math\AxisAlignedBoundingBox.hpp" />
     <ClCompile Include="Sources\Engine\Component\CameraComponent.cpp" />
     <ClCompile Include="Sources\Engine\Component\MeshletComponent.cpp" />
     <ClCompile Include="Sources\Engine\Component\PointLightComponent.cpp" />

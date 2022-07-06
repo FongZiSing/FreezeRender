@@ -367,6 +367,9 @@
     <ClCompile Include="Sources\Engine\Render\Shading\Meshlet.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Core\Math\AxisAlignedBoundingBox.hpp">
+      <Filter>Sources\Core %28 Core Layer %29\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint">
