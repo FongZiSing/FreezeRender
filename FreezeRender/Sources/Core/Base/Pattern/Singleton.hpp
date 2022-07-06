@@ -2,7 +2,7 @@
 
 #include <Common.hpp>
 #include <type_traits>
-#include <atomic>
+#include <Thread/SpinLock.hpp>
 
 
 
@@ -35,41 +35,7 @@ class UniqueResource
 {
 private:
 	Derived* resource;
-
-#pragma region SpinLock
-__pragma(push_macro("Yield"))
-#undef Yield
-
-	std::atomic<bool> flag{ false };
-
-	void Yield()
-	{
-		_mm_pause();
-	}
-
-	void Lock()
-	{
-		while (true)
-		{
-			if (!flag.exchange(true, std::memory_order_acquire))
-			{
-				break;
-			}
-
-			while (flag.load(std::memory_order_relaxed))
-			{
-				Yield();
-			}
-		}
-	}
-
-	void Unlock()
-	{
-		flag.store(false, std::memory_order_release);
-	}
-
-__pragma(pop_macro("Yield"))
-#pragma endregion SpinLock
+	SpinLock scope;
 
 public:
 	UniqueResource(const UniqueResource&) = delete;
@@ -84,30 +50,28 @@ public:
 		{
 			delete resource;
 		}
-		resource = nullptr;
-		flag.store(false, std::memory_order_release);
 	}
 
 	template<class DerivedClass, typename ...Args>
 	constexpr void Initialize(Args&&... agrs) noexcept
 	{
-		Lock();
+		scope.Lock();
 		if (!resource)
 		{
 			resource = new DerivedClass(std::forward<Args>(agrs)...);
 		}
-		Unlock();
+		scope.Unlock();
 	}
 
 	inline void Swap(UniqueResource& rhs) noexcept
 	{
-		Lock();
+		scope.Lock();
 		{
 			Derived* temp = resource;
 			resource = rhs.resource;
 			rhs.resource = temp;
 		}
-		Unlock();
+		scope.Unlock();
 	}
 
 	constexpr Derived* operator -> () const noexcept { return resource; }

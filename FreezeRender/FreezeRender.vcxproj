@@ -45,6 +45,7 @@
     <ClInclude Include="Sources\Core\Base\Pattern\Singleton.hpp" />
     <ClInclude Include="Sources\Core\Base\Thread\ParallelFor.hpp" />
     <ClInclude Include="Sources\Core\Base\Thread\RunnableTask.hpp" />
+    <ClInclude Include="Sources\Core\Base\Thread\SpinLock.hpp" />
     <ClInclude Include="Sources\Core\Math\Color.hpp" />
     <ClInclude Include="Sources\Core\Math\Math.hpp" />
     <ClInclude Include="Sources\Core\Math\Matrix.hpp" />
@@ -91,6 +92,7 @@
     <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp" />
     <ClCompile Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.cpp" />
     <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp" />
+    <ClCompile Include="Sources\Engine\Render\Shading\Meshlet.cpp" />
     <ClCompile Include="Sources\Engine\Shader\FragmentShader.cpp" />
     <ClCompile Include="Sources\Engine\Shader\VertexShader.cpp" />
     <ClCompile Include="Sources\Engine\World\RenderWorld.cpp" />

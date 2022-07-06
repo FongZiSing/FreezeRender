@@ -7,6 +7,7 @@
 
 struct Meshlet
 {
+public:
 	AMeshlet& data;
 	Array<Material> materials;
 
@@ -28,6 +29,7 @@ struct Meshlet
 
 	class Iterator
 	{
+	private:
 		const Meshlet& mesh;
 		const AVertexIndex* begin;
 		const AVertexIndex* end;
@@ -40,7 +42,9 @@ struct Meshlet
 		{}
 
 		force_inline void operator++ () { begin += 3; }
+		
 		force_inline explicit operator bool() const { return begin < end; }
+		
 		force_inline bool operator! () const { return !this->operator bool(); }
 
 		ShadingTriangle Assembly() const
@@ -58,4 +62,12 @@ struct Meshlet
 	{
 		return Iterator(*this);
 	}
+
+	void Build()
+	{
+		BuildBVH();
+	}
+
+private:
+	void BuildBVH();
 };
