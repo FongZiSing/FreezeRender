@@ -1,22 +1,33 @@
+//
+// MeshletComponent.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of meshlet component.
+//
 #pragma once
 
 #include <Render/Shading/Meshlet.hpp>
 
 
 
-class MeshletComponent
+namespace Pluto
 {
-private:
-	AMeshlet& data;
-	Meshlet& meshlet;
-
-
-public:
-	MeshletComponent(AMeshlet& asset, Meshlet& target)
-		: data(asset)
-		, meshlet(target)
+	class MeshletComponent
 	{
-	}
+	private:
+		AMeshlet& data;
+		Meshlet& meshlet;
 
-	void TickComponent(float deltaTime);
-};
+
+	public:
+		MeshletComponent(AMeshlet& asset, Meshlet& target)
+			: data(asset)
+			, meshlet(target)
+		{
+		}
+
+		void TickComponent(float deltaTime);
+	};
+}

@@ -1,19 +1,30 @@
+//
+// Texture.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Texture asset.
+//
 #pragma once
 
 #include <Asset/Texture/Texture.hpp>
 
 
 
-/**
- * @brief Material object.
- */
-struct AMaterial
+namespace Pluto
 {
-	using TextureReference = std::unique_ptr<ATexture>;
+	/**
+	 * @brief Material object.
+	 */
+	struct AMaterial
+	{
+		using TextureReference = std::unique_ptr<ATexture>;
 
-	WideString id { L"Native" };
-	WideString name { L"Native" };
+		WideString id{ L"Native" };
+		WideString name{ L"Native" };
 
-	TextureReference diffuse { nullptr };
-	TextureReference normal { nullptr };
-};
+		TextureReference diffuse{ nullptr };
+		TextureReference normal{ nullptr };
+	};
+}

@@ -1,3 +1,11 @@
+//
+// Math/SIMD.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Math functions of architecture intrinsic.
+//
 #pragma once
 
 #include <Common.hpp>
@@ -6,99 +14,104 @@
 
 
 
-// 128-bit register.
-using R128 = __m128;
-
-// 128-bit integer register.
-using R128i = __m128i;
-
-// 256-bit register.
-using R256 = __m256;
-
-// 256-bit integer register.
-using R256i = __m256i;
-
-
-
-namespace Number
+namespace Pluto
 {
-	force_inline constexpr R128 MakeRegister(const unsigned int& x, const unsigned int& y, const unsigned int& z, const unsigned int& w)
+	// 128-bit register.
+	using R128 = __m128;
+
+	// 128-bit integer register.
+	using R128i = __m128i;
+
+	// 256-bit register.
+	using R256 = __m256;
+
+	// 256-bit integer register.
+	using R256i = __m256i;
+
+
+
+	/**
+	 * @brief Definitions of useful mathematical constants.
+	 */
+	namespace Number
 	{
-		R128 result;
-		result.m128_u32[0] = x;
-		result.m128_u32[1] = y;
-		result.m128_u32[2] = z;
-		result.m128_u32[3] = w;
-		return result;
-	}
+		force_inline constexpr R128 MakeRegister(const unsigned int& x, const unsigned int& y, const unsigned int& z, const unsigned int& w)
+		{
+			R128 result;
+			result.m128_u32[0] = x;
+			result.m128_u32[1] = y;
+			result.m128_u32[2] = z;
+			result.m128_u32[3] = w;
+			return result;
+		}
 
-	force_inline constexpr R128 MakeRegister(const unsigned int& x)
-	{
-		R128 result;
-		result.m128_u32[0] = x;
-		result.m128_u32[1] = x;
-		result.m128_u32[2] = x;
-		result.m128_u32[3] = x;
-		return result;
-	}
+		force_inline constexpr R128 MakeRegister(const unsigned int& x)
+		{
+			R128 result;
+			result.m128_u32[0] = x;
+			result.m128_u32[1] = x;
+			result.m128_u32[2] = x;
+			result.m128_u32[3] = x;
+			return result;
+		}
 
-	force_inline constexpr R128 MakeRegister(const float& x, const float& y, const float& z, const float& w)
-	{
-		R128 result;
-		result.m128_f32[0] = x;
-		result.m128_f32[1] = y;
-		result.m128_f32[2] = z;
-		result.m128_f32[3] = w;
-		return result;
-	}
+		force_inline constexpr R128 MakeRegister(const float& x, const float& y, const float& z, const float& w)
+		{
+			R128 result;
+			result.m128_f32[0] = x;
+			result.m128_f32[1] = y;
+			result.m128_f32[2] = z;
+			result.m128_f32[3] = w;
+			return result;
+		}
 
-	force_inline constexpr R128 MakeRegister(const float& x)
-	{
-		R128 result;
-		result.m128_f32[0] = x;
-		result.m128_f32[1] = x;
-		result.m128_f32[2] = x;
-		result.m128_f32[3] = x;
-		return result;
-	}
+		force_inline constexpr R128 MakeRegister(const float& x)
+		{
+			R128 result;
+			result.m128_f32[0] = x;
+			result.m128_f32[1] = x;
+			result.m128_f32[2] = x;
+			result.m128_f32[3] = x;
+			return result;
+		}
 
-	constexpr const R128 R_ZERO          = MakeRegister(  0.f );
-	constexpr const R128 R_ONE           = MakeRegister(  1.f );
-	constexpr const R128 R_NEGONE        = MakeRegister( -1.f );
-	constexpr const R128 R_TWO           = MakeRegister(  2.f );
-	constexpr const R128 R_NEGTWO        = MakeRegister( -2.f );
-	constexpr const R128 R_HALF          = MakeRegister( 0.5f );
-	constexpr const R128 R_PI            = MakeRegister(  PI  );
-	constexpr const R128 R_PI_2          = MakeRegister( 0.5f * PI );
-	constexpr const R128 R_PI2           = MakeRegister( 2.0f * PI );
-	constexpr const R128 R_ONE_PI2       = MakeRegister( 1.f / (2.f * PI) );
-	constexpr const R128 R_SIGNBIT       = MakeRegister( unsigned int(1 << 31) );
-	constexpr const R128 R_SIGNMASK      = MakeRegister( unsigned int(~(1 << 31)) );
+		constexpr const R128 R_ZERO          = MakeRegister(  0.f );
+		constexpr const R128 R_ONE           = MakeRegister(  1.f );
+		constexpr const R128 R_NEGONE        = MakeRegister( -1.f );
+		constexpr const R128 R_TWO           = MakeRegister(  2.f );
+		constexpr const R128 R_NEGTWO        = MakeRegister( -2.f );
+		constexpr const R128 R_HALF          = MakeRegister( 0.5f );
+		constexpr const R128 R_PI            = MakeRegister(  PI  );
+		constexpr const R128 R_PI_2          = MakeRegister( 0.5f * PI );
+		constexpr const R128 R_PI2           = MakeRegister( 2.0f * PI );
+		constexpr const R128 R_ONE_PI2       = MakeRegister( 1.f / (2.f * PI) );
+		constexpr const R128 R_SIGNBIT       = MakeRegister( unsigned int(1 << 31) );
+		constexpr const R128 R_SIGNMASK      = MakeRegister( unsigned int(~(1 << 31)) );
 
-	constexpr const R128 R_DEG_TO_RAD    = MakeRegister( DEG_TO_RAD );
-	constexpr const R128 R_RAD_TO_DEG    = MakeRegister( RAD_TO_DEG );
-	constexpr const R128 R_180F          = MakeRegister( 180.f );
-	constexpr const R128 R_360F          = MakeRegister( 360.f );
+		constexpr const R128 R_DEG_TO_RAD    = MakeRegister( DEG_TO_RAD );
+		constexpr const R128 R_RAD_TO_DEG    = MakeRegister( RAD_TO_DEG );
+		constexpr const R128 R_180F          = MakeRegister( 180.f );
+		constexpr const R128 R_360F          = MakeRegister( 360.f );
 	
-	constexpr const R128 R_FLOAT_NON_FRACTIONAL = MakeRegister( FLOAT_NON_FRACTIONAL );
+		constexpr const R128 R_FLOAT_NON_FRACTIONAL = MakeRegister( FLOAT_NON_FRACTIONAL );
 
-	constexpr const R128 R_XMASK         = MakeRegister( 0xffffffffu,     0u,          0u,          0u      );
-	constexpr const R128 R_YMASK         = MakeRegister(     0u,      0xffffffffu,     0u,          0u      );
-	constexpr const R128 R_ZMASK         = MakeRegister(     0u,          0u,      0xffffffffu,     0u      );
-	constexpr const R128 R_WMASK         = MakeRegister(     0u,          0u,          0u,      0xffffffffu );
-	constexpr const R128 R_XYMASK        = MakeRegister( 0xffffffffu, 0xffffffffu,     0u,          0u      );
-	constexpr const R128 R_XZMASK        = MakeRegister( 0xffffffffu,     0u,      0xffffffffu,     0u      );
-	constexpr const R128 R_YWMASK        = MakeRegister(     0u,      0xffffffffu,     0u,      0xffffffffu );
-	constexpr const R128 R_ZWMASK        = MakeRegister(     0u,          0u,      0xffffffffu, 0xffffffffu );
-	constexpr const R128 R_XYZMASK       = MakeRegister( 0xffffffffu, 0xffffffffu, 0xffffffffu,     0u      );
-	constexpr const R128 R_YZWMASK       = MakeRegister(     0u,      0xffffffffu, 0xffffffffu, 0xffffffffu );
+		constexpr const R128 R_XMASK         = MakeRegister( 0xffffffffu,     0u,          0u,          0u      );
+		constexpr const R128 R_YMASK         = MakeRegister(     0u,      0xffffffffu,     0u,          0u      );
+		constexpr const R128 R_ZMASK         = MakeRegister(     0u,          0u,      0xffffffffu,     0u      );
+		constexpr const R128 R_WMASK         = MakeRegister(     0u,          0u,          0u,      0xffffffffu );
+		constexpr const R128 R_XYMASK        = MakeRegister( 0xffffffffu, 0xffffffffu,     0u,          0u      );
+		constexpr const R128 R_XZMASK        = MakeRegister( 0xffffffffu,     0u,      0xffffffffu,     0u      );
+		constexpr const R128 R_YWMASK        = MakeRegister(     0u,      0xffffffffu,     0u,      0xffffffffu );
+		constexpr const R128 R_ZWMASK        = MakeRegister(     0u,          0u,      0xffffffffu, 0xffffffffu );
+		constexpr const R128 R_XYZMASK       = MakeRegister( 0xffffffffu, 0xffffffffu, 0xffffffffu,     0u      );
+		constexpr const R128 R_YZWMASK       = MakeRegister(     0u,      0xffffffffu, 0xffffffffu, 0xffffffffu );
 
-	constexpr const R128 R_255F          = MakeRegister( 255.f );
-}
+		constexpr const R128 R_255F          = MakeRegister( 255.f );
+	}
 
 
-#ifndef SIMD_HPP_SSE_IMPL
-#define SIMD_HPP_SSE_IMPL
+
+#pragma region sse
 
 	/**
 	 * @brief Load a R128 from aligned memory.
@@ -409,12 +422,11 @@ namespace Number
 		return RegisterAdd(trunc, add);
 	}
 
-#endif // !SIMD_HPP_SSE_IMPL
+#pragma endregion sse
 
 
 
-#ifndef SIMD_HPP_AVX_IMPL
-#define SIMD_HPP_AVX_IMPL
+#pragma region avx
 
 	/**
 	 * @brief Load a R256 from aligned memory.
@@ -509,5 +521,5 @@ namespace Number
 		}
 	}
 
-
-#endif // !SIMD_HPP_AVX_IMPL
+#pragma endregion sse
+}

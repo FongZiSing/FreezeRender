@@ -2,10 +2,13 @@
 
 
 
-InputSystem::InputSystem()
+namespace Pluto
 {
-}
+	InputSystem::InputSystem()
+	{
+	}
 
-InputSystem::~InputSystem()
-{
+	InputSystem::~InputSystem()
+	{
+	}
 }

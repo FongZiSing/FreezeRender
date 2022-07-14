@@ -1,3 +1,11 @@
+//
+// Light.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Light asset.
+//
 #pragma once
 
 #include <Common.hpp>
@@ -5,22 +13,25 @@
 
 
 
-/**
- * @brief The light object.
- */
-struct ALight
+namespace Pluto
 {
-	float intensity;
+	/**
+	 * @brief The light object.
+	 */
+	struct ALight
+	{
+		float intensity;
 
-	Vector3 location;
-};
+		Vector3 location;
+	};
 
 
 
-/**
- * @brief The point light object.
- */
-struct APointLight final : public ALight
-{
-	// TODO
-};
+	/**
+	 * @brief The point light object.
+	 */
+	struct APointLight final : public ALight
+	{
+		// TODO
+	};
+}

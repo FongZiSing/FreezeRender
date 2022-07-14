@@ -17,9 +17,6 @@
     <Filter Include="Sources\Core %28 Core Layer %29\Base\Container">
       <UniqueIdentifier>{82b0f3f9-f743-4ed6-bab6-4d63522af1c7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Sources\Core %28 Core Layer %29\Base\Container\Detail">
-      <UniqueIdentifier>{19d2946a-22be-4479-9437-a073d190ba8a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Sources\Core %28 Core Layer %29\Base\Pattern">
       <UniqueIdentifier>{17811951-c492-4e4f-9971-4a8f8f3407d5}</UniqueIdentifier>
     </Filter>
@@ -134,15 +131,15 @@
     <Filter Include="Sources\Engine %28 Function Layer %29\Output">
       <UniqueIdentifier>{2c8bbd35-8104-4413-b31f-b6a110bca87b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sources\Engine %28 Function Layer %29\Render\RayTracing\BoundingVolumeHierarchy">
+      <UniqueIdentifier>{510831fc-4187-49d1-b8e7-ade22adc945c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\Engine.hpp" />
     <ClInclude Include="Sources\Common.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\String.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Base\Container</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Core\Base\Container\Detail\String.hpp">
-      <Filter>Sources\Core %28 Core Layer %29\Base\Container\Detail</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Core\Base\Container\Array.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Base\Container</Filter>
@@ -171,7 +168,7 @@
     <ClInclude Include="Sources\Core\Math\SIMD.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Core\Base\Algorithm\KahanSummation.hpp">
+    <ClInclude Include="Sources\Core\Base\Algorithm\KahanSum.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Base\Algorithm</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Asset\Texture\Texture.hpp">
@@ -222,7 +219,7 @@
     <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\RenderVisibilityBuffer.hpp">
+    <ClInclude Include="Sources\Engine\Render\VisibilityBuffer.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Platform\Windows\D2DApp.hpp">
@@ -294,17 +291,26 @@
     <ClInclude Include="Sources\Engine\Render\Shading\Texture.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
     </ClInclude>
-    <ClInclude Include="Sources\Engine\Render\RenderPixelFormat.hpp">
+    <ClInclude Include="Sources\Engine\Render\PixelFormat.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\Core\Base\Container\UnrolledLinkList.hpp">
-      <Filter>Sources\Core %28 Core Layer %29\Base\Container</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Engine\Output\OutputSystem.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Output</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Core\Base\Thread\SpinLock.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Base\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\RayTracing\BoundingVolumeHierarchy\BVH.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\RayTracing\BoundingVolumeHierarchy</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Platform\ParallelFor.hpp">
+      <Filter>Sources\Platform %28 Platform Layer %29\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Platform\Async.hpp">
+      <Filter>Sources\Platform %28 Platform Layer %29\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Engine\Render\Shading\Sampler.hpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -328,7 +334,7 @@
     <ClCompile Include="Sources\Engine\World\RenderWorld.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\World</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp">
+    <ClCompile Include="Sources\Engine\Render\GeometryBuffer.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Platform\Windows\D2DApp.cpp">
@@ -367,7 +373,7 @@
     <ClCompile Include="Sources\Engine\Render\Shading\Meshlet.cpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Core\Math\AxisAlignedBoundingBox.hpp">
+    <ClCompile Include="Sources\Core\Math\Box.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Math</Filter>
     </ClCompile>
   </ItemGroup>

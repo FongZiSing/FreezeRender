@@ -3,8 +3,11 @@
 
 
 
-TextureLoader::Status TextureLoaderLibrary::Load(const wchar_t* const filepath, ATexture* result, APixelFormat asformat)
+namespace Pluto
 {
-	WICTextureLoader loader(filepath);
-	return loader.Load(result, asformat);
+	TextureLoader::Status TextureLoaderLibrary::Load(const wchar_t* const filepath, ATexture* result, APixelFormat asformat)
+	{
+		WICTextureLoader loader(filepath);
+		return loader.Load(result, asformat);
+	}
 }

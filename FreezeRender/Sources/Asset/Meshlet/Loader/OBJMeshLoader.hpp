@@ -1,3 +1,11 @@
+//
+// OBJMeshLoader.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Utility of load OBJ mesh.
+//
 #pragma once
 
 #include "MeshLoader.hpp"
@@ -5,37 +13,51 @@
 
 
 
-/**
- * @biref Load meshlet according to the specified .obj file.
- */
-class OBJMeshLoader final : public MeshLoader
+namespace Pluto
 {
-	// Store the last result of operation.
-	Status status = Status::Uninitialized;
+	/**
+	 * @biref Load meshlet according to the specified .obj file.
+	 */
+	class OBJMeshLoader final : public MeshLoader
+	{
+		// Store the last result of operation.
+		Status status = Status::Uninitialized;
 
-	// Store the mesh file path.
-	std::filesystem::path filepath;
+		// Store the mesh file path.
+		std::filesystem::path filepath;
 
-public:
-	/// Initialize.
-	OBJMeshLoader(const std::filesystem::path& filepath) : filepath(filepath) { this->status = Verify(); }
+	public:
 
-	OBJMeshLoader(std::filesystem::path&& filepath) : filepath(std::move(filepath)) { this->status = Verify(); }
+		//--------------------------------
+		//~ Begin initialize.
+		
+		OBJMeshLoader(const std::filesystem::path& filepath) : filepath(filepath) { this->status = Verify(); }
 
-	OBJMeshLoader(const wchar_t* const filepath) noexcept : filepath(filepath) { this->status = Verify(); };
-	/// Initialize.
+		OBJMeshLoader(std::filesystem::path&& filepath) : filepath(std::move(filepath)) { this->status = Verify(); }
 
-	/// Inline function.
-	WideString GetNativeName() const override { return filepath.native(); }
+		OBJMeshLoader(const wchar_t* const filepath) noexcept : filepath(filepath) { this->status = Verify(); };
+		
+		//~ End initialize.
+		//--------------------------------
 
-	WideString GetAbsolutePath() const override { return std::filesystem::canonical(filepath).wstring(); }
 
-	WideString GetName() const override { return filepath.filename().wstring(); }
+		//--------------------------------
+		//~ Begin inline function.
+		
+		WideString GetNativeName() const override { return filepath.native(); }
 
-	Extension GetExtension() const override { return Extension::OBJ; }
-	/// Inline function.
-	
-	Status Verify() const override;
+		WideString GetAbsolutePath() const override { return std::filesystem::canonical(filepath).wstring(); }
 
-	Status Load(AMeshlet* result) override;
-};
+		WideString GetName() const override { return filepath.filename().wstring(); }
+
+		Extension GetExtension() const override { return Extension::OBJ; }
+		
+		//~ End inline function.
+		//--------------------------------
+
+
+		Status Verify() const override;
+
+		Status Load(AMeshlet* result) override;
+	};
+}

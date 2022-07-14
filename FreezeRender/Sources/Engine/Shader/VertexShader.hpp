@@ -1,68 +1,79 @@
+//
+// VertexShader.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of vertex shader.
+//
 #pragma once
 
 #include <Render/Shading/Polygon.hpp>
 
 
 
-namespace Shader
+namespace Pluto
 {
-	/**
-	 * @brief The data structure used by the vertex shader.
-	 */
-	struct VertexPayload
+	namespace Shader
 	{
-		const ShadingTriangle& triangle;
-		const Matrix& modelViewMatrix;
-		const Matrix& modelViewInvMatrix;
-		const Matrix& modelViewProjectionMatrix;
-
-
-		// Initialize.
-		VertexPayload(ShadingTriangle& inOutTriange, const Matrix& inModelViewMatrix, const Matrix& inModelViewInvMatrix, const Matrix& inModelViewProjectionMatrix)
-			: triangle(inOutTriange)
-			, modelViewMatrix(inModelViewMatrix)
-			, modelViewInvMatrix(inModelViewInvMatrix)
-			, modelViewProjectionMatrix(inModelViewProjectionMatrix)
+		/**
+		 * @brief The data structure used by the vertex shader.
+		 */
+		struct VertexPayload
 		{
-			// TODO
-		}
-	};
+			const ShadingTriangle& triangle;
+			const Matrix& modelViewMatrix;
+			const Matrix& modelViewInvMatrix;
+			const Matrix& modelViewProjectionMatrix;
 
 
-	/**
-	 * @brief All supported vertex shader.
-	 */
-	namespace Vertex
-	{
-		static void Nothing(const VertexPayload& payload) { }
-	}
-
-
-	/**
-	 * @brief The entry of vertex shader.
-	 */
-	class VertexShader
-	{
-		typedef void(*PrivateHandle)(const VertexPayload&);
-
-		static constexpr const PrivateHandle handle = Vertex::Nothing;
-
-	public:
-		force_noinline without_globalvar void operator() (const VertexPayload& payload)
-		{
-			// Empty function optimize.
-			// for example:
-			//     line 1:    VertexShader vs;
-			//     line 2:    vs( VertexPayload { ... } );
-			//
-			// if `VertexShader::handle == Vertex::Nothing` is true,
-			// line 2 will be ignored by the compiler and VertexPayload constructor function will not even be called.
-			//
-			// if the compiler supports that...
-			if constexpr (VertexShader::handle != Vertex::Nothing)
+			// Initialize.
+			VertexPayload(ShadingTriangle& inOutTriange, const Matrix& inModelViewMatrix, const Matrix& inModelViewInvMatrix, const Matrix& inModelViewProjectionMatrix)
+				: triangle(inOutTriange)
+				, modelViewMatrix(inModelViewMatrix)
+				, modelViewInvMatrix(inModelViewInvMatrix)
+				, modelViewProjectionMatrix(inModelViewProjectionMatrix)
 			{
-				handle(payload);
+				// TODO
 			}
+		};
+
+
+		/**
+		 * @brief All supported vertex shader.
+		 */
+		namespace Vertex
+		{
+			static void Nothing(const VertexPayload& payload) { }
 		}
-	};
+
+
+		/**
+		 * @brief The entry of vertex shader.
+		 */
+		class VertexShader
+		{
+			typedef void(*PrivateHandle)(const VertexPayload&);
+
+			static constexpr const PrivateHandle handle = Vertex::Nothing;
+
+		public:
+			force_noinline without_globalvar void operator() (const VertexPayload& payload)
+			{
+				// Empty function optimize.
+				// for example:
+				//     line 1:    VertexShader vs;
+				//     line 2:    vs( VertexPayload { ... } );
+				//
+				// if `VertexShader::handle == Vertex::Nothing` is true,
+				// line 2 will be ignored by the compiler and VertexPayload constructor function will not even be called.
+				//
+				// if the compiler supports that...
+				if constexpr (VertexShader::handle != Vertex::Nothing)
+				{
+					handle(payload);
+				}
+			}
+		};
+	}
 }

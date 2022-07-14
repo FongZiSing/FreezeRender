@@ -3,14 +3,18 @@
 
 
 
-Concurrency::concurrent_queue<OutputSystem::Text> textQueue;
-
-void OutputSystem::PrintText(Text text)
+namespace Pluto
 {
-	textQueue.push(std::move(text));
-}
+	// TODO move to `Platform` folder.
+	Concurrency::concurrent_queue<OutputSystem::Text> textQueue;
 
-bool OutputSystem::PopTextImpl(Text& text)
-{
-	return textQueue.try_pop(text);
+	void OutputSystem::PrintText(Text text)
+	{
+		textQueue.push(std::move(text));
+	}
+
+	bool OutputSystem::PopTextImpl(Text& text)
+	{
+		return textQueue.try_pop(text);
+	}
 }

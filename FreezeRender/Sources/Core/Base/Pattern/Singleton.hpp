@@ -1,3 +1,11 @@
+//
+// Pattern/Singleton.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of singleton.
+//
 #pragma once
 
 #include <Common.hpp>
@@ -6,75 +14,78 @@
 
 
 
-template <class Derived>
-class Singleton
+namespace Pluto
 {
-protected:
-	struct Token {};
-
-	Singleton() noexcept = default;
-
-public:
-	static Derived& Get() noexcept(std::is_nothrow_constructible<Derived, Token>::value)
+	template <class Derived>
+	class Singleton
 	{
-		static Derived Instance{ Token() };
-		return Instance;
-	}
+	protected:
+		struct Token {};
 
-	Singleton(const Singleton&) = delete;
+		Singleton() noexcept = default;
 
-	Singleton& operator = (const Singleton&) = delete;
-
-	~Singleton() = default;
-};
-
-
-
-template <class Derived>
-class UniqueResource
-{
-private:
-	Derived* resource;
-	SpinLock scope;
-
-public:
-	UniqueResource(const UniqueResource&) = delete;
-
-	UniqueResource& operator = (const UniqueResource&) = delete;
-
-	UniqueResource() noexcept = default;
-
-	~UniqueResource()
-	{
-		if (resource)
+	public:
+		static Derived& Get() noexcept(std::is_nothrow_constructible<Derived, Token>::value)
 		{
-			delete resource;
+			static Derived Instance{ Token() };
+			return Instance;
 		}
-	}
 
-	template<class DerivedClass, typename ...Args>
-	constexpr void Initialize(Args&&... agrs) noexcept
+		Singleton(const Singleton&) = delete;
+
+		Singleton& operator = (const Singleton&) = delete;
+
+		~Singleton() = default;
+	};
+
+
+
+	template <class Derived>
+	class UniqueResource
 	{
-		scope.Lock();
-		if (!resource)
-		{
-			resource = new DerivedClass(std::forward<Args>(agrs)...);
-		}
-		scope.Unlock();
-	}
+	private:
+		Derived* resource;
+		Thread::AtomicSpinLock scope;
 
-	inline void Swap(UniqueResource& rhs) noexcept
-	{
-		scope.Lock();
-		{
-			Derived* temp = resource;
-			resource = rhs.resource;
-			rhs.resource = temp;
-		}
-		scope.Unlock();
-	}
+	public:
+		UniqueResource(const UniqueResource&) = delete;
 
-	constexpr Derived* operator -> () const noexcept { return resource; }
-	
-	constexpr Derived* operator * () const noexcept { return resource; }
-};
+		UniqueResource& operator = (const UniqueResource&) = delete;
+
+		UniqueResource() noexcept = default;
+
+		~UniqueResource()
+		{
+			if (resource)
+			{
+				delete resource;
+			}
+		}
+
+		template<class DerivedClass, typename ...Args>
+		constexpr void Initialize(Args&&... agrs) noexcept
+		{
+			scope.Lock();
+			if (!resource)
+			{
+				resource = new DerivedClass(std::forward<Args>(agrs)...);
+			}
+			scope.Unlock();
+		}
+
+		inline void Swap(UniqueResource& rhs) noexcept
+		{
+			scope.Lock();
+			{
+				Derived* temp = resource;
+				resource = rhs.resource;
+				rhs.resource = temp;
+			}
+			scope.Unlock();
+		}
+
+		constexpr Derived* operator -> () const noexcept { return resource; }
+
+		constexpr Derived* operator * () const noexcept { return resource; }
+	};
+}

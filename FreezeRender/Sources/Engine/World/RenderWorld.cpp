@@ -5,90 +5,93 @@
 
 
 
-/**
- * @brief Internal data of RenderWorld.
- */
-inline namespace RenderWorldData
+namespace Pluto
 {
-	std::unique_ptr<AWorld> world;
-}
-
-
-
-RenderWorld::RenderWorld()
-{
-}
-
-RenderWorld::~RenderWorld()
-{
-}
-
-void RenderWorld::Load()
-{
-	//world = std::make_unique<AWorld>();
-	//WorldLoaderLibrary::InitializeDefaultWorld(*world);
-}
-
-
-void RenderWorld::Startup(unsigned int screenWidth, unsigned int screenHeight)
-{
-	world = std::make_unique<AWorld>();
-	WorldLoaderLibrary::InitializeDefaultWorld(*world);
-
-
-	for (auto& perCamera : world->allCamera)
+	/**
+	 * @brief Internal data of RenderWorld.
+	 */
+	inline namespace RenderWorldData
 	{
-		auto& renderCamera = render.cameras.Emplace(perCamera, screenWidth, screenHeight);
-		logic.cameras.Emplace(perCamera, renderCamera);
+		std::unique_ptr<AWorld> world;
 	}
 
-	for (auto& perMeshlet : world->allMeshlet)
+
+
+	RenderWorld::RenderWorld()
 	{
-		auto& renderMeshlet = render.meshlets.Emplace(perMeshlet);
-		logic.meshlets.Emplace(perMeshlet, renderMeshlet);
-	}
-	
-	for (auto& perPointLight : world->allPointLight)
-	{
-		auto& renderPointlight = render.pointlights.Emplace(perPointLight);
-		logic.pointlights.Emplace(perPointLight, renderPointlight);
 	}
 
-}
-
-void RenderWorld::Shutdown()
-{
-	logic.cameras.Clear();
-	logic.meshlets.Clear();
-	logic.pointlights.Clear();
-
-	render.cameras.Clear();
-	render.meshlets.Clear();
-	render.pointlights.Clear();
-}
-
-void RenderWorld::ScreenResize(const unsigned int& width, const unsigned int& height)
-{
-	for (auto& camera : logic.cameras)
+	RenderWorld::~RenderWorld()
 	{
-		camera.UpdateView(width, height);
 	}
-}
 
-void RenderWorld::Tick(float deltaTime)
-{
-	for (auto& camera : logic.cameras)
+	void RenderWorld::Load()
 	{
-		camera.TickComponent(deltaTime);
+		//world = std::make_unique<AWorld>();
+		//WorldLoaderLibrary::InitializeDefaultWorld(*world);
 	}
-	
-	for (auto& meshlet : logic.meshlets)
+
+
+	void RenderWorld::Startup(unsigned int screenWidth, unsigned int screenHeight)
 	{
-		meshlet.TickComponent(deltaTime);
+		world = std::make_unique<AWorld>();
+		WorldLoaderLibrary::InitializeDefaultWorld(*world);
+
+
+		for (auto& perCamera : world->allCamera)
+		{
+			auto& renderCamera = render.cameras.Emplace(perCamera, screenWidth, screenHeight);
+			logic.cameras.Emplace(perCamera, renderCamera);
+		}
+
+		for (auto& perMeshlet : world->allMeshlet)
+		{
+			auto& renderMeshlet = render.meshlets.Emplace(perMeshlet);
+			logic.meshlets.Emplace(perMeshlet, renderMeshlet);
+		}
+
+		for (auto& perPointLight : world->allPointLight)
+		{
+			auto& renderPointlight = render.pointlights.Emplace(perPointLight);
+			logic.pointlights.Emplace(perPointLight, renderPointlight);
+		}
+
 	}
-	
-	for (auto& pointlight : logic.pointlights)
+
+	void RenderWorld::Shutdown()
 	{
-		pointlight.TickComponent(deltaTime);
+		logic.cameras.Clear();
+		logic.meshlets.Clear();
+		logic.pointlights.Clear();
+
+		render.cameras.Clear();
+		render.meshlets.Clear();
+		render.pointlights.Clear();
+	}
+
+	void RenderWorld::ScreenResize(const unsigned int& width, const unsigned int& height)
+	{
+		for (auto& camera : logic.cameras)
+		{
+			camera.UpdateView(width, height);
+		}
+	}
+
+	void RenderWorld::Tick(float deltaTime)
+	{
+		for (auto& camera : logic.cameras)
+		{
+			camera.TickComponent(deltaTime);
+		}
+
+		for (auto& meshlet : logic.meshlets)
+		{
+			meshlet.TickComponent(deltaTime);
+		}
+
+		for (auto& pointlight : logic.pointlights)
+		{
+			pointlight.TickComponent(deltaTime);
+		}
 	}
 }

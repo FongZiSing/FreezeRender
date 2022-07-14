@@ -2,7 +2,10 @@
 
 
 
-void Meshlet::BuildBVH()
+namespace Pluto
 {
+	void Meshlet::BuildBVH()
+	{
 
+	}
 }

@@ -94,7 +94,11 @@
 #define branch_unlikely [[unlikely]]
 #endif
 
+
+
 // All of the warnings that we are able to enable
 #pragma warning(default: 4996) // 'function' was declared deprecated.
+
+
 
 #endif // !PLATFORM_COMMON_H

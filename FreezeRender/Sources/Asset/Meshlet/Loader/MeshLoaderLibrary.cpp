@@ -4,8 +4,10 @@
 
 
 
-namespace Utility
+namespace Pluto
 {
+#pragma region utility
+
 	inline without_globalvar MeshLoader::Extension GetExtension(const std::filesystem::path& filepath)
 	{
 		if (IsExtesionEqual(filepath, L".obj"))
@@ -16,24 +18,24 @@ namespace Utility
 
 		return MeshLoader::Extension::Unknown;
 	};
-}
+
+#pragma endregion utility
 
 
 
-MeshLoader::Status MeshLoaderLibrary::Load(const wchar_t* const filename, AMeshlet* result)
-{
-	using namespace Utility;
-
-	const std::filesystem::path filepath = filename;
-	switch (GetExtension(filepath))
+	MeshLoader::Status MeshLoaderLibrary::Load(const wchar_t* const filename, AMeshlet* result)
 	{
+		const std::filesystem::path filepath = filename;
+		switch (GetExtension(filepath))
+		{
 		case MeshLoader::Extension::OBJ:
 		{
 			OBJMeshLoader loader(filepath);
 			return loader.Load(result);
 		}
 		// TODO: Support more format.
-	}
+		}
 
-	return MeshLoader::Status::FormatNotSupported;
+		return MeshLoader::Status::FormatNotSupported;
+	}
 }

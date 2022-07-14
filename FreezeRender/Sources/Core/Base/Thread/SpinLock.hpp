@@ -1,49 +1,73 @@
+//
+// Thread/SpinLock.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Mutex.
+//
 #pragma once
 
 #include<atomic>
 
 
 
-struct SpinLock
+namespace Pluto
 {
-private:
-	std::atomic<bool> flag{ false };
-
-	inline void YieldImpl()
+	/**
+	 * @brief Common thread utility.
+	 */
+	namespace Thread
 	{
-		_mm_pause();
-	}
-
-public:
-	SpinLock() noexcept = default;
-
-	SpinLock(const SpinLock&) = delete;
-
-	SpinLock& operator = (const SpinLock&) = delete;
-
-	void Lock()
-	{
-		while (true)
+		/**
+		 * @brief A mutex that doesn't put the thread into a WAIT state but instead repeatedly tries to aquire the lock.
+		 * @note Should be used only for very short locks
+		 */
+		struct AtomicSpinLock
 		{
-			if (!flag.exchange(true, std::memory_order_acquire))
+		private:
+			std::atomic<bool> flag{ false };
+
+		public:
+			
+			AtomicSpinLock() noexcept = default;
+
+			//--------------------------------
+			//~ Begin non-copyable.
+
+			AtomicSpinLock(const AtomicSpinLock&) = delete;
+			AtomicSpinLock& operator = (const AtomicSpinLock&) = delete;
+
+			//~ End non-copyable.
+			//--------------------------------
+
+			
+			void Lock()
 			{
-				break;
+				while (true)
+				{
+					if (!flag.exchange(true, std::memory_order_acquire))
+					{
+						break;
+					}
+
+					while (flag.load(std::memory_order_relaxed))
+					{
+						//std::this_thread::yield();
+						_mm_pause();
+					}
+				}
 			}
 
-			while (flag.load(std::memory_order_relaxed))
+			bool Trylock()
 			{
-				YieldImpl();
+				return flag.exchange(true, std::memory_order_acquire);
 			}
-		}
-	}
 
-	bool Trylock()
-	{
-		return flag.exchange(true, std::memory_order_acquire);
+			void Unlock()
+			{
+				flag.store(false, std::memory_order_release);
+			}
+		};
 	}
-
-	void Unlock()
-	{
-		flag.store(false, std::memory_order_release);
-	}
-};
+}

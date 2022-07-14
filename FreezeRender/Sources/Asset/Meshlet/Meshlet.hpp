@@ -1,4 +1,12 @@
-﻿#pragma once
+﻿//
+// Meshlet.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Meshlet asset.
+//
+#pragma once
 
 #include <Common.hpp>
 #include <Container/Array.hpp>
@@ -7,38 +15,41 @@
 
 
 
-/**
- * @brief The model object.
- */
-struct AMeshlet
+namespace Pluto
 {
-	WideString id;
-	WideString name;
-
-	Matrix transform = Matrix::Identity;
-
-	Array<AMaterial> materials;
-	Array<AVertex> vertices;
-	Array<AVertexIndex> indices;
-	Array<AVertexCluster> clusters;
-
-
-	warn_nodiscard bool IsValid() const
+	/**
+	 * @brief The model object.
+	 */
+	struct AMeshlet
 	{
-		return !vertices.IsEmpty() && !indices.IsEmpty() && !materials.IsEmpty() && !clusters.IsEmpty();
-	}
+		WideString id;
+		WideString name;
 
-	unsigned int GetMaterialIndex(const AVertexIndex& target)
-	{
-		for (auto& cluster : clusters)
+		Matrix transform = Matrix::Identity;
+
+		Array<AMaterial> materials;
+		Array<AVertex> vertices;
+		Array<AVertexIndex> indices;
+		Array<AVertexCluster> clusters;
+
+
+		warn_nodiscard bool IsValid() const
 		{
-			if (target.index >= cluster.beginVertexIndex &&
-				target.index < cluster.endVertexIndex &&
-				cluster.materialIndex < materials.Size())
-			{
-				return cluster.materialIndex;
-			}
+			return !vertices.IsEmpty() && !indices.IsEmpty() && !materials.IsEmpty() && !clusters.IsEmpty();
 		}
-		return -1;
-	}
-};
+
+		unsigned int GetMaterialIndex(const AVertexIndex& target)
+		{
+			for (auto& cluster : clusters)
+			{
+				if (target.index >= cluster.beginVertexIndex &&
+					target.index < cluster.endVertexIndex &&
+					cluster.materialIndex < materials.Size())
+				{
+					return cluster.materialIndex;
+				}
+			}
+			return -1;
+		}
+	};
+}

@@ -2,6 +2,9 @@
 
 
 
-void PointLightComponent::TickComponent(float deltaTime)
+namespace Pluto
 {
+	void PointLightComponent::TickComponent(float deltaTime)
+	{
+	}
 }

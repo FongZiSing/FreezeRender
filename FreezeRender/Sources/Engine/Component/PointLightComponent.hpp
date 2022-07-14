@@ -1,21 +1,32 @@
+//
+// PointLightComponent.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of PointLight component.
+//
 #pragma once
 
 #include <Render/Shading/Light.hpp>
 
 
 
-class PointLightComponent
+namespace Pluto
 {
-private:
-	APointLight& data;
-	PointLight& light;
+	class PointLightComponent
+	{
+	private:
+		APointLight& data;
+		PointLight& light;
 
 
-public:
-	explicit PointLightComponent(APointLight& asset, PointLight& target)
-		: data(asset)
-		, light(target)
-	{}
+	public:
+		explicit PointLightComponent(APointLight& asset, PointLight& target)
+			: data(asset)
+			, light(target)
+		{}
 
-	void TickComponent(float deltaTime);
-};
+		void TickComponent(float deltaTime);
+	};
+}

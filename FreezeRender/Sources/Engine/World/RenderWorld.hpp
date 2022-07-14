@@ -1,3 +1,11 @@
+//
+// RenderWorld.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of world.
+//
 #pragma once
 
 #include <Container/Array.hpp>
@@ -9,52 +17,55 @@
 
 
 
-class RenderWorld
+namespace Pluto
 {
-private:
-	friend class Engine;
-
-public:
-
-	struct
+	class RenderWorld
 	{
-		Array<Camera> cameras;
+	private:
+		friend class Engine;
 
-		Array<Meshlet> meshlets;
+	public:
 
-		Array<PointLight> pointlights;
+		struct
+		{
+			Array<Camera> cameras;
 
-	} render;
-	
+			Array<Meshlet> meshlets;
 
-	struct
-	{
-		Array<CameraComponent> cameras;
+			Array<PointLight> pointlights;
 
-		Array<MeshletComponent> meshlets;
-
-		Array<PointLightComponent> pointlights;
-
-	} logic;
+		} render;
 
 
+		struct
+		{
+			Array<CameraComponent> cameras;
 
-	RenderWorld();
+			Array<MeshletComponent> meshlets;
 
-	~RenderWorld();
+			Array<PointLightComponent> pointlights;
 
-	void Load();
+		} logic;
 
-	void Unload() {}
 
-private:
-	void Startup(unsigned int screenWidth, unsigned int screenHeight);
 
-	void Shutdown();
+		RenderWorld();
 
-	void ScreenResize(const unsigned int& width, const unsigned int& height);
+		~RenderWorld();
 
-	void Tick(float deltaTime);
-};
+		void Load();
 
-extern UniqueResource<RenderWorld> GWorld;
+		void Unload() {}
+
+	private:
+		void Startup(unsigned int screenWidth, unsigned int screenHeight);
+
+		void Shutdown();
+
+		void ScreenResize(const unsigned int& width, const unsigned int& height);
+
+		void Tick(float deltaTime);
+	};
+
+	extern UniqueResource<RenderWorld> GWorld;
+}

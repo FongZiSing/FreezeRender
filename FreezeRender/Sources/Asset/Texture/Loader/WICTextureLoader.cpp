@@ -10,11 +10,14 @@ using Microsoft::WRL::ComPtr;
 
 
 
-/**
- * @brief TODO Faster loader with windows imaging component.
-*/
-namespace LoaderDetail
+namespace Pluto
 {
+	/**
+	 * @brief TODO Faster loader with windows imaging component.
+	 * @TODO Put in `Platform` folder. 
+	 */
+#pragma region loader
+
 	Array<ExtesionDescriptor> targets = {
 		{ L".jpeg",  (unsigned)WICTextureLoader::Extension::JPEG },
 		{ L".jpg",   (unsigned)WICTextureLoader::Extension::JPG  },
@@ -29,7 +32,7 @@ namespace LoaderDetail
 		GUID_WICPixelFormat128bppPRGBAFloat,
 	};
 
-	WICTextureLoader::Status Load(const wchar_t* const filepath, ATexture* result, APixelFormat asformat)
+	WICTextureLoader::Status LoadTexture(const wchar_t* const filepath, ATexture* result, APixelFormat asformat)
 	{
 		using Status = WICTextureLoader::Status;
 
@@ -128,77 +131,80 @@ namespace LoaderDetail
 		result->bits.Swap(buffer);
 		return Status::Ok;
 	}
-}
+
+#pragma endregion loader
 
 
-WICTextureLoader::WICTextureLoader(const std::filesystem::path& filepath)
-{
-	this->filepath = filepath;
-	int index = IsExtesionEqual(this->filepath, LoaderDetail::targets);
-	this->extension = index >= 0 ? (Extension)LoaderDetail::targets[index].reserved1 : Extension::Unknown;
-	this->status = Verify();
-}
 
-WICTextureLoader::WICTextureLoader(std::filesystem::path&& filepath)
-{
-	this->filepath = std::move(filepath);
-	int index = IsExtesionEqual(this->filepath, LoaderDetail::targets);
-	this->extension = index >= 0 ? (Extension)LoaderDetail::targets[index].reserved1 : Extension::Unknown;
-	this->status = Verify();
-}
-
-WICTextureLoader::Status WICTextureLoader::Verify() const
-{
-	if (filepath.empty())
+	WICTextureLoader::WICTextureLoader(const std::filesystem::path& filepath)
 	{
-		return Status::initFailed;
+		this->filepath = filepath;
+		int index = IsExtesionEqual(this->filepath, targets);
+		this->extension = index >= 0 ? (Extension)targets[index].reserved1 : Extension::Unknown;
+		this->status = Verify();
 	}
 
-	if (!std::filesystem::exists(filepath))
+	WICTextureLoader::WICTextureLoader(std::filesystem::path&& filepath)
 	{
-		return Status::initFailed;
+		this->filepath = std::move(filepath);
+		int index = IsExtesionEqual(this->filepath, targets);
+		this->extension = index >= 0 ? (Extension)targets[index].reserved1 : Extension::Unknown;
+		this->status = Verify();
 	}
 
-	if (extension == Extension::Unknown)
+	WICTextureLoader::Status WICTextureLoader::Verify() const
 	{
-		return Status::initFailed;
-	}
-	return Status::initSuccess;
-}
+		if (filepath.empty())
+		{
+			return Status::initFailed;
+		}
 
-WICTextureLoader::Status WICTextureLoader::Load(ATexture* result, APixelFormat asformat)
-{
-	if (status == Status::initFailed)
+		if (!std::filesystem::exists(filepath))
+		{
+			return Status::initFailed;
+		}
+
+		if (extension == Extension::Unknown)
+		{
+			return Status::initFailed;
+		}
+		return Status::initSuccess;
+	}
+
+	WICTextureLoader::Status WICTextureLoader::Load(ATexture* result, APixelFormat asformat)
 	{
+		if (status == Status::initFailed)
+		{
+			return status;
+		}
+
+		if (result == nullptr || asformat <= APixelFormat::None || asformat >= APixelFormat::Max)
+		{
+			status = Status::InvalidInput;
+			return status;
+		}
+
+		Status status = LoadTexture(this->GetAbsolutePath().Data(), result, asformat);
+		if (status != Status::Ok)
+		{
+			result->format = APixelFormat::None;
+			result->bytePerChannels = 0;
+			result->bytePerPixel = 0;
+			result->channels = 0;
+			result->strides = 0;
+			result->width = 0;
+			result->height = 0;
+			result->bits.Deallocate();
+			result->name.Clear();
+			result->id.Clear();
+		}
+		else
+		{
+			result->name = filepath.filename();
+			static std::atomic<long long> id = 0;
+			result->id = WideString(L"WICLoaderMesh_").Append(GenerateId(id));
+		}
+
 		return status;
 	}
-
-	if (result == nullptr || asformat <= APixelFormat::None || asformat >= APixelFormat::Max)
-	{
-		status = Status::InvalidInput;
-		return status;
-	}
-
-	Status status = LoaderDetail::Load(this->GetAbsolutePath().Data(), result, asformat);
-	if (status != Status::Ok)
-	{
-		result->format = APixelFormat::None;
-		result->bytePerChannels = 0;
-		result->bytePerPixel = 0;
-		result->channels = 0;
-		result->strides = 0;
-		result->width = 0;
-		result->height = 0;
-		result->bits.Deallocate();
-		result->name.Clear();
-		result->id.Clear();
-	}
-	else
-	{
-		result->name = filepath.filename();
-		static std::atomic<long long> id = 0;
-		result->id = WideString(L"WICLoaderMesh_").Append(GenerateId(id));
-	}
-
-	return status;
 }

@@ -1,3 +1,11 @@
+//
+// RayTracingRenderer.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of ray tracing renderer.
+//
 #pragma once
 
 #include "../Renderer.hpp"
@@ -5,26 +13,29 @@
 
 
 
-class RayTracingRenderer : public Renderer
+namespace Pluto
 {
-private:
-	int width;
-	int height;
+	class RayTracingRenderer : public Renderer
+	{
+	private:
+		int width;
+		int height;
 
-	ColorRenderTarget scene;
-	PosFloatRenderTarget depth;
-	PrimitiveRay primitiveRay;
+		ColorRenderTarget scene;
+		PosFloatRenderTarget depth;
+		PrimitiveRay primitiveRay;
 
-public:
-	RayTracingRenderer();
+	public:
+		RayTracingRenderer();
 
-	virtual void Startup(unsigned int screenWidth, unsigned int screenHeight) override { ScreenResize(screenWidth, screenHeight); }
+		virtual void Startup(unsigned int screenWidth, unsigned int screenHeight) override { ScreenResize(screenWidth, screenHeight); }
 
-	virtual void Shutdown() override {}
+		virtual void Shutdown() override {}
 
-	virtual void ScreenResize(int inWidth, int inHeight) override;
+		virtual void ScreenResize(int inWidth, int inHeight) override;
 
-	virtual ColorRenderTarget& Render(const RenderWorld* Scene) override;
+		virtual ColorRenderTarget& Render(const RenderWorld* Scene) override;
 
-protected:
-};
+	protected:
+	};
+}

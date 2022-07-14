@@ -7,8 +7,10 @@
 
 
 
-inline namespace ParallelRaster
+namespace Pluto
 {
+#pragma region parallel_raster
+
 	// global rasterizer setting.
 	namespace Config
 	{
@@ -31,7 +33,7 @@ inline namespace ParallelRaster
 	/**
 	* @brief The Async task to clear or re-allocate render target.
 	*/
-	class DoubleBufferingTask final : public Singleton<DoubleBufferingTask>, TinyRunnableTask
+	class DoubleBufferingTask final : public Singleton<DoubleBufferingTask>, Thread::TinyRunnableTask
 	{
 		// background render target.
 		struct
@@ -122,264 +124,419 @@ inline namespace ParallelRaster
 			Start();
 		}
 	};
-}
+
+#pragma endregion parallel_raster
 
 
 
-Rasterizer::Rasterizer()
-	: width(2)
-	, height(2)
-	, VBuffer(2, 2)
-	, WBuffer(2, 2)
-	, GBuffer(2, 2)
-	, scene(2, 2)
-{
-}
-
-void Rasterizer::ScreenResize(int inWidth, int inHeight)
-{
-	width = inWidth;
-	height = inHeight;
-	VBuffer.Resize(inWidth, inHeight);
-	WBuffer.Resize(inWidth, inHeight);
-	GBuffer.Resize(inWidth, inHeight);
-	scene.Resize(inWidth, inHeight);
-}
-
-ColorRenderTarget& Rasterizer::Render(const RenderWorld* Scene)
-{
-	const Camera& viewBuffer = Scene->render.cameras[0];
-	const Array<Meshlet>& meshletBuffer = Scene->render.meshlets;
-	const Array<PointLight>& lightBuffer = Scene->render.pointlights;
-
-	PrePass(viewBuffer, meshletBuffer);
-	BasePass(viewBuffer, lightBuffer);
-
-	return scene;
-}
-
-void Rasterizer::PrePass(const Camera& viewBuffer, const Array<Meshlet>& meshletBuffer)
-{
-	// Clear last frame.
-	DoubleBufferingTask::Get().TrySync(&VBuffer, &GBuffer, &scene);
-	WBuffer.Clear();
-
-
-	//****************************************************************
-	// stage 1: Geometry process.
-	//****************************************************************
-	using namespace Clipping;
-
-	const Matrix& projection = viewBuffer.projection;
-	const Matrix& view = viewBuffer.view;
-	const Matrix vp = projection * view;
-	const Vector2 ndc2screen = viewBuffer.GetNdcToScreen();
-
-	for (auto& perMeshlet : meshletBuffer)
+	Rasterizer::Rasterizer()
+		: width(2)
+		, height(2)
+		, VBuffer(2, 2)
+		, WBuffer(2, 2)
+		, GBuffer(2, 2)
+		, scene(2, 2)
 	{
-		branch_unlikely if (!perMeshlet.IsValid())
+	}
+
+	void Rasterizer::ScreenResize(int inWidth, int inHeight)
+	{
+		width = inWidth;
+		height = inHeight;
+		VBuffer.Resize(inWidth, inHeight);
+		WBuffer.Resize(inWidth, inHeight);
+		GBuffer.Resize(inWidth, inHeight);
+		scene.Resize(inWidth, inHeight);
+	}
+
+	ColorRenderTarget& Rasterizer::Render(const RenderWorld* Scene)
+	{
+		const Camera& viewBuffer = Scene->render.cameras[0];
+		const Array<Meshlet>& meshletBuffer = Scene->render.meshlets;
+		const Array<PointLight>& lightBuffer = Scene->render.pointlights;
+
+		PrePass(viewBuffer, meshletBuffer);
+		BasePass(viewBuffer, lightBuffer);
+
+		return scene;
+	}
+
+	void Rasterizer::PrePass(const Camera& viewBuffer, const Array<Meshlet>& meshletBuffer)
+	{
+		// Clear last frame.
+		DoubleBufferingTask::Get().TrySync(&VBuffer, &GBuffer, &scene);
+		WBuffer.Clear();
+
+
+		//****************************************************************
+		// stage 1: Geometry process.
+		//****************************************************************
+		using namespace Clipping;
+
+		const Matrix& projection = viewBuffer.projection;
+		const Matrix& view = viewBuffer.view;
+		const Matrix vp = projection * view;
+		const Vector2 ndc2screen = viewBuffer.GetNdcToScreen();
+
+		for (auto& perMeshlet : meshletBuffer)
 		{
-			continue;
-		}
-
-		AMeshlet& meshlet = perMeshlet.data;
-		const Matrix mvp = vp * meshlet.transform;
-		const Matrix mv = view * meshlet.transform;
-		const Matrix _mv = mv.Inverse().Transpose();
-
-		for (Meshlet::Iterator It = perMeshlet.CreateIterator(); It; ++It)
-		{
-			// Init triangle.
-			ShadingTriangle triangle = It.Assembly();
-
-			// Disable vertex shader during compilation.
-			if constexpr (Config::bEnableVertexShader)
+			branch_unlikely if (!perMeshlet.IsValid())
 			{
-				// execute vertex shader.
-				vertexShader({ triangle, mv, _mv, mvp });
+				continue;
 			}
 
-			// Model-View-Projection.
-			triangle.vertices[0].screenspace.position = mvp * triangle.vertices[0].screenspace.position;
-			triangle.vertices[1].screenspace.position = mvp * triangle.vertices[1].screenspace.position;
-			triangle.vertices[2].screenspace.position = mvp * triangle.vertices[2].screenspace.position;
+			AMeshlet& meshlet = perMeshlet.data;
+			const Matrix mvp = vp * meshlet.transform;
+			const Matrix mv = view * meshlet.transform;
+			const Matrix _mv = mv.Inverse().Transpose();
 
-			// Homogeneous clip.
-			int triangleNum = 0;
-			HomogeneousClipping(triangle, gClippingTriangleBuffer, triangleNum);
-
-			while (triangleNum --> 0)
+			for (Meshlet::Iterator It = perMeshlet.CreateIterator(); It; ++It)
 			{
-				ShadingTriangle& clippedTriangle = gClippingTriangleBuffer[triangleNum];
-				for (ShadingVertex& vertex : clippedTriangle.vertices)
+				// Init triangle.
+				ShadingTriangle triangle = It.Assembly();
+
+				// Disable vertex shader during compilation.
+				if constexpr (Config::bEnableVertexShader)
 				{
-					Vector4& position = vertex.screenspace.position;
-					Vector3& location = vertex.viewspace.position;
-					Vector3& normal = vertex.viewspace.normal;
-
-					// Perspective division.
-					// homogeneous clip space to normalized device coordinates(NDC) space.
-					position.x /= position.w;
-					position.y /= position.w;
-					position.z /= position.w;
-
-					// Viewport transformation (screen mapping).
-					// NDC-space to screen space, y-axis up.
-					position.x = 0.5f * width * (position.x + 1.f);
-					position.y = 0.5f * height * (position.y + 1.f);
-					position.z = position.z * ndc2screen.x + ndc2screen.y;
-
-					// view transformation.
-					// local space to view space.
-					location = mv * location;
-					normal = (_mv * Vector4(normal, 0.f)).XYZ().Normalize();
+					// execute vertex shader.
+					vertexShader({ triangle, mv, _mv, mvp });
 				}
 
-				if (BackFaceCulling(clippedTriangle))
-				{
-					continue;
-				}
+				// Model-View-Projection.
+				triangle.vertices[0].screenspace.position = mvp * triangle.vertices[0].screenspace.position;
+				triangle.vertices[1].screenspace.position = mvp * triangle.vertices[1].screenspace.position;
+				triangle.vertices[2].screenspace.position = mvp * triangle.vertices[2].screenspace.position;
 
-				clippedTriangle.material = triangle.material;
-				RasterizeTriangle(clippedTriangle);
+				// Homogeneous clip.
+				int triangleNum = 0;
+				HomogeneousClipping(triangle, gClippingTriangleBuffer, triangleNum);
+
+				while (triangleNum-- > 0)
+				{
+					ShadingTriangle& clippedTriangle = gClippingTriangleBuffer[triangleNum];
+					for (ShadingVertex& vertex : clippedTriangle.vertices)
+					{
+						Vector4& position = vertex.screenspace.position;
+						Vector3& location = vertex.viewspace.position;
+						Vector3& normal = vertex.viewspace.normal;
+
+						// Perspective division.
+						// homogeneous clip space to normalized device coordinates(NDC) space.
+						position.x /= position.w;
+						position.y /= position.w;
+						position.z /= position.w;
+
+						// Viewport transformation (screen mapping).
+						// NDC-space to screen space, y-axis up.
+						position.x = 0.5f * width * (position.x + 1.f);
+						position.y = 0.5f * height * (position.y + 1.f);
+						position.z = position.z * ndc2screen.x + ndc2screen.y;
+
+						// view transformation.
+						// local space to view space.
+						location = mv * location;
+						normal = (_mv * Vector4(normal, 0.f)).XYZ().Normalize();
+					}
+
+					if (BackFaceCulling(clippedTriangle))
+					{
+						continue;
+					}
+
+					clippedTriangle.material = triangle.material;
+					RasterizeTriangle(clippedTriangle);
+				}
 			}
 		}
-	}
 
-	//****************************************************************
-	// stage 2: Triangle setup.
-	//****************************************************************
-	const int count = width * height;
-	for (int i = 0; i < count; ++i)
-	{
-		// Triangle Traversal.
-		if (VBuffer.materialid.GetPixel(i))
+		//****************************************************************
+		// stage 2: Triangle setup.
+		//****************************************************************
+		const int count = width * height;
+		for (int i = 0; i < count; ++i)
 		{
-			WBuffer.Push(VBuffer, i);
+			// Triangle Traversal.
+			if (VBuffer.materialid.GetPixel(i))
+			{
+				WBuffer.Push(VBuffer, i);
+			}
 		}
+
+		//****************************************************************
+		// stage 3: Generate geometry buffer.
+		//****************************************************************
+		Thread::ParallelFor(0u, WBuffer.number, [this](const unsigned int& worklistIndex)
+			{
+				const int& screenIndex = WBuffer.screen.GetPixel(worklistIndex);
+				auto& interpolation = WBuffer.interpolation.GetPixel(worklistIndex);
+
+				R256 result;
+				const R256 attr1 = Register8LoadAligned(&WBuffer.vertex1.GetPixel(worklistIndex));
+				const R256 attr2 = Register8LoadAligned(&WBuffer.vertex2.GetPixel(worklistIndex));
+				const R256 attr3 = Register8LoadAligned(&WBuffer.vertex3.GetPixel(worklistIndex));
+				const R256 depth = MakeRegister8(1.f / interpolation.oneOverDepth);
+				const R256 alpha = MakeRegister8(interpolation.alpha);
+				const R256 beta = MakeRegister8(interpolation.beta);
+				const R256 gamma = MakeRegister8(interpolation.gamma);
+				result = Register8MultiplyAddMultiply(attr1, alpha, attr2, beta);
+				result = Register8MultiplyAdd(attr3, gamma, result);
+				result = Register8Multiply(depth, result);
+
+				ShadingPoint point;
+				Register8StoreAligned(result, &point);
+
+				const Color diffuseColor = WBuffer.materialid.GetPixel(worklistIndex)->diffuse.sampler(point.uv);
+				GBuffer.position.SetPixel(screenIndex, { point.position, 0.f });
+				GBuffer.normal.SetPixel(screenIndex, { point.normal, 0.f });
+				GBuffer.diffuse.SetPixel(screenIndex, diffuseColor);
+			});
 	}
 
-	//****************************************************************
-	// stage 3: Generate geometry buffer.
-	//****************************************************************
-	ParallelFor(0u, WBuffer.number, [this](const unsigned int& worklistIndex)
+	void Rasterizer::BasePass(const Camera& viewBuffer, const Array<PointLight>& lightBuffer)
+	{
+		//****************************************************************
+		// stage 4: Parallel shading.
+		//****************************************************************
+		Thread::ParallelFor(0u, WBuffer.number, [this, &viewBuffer, &lightBuffer](const unsigned int& worklistIndex)
+			{
+				const int& screenIndex = WBuffer.screen.GetPixel(worklistIndex);
+				Shader::DeferredFragmentPayload payload;
+
+				payload.pointlights = &lightBuffer;
+				payload.viewpoint = viewBuffer.data.location;
+				payload.shadingpoint = GBuffer.position.GetPixel(screenIndex).XYZRef();
+				payload.normal = GBuffer.normal.GetPixel(screenIndex).XYZRef();
+				payload.diffuse = GBuffer.diffuse.GetPixel(screenIndex);
+
+				// execute fragment shader.
+				scene.SetPixel(screenIndex, fragmentShader(payload));
+			});
+	}
+
+	void Rasterizer::RasterizeTriangle(const ShadingTriangle& triangle)
+	{
+		// [ Mileff P, Neh¨¦z K, Dudra J. 2015, "Accelerated Half-Space Triangle Rasterization" ]
+		// Detail see http://acta.uni-obuda.hu//Mileff_Nehez_Dudra_63.pdf
+		enum class Strategy : unsigned char
 		{
-			const int& screenIndex = WBuffer.screen.GetPixel(worklistIndex);
-			auto& interpolation = WBuffer.interpolation.GetPixel(worklistIndex);
+			HalfSpace,      // half-space rasterization
+			BlockHalfSpace, // Block-base half-space rasterization.
+		};
 
-			R256 result;
-			const R256 attr1 = Register8LoadAligned(&WBuffer.vertex1.GetPixel(worklistIndex));
-			const R256 attr2 = Register8LoadAligned(&WBuffer.vertex2.GetPixel(worklistIndex));
-			const R256 attr3 = Register8LoadAligned(&WBuffer.vertex3.GetPixel(worklistIndex));
-			const R256 depth = MakeRegister8(1.f / interpolation.oneOverDepth);
-			const R256 alpha = MakeRegister8(interpolation.alpha);
-			const R256 beta = MakeRegister8(interpolation.beta);
-			const R256 gamma = MakeRegister8(interpolation.gamma);
-			result = Register8MultiplyAddMultiply(attr1, alpha, attr2, beta);
-			result = Register8MultiplyAdd(attr3, gamma, result);
-			result = Register8Multiply(depth, result);
+		constexpr static const R128 R_HALF_SPACE_EPSILON = Number::MakeRegister(-1e-4f);
 
-			ShadingPoint point;
-			Register8StoreAligned(result, &point);
+		const auto&& [v1, v2, v3] = triangle.ScreenspacePosition();
+		const auto&& [l1, l2, l3] = triangle.ViewspacePosition();
+		const auto&& [n1, n2, n3] = triangle.ViewspaceNormal();
+		const auto&& [uv1, uv2, uv3] = triangle.LocalspaceUV();
 
-			const Color diffuseColor = WBuffer.materialid.GetPixel(worklistIndex)->diffuse.sampler(point.uv);
-			GBuffer.position.SetPixel(screenIndex, { point.position, 0.f });
-			GBuffer.normal.SetPixel(screenIndex, { point.normal, 0.f });
-			GBuffer.diffuse.SetPixel(screenIndex, diffuseColor);
-		});
-}
+		const auto&& [minx, maxx, miny, maxy] = triangle.GetBoundingBox(width, height);
+		R128 startx = MakeRegister(minx + 0.5f);
+		R128 starty = MakeRegister(miny + 0.5f);
 
-void Rasterizer::BasePass(const Camera& viewBuffer, const Array<PointLight>& lightBuffer)
-{
-	//****************************************************************
-	// stage 4: Parallel shading.
-	//****************************************************************
-	ParallelFor(0u, WBuffer.number, [this, &viewBuffer, &lightBuffer](const unsigned int& worklistIndex)
+		R128 v123x = MakeRegister(1.f, v1.x, v2.x, v3.x);
+		R128 v123y = MakeRegister(1.f, v1.y, v2.y, v3.y);
+		R128 v231x = RegisterSwizzle(v123x, 0, 2, 3, 1);
+		R128 v231y = RegisterSwizzle(v123y, 0, 2, 3, 1);
+		R128 v312w = MakeRegister(1.f, v3.w, v1.w, v2.w);
+
+		R128 i = RegisterSubtract(v123y, v231y);
+		R128 j = RegisterSubtract(v231x, v123x);
+		R128 k = RegisterSubtract(RegisterMultiply(v123x, v231y), RegisterMultiply(v123y, v231x));
+
+		// iteration-based (2 * area / depth).
 		{
-			const int& screenIndex = WBuffer.screen.GetPixel(worklistIndex);
-			Shader::DeferredFragmentPayload payload;
+			R128 i0 = RegisterSum4(RegisterDivide(i, v312w));
+			R128 j0 = RegisterSum4(RegisterDivide(j, v312w));
+			R128 k0 = RegisterSum4(RegisterDivide(k, v312w));
 
-			payload.pointlights = &lightBuffer;
-			payload.viewpoint = viewBuffer.data.location;
-			payload.shadingpoint = GBuffer.position.GetPixel(screenIndex).XYZRef();
-			payload.normal = GBuffer.normal.GetPixel(screenIndex).XYZRef();
-			payload.diffuse = GBuffer.diffuse.GetPixel(screenIndex);
+			i = RegisterSelect(Number::R_XMASK, i0, i);
+			j = RegisterSelect(Number::R_XMASK, j0, j);
+			k = RegisterSelect(Number::R_XMASK, k0, k);
+		}
 
-			// execute fragment shader.
-			scene.SetPixel(screenIndex, fragmentShader(payload));
-		});
-}
+		// iterator.
+		const R128 invZ = MakeRegister(1.f, 1.f / v3.w, 1.f / v1.w, 1.f / v2.w);
+		R128 f = RegisterAdd(RegisterMultiplyAddMultiply(i, startx, j, starty), k);
+		{
+			const R128 invArea2 = RegisterDivide(Number::R_ONE, MakeRegister(RegisterSum(RegisterSetX0(f))));
 
-void Rasterizer::RasterizeTriangle(const ShadingTriangle& triangle)
-{
-	// [ Mileff P, Neh¨¦z K, Dudra J. 2015, "Accelerated Half-Space Triangle Rasterization" ]
-	// Detail see http://acta.uni-obuda.hu//Mileff_Nehez_Dudra_63.pdf
-	enum class Strategy : unsigned char
-	{
-		HalfSpace,      // half-space rasterization
-		BlockHalfSpace, // Block-base half-space rasterization.
-	};
+			// [ 1 / depth, gamma, alpha, beta ]
+			f = RegisterMultiply(f, invArea2);
 
-	constexpr static const R128 R_HALF_SPACE_EPSILON = Number::MakeRegister(-1e-4f);
+			// f[ d(1 / depth) / dx, d(gamma) / dx, d(alpha) / dx, d(beta) / dx ]
+			i = RegisterMultiply(i, invArea2);
 
-	const auto&& [v1, v2, v3] = triangle.ScreenspacePosition();
-	const auto&& [l1, l2, l3] = triangle.ViewspacePosition();
-	const auto&& [n1, n2, n3] = triangle.ViewspaceNormal();
-	const auto&& [uv1, uv2, uv3] = triangle.LocalspaceUV();
+			// [ d(1 / depth) / dy, d(gamma) / dy, d(alpha) / dy, d(beta) / dy ]
+			j = RegisterMultiply(j, invArea2);
+		}
 
-	const auto&& [minx, maxx, miny, maxy] = triangle.GetBoundingBox(width, height);
-	R128 startx = MakeRegister(minx + 0.5f);
-	R128 starty = MakeRegister(miny + 0.5f);
+		if constexpr (Config::bEnableAdaptiveHalfSpaceRaster)
+		{
+			constexpr static const int block = 4;
+			const int boxX = (maxx - minx);
+			const int boxY = (maxy - miny);
+			const float cost = boxX * 1.f / boxY;
 
-	R128 v123x = MakeRegister(1.f, v1.x, v2.x, v3.x);
-	R128 v123y = MakeRegister(1.f, v1.y, v2.y, v3.y);
-	R128 v231x = RegisterSwizzle(v123x, 0, 2, 3, 1);
-	R128 v231y = RegisterSwizzle(v123y, 0, 2, 3, 1);
-	R128 v312w = MakeRegister(1.f, v3.w, v1.w, v2.w);
+			const bool adapt = cost > 0.40f && cost < 1.60f;
+			const bool small = boxX < block&& boxY < block;
 
-	R128 i = RegisterSubtract(v123y, v231y);
-	R128 j = RegisterSubtract(v231x, v123x);
-	R128 k = RegisterSubtract(RegisterMultiply(v123x, v231y), RegisterMultiply(v123y, v231x));
+			Strategy strategy = false ? Strategy::HalfSpace : Strategy::BlockHalfSpace;
+			if (strategy == Strategy::HalfSpace)
+			{
+				R128 cy = f;
+				for (int y = miny; y <= maxy; ++y)
+				{
+					R128 cx = cy;
+					for (int x = minx; x <= maxx; ++x)
+					{
+						// if cx[1] > 0 and cx[2] > 0 and cx[3] > 0
+						if ((RegisterMaskBits(RegisterGE(cx, R_HALF_SPACE_EPSILON)) & 0x0E) == 0x0E)
+						{
+							// (1 / depth, gamma, alpha, beta )
+							const R128& zInverseAndInterpolation = cx;
+							const float depth = 1.f / RegisterGetX(zInverseAndInterpolation);
+							const int index = (height - y - 1) * width + x;
 
-	// iteration-based (2 * area / depth).
-	{
-		R128 i0 = RegisterSum4(RegisterDivide(i, v312w));
-		R128 j0 = RegisterSum4(RegisterDivide(j, v312w));
-		R128 k0 = RegisterSum4(RegisterDivide(k, v312w));
+							// Z-depth testing.
+							if (GBuffer.depth.GetPixel(index) < depth)
+							{
+								GBuffer.depth.SetPixel(index, depth);
+								VBuffer.SetPixel(index, triangle, RegisterMultiply(zInverseAndInterpolation, invZ));
+							}
+						}
+						cx = RegisterAdd(cx, i);
+					}
+					cy = RegisterAdd(cy, j);
+				}
+			}
+			else
+			{
+				constexpr static const R128 R_OFFSET_X = Number::MakeRegister(0.f, block - 1.f, 0.f, block - 1.f);
+				constexpr static const R128 R_OFFSET_Y = Number::MakeRegister(0.f, 0.f, block - 1.f, block - 1.f);
+				constexpr static const R128 R_MOVE_STEP4 = Number::MakeRegister((float)block);
 
-		i = RegisterSelect(Number::R_XMASK, i0, i);
-		j = RegisterSelect(Number::R_XMASK, j0, j);
-		k = RegisterSelect(Number::R_XMASK, k0, k);
-	}
+				const R128 repi1 = RegisterReplicate(i, 1);
+				const R128 repi2 = RegisterReplicate(i, 2);
+				const R128 repi3 = RegisterReplicate(i, 3);
 
-	// iterator.
-	const R128 invZ = MakeRegister(1.f, 1.f / v3.w, 1.f / v1.w, 1.f / v2.w);
-	R128 f = RegisterAdd(RegisterMultiplyAddMultiply(i, startx, j, starty), k);
-	{
-		const R128 invArea2 = RegisterDivide(Number::R_ONE, MakeRegister(RegisterSum(RegisterSetX0(f))));
+				const R128 repj1 = RegisterReplicate(j, 1);
+				const R128 repj2 = RegisterReplicate(j, 2);
+				const R128 repj3 = RegisterReplicate(j, 3);
 
-		// [ 1 / depth, gamma, alpha, beta ]
-		f = RegisterMultiply(f, invArea2);
+				const R128 offsetx1 = RegisterMultiply(repi1, R_OFFSET_X);
+				const R128 offsety1 = RegisterMultiply(repj1, R_OFFSET_Y);
+				const R128 offsetx2 = RegisterMultiply(repi2, R_OFFSET_X);
+				const R128 offsety2 = RegisterMultiply(repj2, R_OFFSET_Y);
+				const R128 offsetx3 = RegisterMultiply(repi3, R_OFFSET_X);
+				const R128 offsety3 = RegisterMultiply(repj3, R_OFFSET_Y);
 
-		// f[ d(1 / depth) / dx, d(gamma) / dx, d(alpha) / dx, d(beta) / dx ]
-		i = RegisterMultiply(i, invArea2);
+				const R128 movex = RegisterMultiply(i, R_MOVE_STEP4);
+				const R128 movey = RegisterMultiply(j, R_MOVE_STEP4);
+				const R128 movex1 = RegisterMultiply(repi1, R_MOVE_STEP4);
+				const R128 movey1 = RegisterMultiply(repj1, R_MOVE_STEP4);
+				const R128 movex2 = RegisterMultiply(repi2, R_MOVE_STEP4);
+				const R128 movey2 = RegisterMultiply(repj2, R_MOVE_STEP4);
+				const R128 movex3 = RegisterMultiply(repi3, R_MOVE_STEP4);
+				const R128 movey3 = RegisterMultiply(repj3, R_MOVE_STEP4);
 
-		// [ d(1 / depth) / dy, d(gamma) / dy, d(alpha) / dy, d(beta) / dy ]
-		j = RegisterMultiply(j, invArea2);
-	}
+				R128 cy = f;
+				R128 cy1 = RegisterAdd(RegisterReplicate(f, 1), RegisterAdd(offsetx1, offsety1));
+				R128 cy2 = RegisterAdd(RegisterReplicate(f, 2), RegisterAdd(offsetx2, offsety2));
+				R128 cy3 = RegisterAdd(RegisterReplicate(f, 3), RegisterAdd(offsetx3, offsety3));
 
-	if constexpr (Config::bEnableAdaptiveHalfSpaceRaster)
-	{
-		constexpr static const int block = 4;
-		const int boxX = (maxx - minx);
-		const int boxY = (maxy - miny);
-		const float cost = boxX * 1.f / boxY;
+				for (int y = miny; y <= maxy; y += block)
+				{
+					R128 cx = cy;
+					R128 cx1 = cy1;
+					R128 cx2 = cy2;
+					R128 cx3 = cy3;
+					for (int x = minx; x <= maxx; x += block)
+					{
+						const int checkw = RegisterMaskBits(RegisterGE(cx1, R_HALF_SPACE_EPSILON));
+						const int checku = RegisterMaskBits(RegisterGE(cx2, R_HALF_SPACE_EPSILON));
+						const int checkv = RegisterMaskBits(RegisterGE(cx3, R_HALF_SPACE_EPSILON));
 
-		const bool adapt = cost > 0.40f && cost < 1.60f;
-		const bool small = boxX < block && boxY < block;
+						// Fully outside.
+						if (checkw == 0x0 || checku == 0x0 || checkv == 0x0)
+						{
+							cx = RegisterAdd(cx, movex);
+							cx1 = RegisterAdd(cx1, movex1);
+							cx2 = RegisterAdd(cx2, movex2);
+							cx3 = RegisterAdd(cx3, movex3);
+							continue;
+						}
 
-		Strategy strategy = false ? Strategy::HalfSpace : Strategy::BlockHalfSpace;
-		if (strategy == Strategy::HalfSpace)
+						// Fully covered blocks.
+						if (checkw == 0xF && checku == 0xF && checkv == 0xF)
+						{
+							R128 cyb = cx;
+							for (int by = 0; by < block; ++by)
+							{
+								R128 cxb = cyb;
+								for (int bx = 0; bx < block; ++bx)
+								{
+									// (1 / depth, gamma, alpha, beta )
+									const R128& zInverseAndInterpolation = cxb;
+									const float depth = 1.f / RegisterGetX(zInverseAndInterpolation);
+									const int index = (height - (y + by) - 1) * width + (x + bx);
+
+									// Z-depth testing.
+									if (GBuffer.depth.IsValid(index) && GBuffer.depth.GetPixel(index) < depth)
+									{
+										GBuffer.depth.SetPixel(index, depth);
+										VBuffer.SetPixel(index, triangle, RegisterMultiply(zInverseAndInterpolation, invZ));
+									}
+									cxb = RegisterAdd(cxb, i);
+								}
+								cyb = RegisterAdd(cyb, j);
+							}
+						}
+
+						// Partially covered blocks.
+						else
+						{
+							R128 cyb = cx;
+							for (int by = 0; by < block; ++by)
+							{
+								R128 cxb = cyb;
+								for (int bx = 0; bx < block; ++bx)
+								{
+									// if cx[1] > 0 and cx[2] > 0 and cx[3] > 0
+									if ((RegisterMaskBits(RegisterGE(cxb, R_HALF_SPACE_EPSILON)) & 0x0E) == 0x0E)
+									{
+										// (1 / depth, gamma, alpha, beta )
+										const R128& zInverseAndInterpolation = cxb;
+										const float depth = 1.f / RegisterGetX(zInverseAndInterpolation);
+										const int index = (height - (y + by) - 1) * width + (x + bx);
+
+										// Z-depth testing.
+										if (GBuffer.depth.IsValid(index) && GBuffer.depth.GetPixel(index) < depth)
+										{
+											GBuffer.depth.SetPixel(index, depth);
+											VBuffer.SetPixel(index, triangle, RegisterMultiply(zInverseAndInterpolation, invZ));
+										}
+									}
+									cxb = RegisterAdd(cxb, i);
+								}
+								cyb = RegisterAdd(cyb, j);
+							}
+						}
+
+						cx = RegisterAdd(cx, movex);
+						cx1 = RegisterAdd(cx1, movex1);
+						cx2 = RegisterAdd(cx2, movex2);
+						cx3 = RegisterAdd(cx3, movex3);
+					}
+
+					cy = RegisterAdd(cy, movey);
+					cy1 = RegisterAdd(cy1, movey1);
+					cy2 = RegisterAdd(cy2, movey2);
+					cy3 = RegisterAdd(cy3, movey3);
+				}
+			}
+		}
+		else
 		{
 			R128 cy = f;
 			for (int y = miny; y <= maxy; ++y)
@@ -399,7 +556,13 @@ void Rasterizer::RasterizeTriangle(const ShadingTriangle& triangle)
 						if (GBuffer.depth.GetPixel(index) < depth)
 						{
 							GBuffer.depth.SetPixel(index, depth);
-							VBuffer.SetPixel(index, triangle, RegisterMultiply(zInverseAndInterpolation, invZ));
+
+							// update VBuffer.
+							Register8Copy(&triangle.vertices[0], &VBuffer.vertex1.GetPixel(index));
+							Register8Copy(&triangle.vertices[1], &VBuffer.vertex2.GetPixel(index));
+							Register8Copy(&triangle.vertices[2], &VBuffer.vertex3.GetPixel(index));
+							RegisterStoreAligned(RegisterMultiply(zInverseAndInterpolation, invZ), &VBuffer.interpolation.GetPixel(index));
+							VBuffer.materialid.SetPixel(index, triangle.material);
 						}
 					}
 					cx = RegisterAdd(cx, i);
@@ -407,333 +570,174 @@ void Rasterizer::RasterizeTriangle(const ShadingTriangle& triangle)
 				cy = RegisterAdd(cy, j);
 			}
 		}
-		else
+	}
+
+	bool Rasterizer::BackFaceCulling(const ShadingTriangle& triangle)
+	{
+		// Disable culling during compilation.
+		if constexpr (!Config::bEnableBackFaceCulling)
 		{
-			constexpr static const R128 R_OFFSET_X = Number::MakeRegister(0.f, block - 1.f, 0.f, block - 1.f);
-			constexpr static const R128 R_OFFSET_Y = Number::MakeRegister(0.f, 0.f, block - 1.f, block - 1.f);
-			constexpr static const R128 R_MOVE_STEP4 = Number::MakeRegister((float)block);
+			return false;
+		}
 
-			const R128 repi1 = RegisterReplicate(i, 1);
-			const R128 repi2 = RegisterReplicate(i, 2);
-			const R128 repi3 = RegisterReplicate(i, 3);
+		// Back face culling in screen space.
+		const Vector4& a = triangle.vertices[0].screenspace.position;
+		const Vector4& b = triangle.vertices[1].screenspace.position;
+		const Vector4& c = triangle.vertices[2].screenspace.position;
 
-			const R128 repj1 = RegisterReplicate(j, 1);
-			const R128 repj2 = RegisterReplicate(j, 2);
-			const R128 repj3 = RegisterReplicate(j, 3);
+		const Vector2 ab = b.XY() - a.XY();
+		const Vector2 ac = c.XY() - a.XY();
+		return (ab ^ ac) < 0;
+	}
 
-			const R128 offsetx1 = RegisterMultiply(repi1, R_OFFSET_X);
-			const R128 offsety1 = RegisterMultiply(repj1, R_OFFSET_Y);
-			const R128 offsetx2 = RegisterMultiply(repi2, R_OFFSET_X);
-			const R128 offsety2 = RegisterMultiply(repj2, R_OFFSET_Y);
-			const R128 offsetx3 = RegisterMultiply(repi3, R_OFFSET_X);
-			const R128 offsety3 = RegisterMultiply(repj3, R_OFFSET_Y);
+	void Rasterizer::HomogeneousClipping(const ShadingTriangle& triangle, ShadingTriangle* outTriangles, int& triangleNum)
+	{
+		// refer to https://fabiensanglard.net/polygon_codec/
+		using namespace Clipping;
 
-			const R128 movex = RegisterMultiply(i, R_MOVE_STEP4);
-			const R128 movey = RegisterMultiply(j, R_MOVE_STEP4);
-			const R128 movex1 = RegisterMultiply(repi1, R_MOVE_STEP4);
-			const R128 movey1 = RegisterMultiply(repj1, R_MOVE_STEP4);
-			const R128 movex2 = RegisterMultiply(repi2, R_MOVE_STEP4);
-			const R128 movey2 = RegisterMultiply(repj2, R_MOVE_STEP4);
-			const R128 movex3 = RegisterMultiply(repi3, R_MOVE_STEP4);
-			const R128 movey3 = RegisterMultiply(repj3, R_MOVE_STEP4);
+		// Disable Clipping during compilation.
+		if constexpr (!Config::bEnableHomogeneousClipping)
+		{
+			outTriangles[0] = triangle;
+			triangleNum = 1;
+			return;
+		}
 
-			R128 cy = f;
-			R128 cy1 = RegisterAdd(RegisterReplicate(f, 1), RegisterAdd(offsetx1, offsety1));
-			R128 cy2 = RegisterAdd(RegisterReplicate(f, 2), RegisterAdd(offsetx2, offsety2));
-			R128 cy3 = RegisterAdd(RegisterReplicate(f, 3), RegisterAdd(offsetx3, offsety3));
+		// The function that determines whether triangle is in the canonical view volume,
+		// call it before perspective division.
+		auto PolygonVisible = [](const ShadingTriangle& triangle) -> bool
+		{
+			const Vector4& v1 = triangle.vertices[0].screenspace.position;
+			const Vector4& v2 = triangle.vertices[1].screenspace.position;
+			const Vector4& v3 = triangle.vertices[2].screenspace.position;
 
-			for (int y = miny; y <= maxy; y += block)
+			return
+				std::fabs(v1.x) <= -v1.w && std::fabs(v1.y) <= -v1.w && std::fabs(v1.z) <= -v1.w &&
+				std::fabs(v2.x) <= -v2.w && std::fabs(v2.y) <= -v2.w && std::fabs(v2.z) <= -v2.w &&
+				std::fabs(v3.x) <= -v3.w && std::fabs(v3.y) <= -v3.w && std::fabs(v3.z) <= -v3.w;
+		};
+
+		// The function that clip polygon in the `Axis-W` plane.
+		auto ClipPolygonForAxisW = [](int& inOutVertexNum, ShadingVertex* inVertices, ShadingVertex* outVertices) -> void
+		{
+			int newVertexNum = 0;
+			const ShadingVertex* vertex1 = &inVertices[inOutVertexNum - 1]; // edge tail
+			const ShadingVertex* vertex2 = &inVertices[0];					// edge head
+
+			while (inOutVertexNum-- > 0)
 			{
-				R128 cx = cy;
-				R128 cx1 = cy1;
-				R128 cx2 = cy2;
-				R128 cx3 = cy3;
-				for (int x = minx; x <= maxx; x += block)
+				const Vector4& position1 = vertex1->screenspace.position;
+				const Vector4& position2 = vertex2->screenspace.position;
+				const float& axis1W = position1.w;
+				const float& axis2W = position2.w;
+
+				const int out1 = axis1W > CLIPPING_PLANE ? -1 : 1;
+				const int out2 = axis2W > CLIPPING_PLANE ? -1 : 1;
+
+				if ((out1 ^ out2) < 0)
 				{
-					const int checkw = RegisterMaskBits(RegisterGE(cx1, R_HALF_SPACE_EPSILON));
-					const int checku = RegisterMaskBits(RegisterGE(cx2, R_HALF_SPACE_EPSILON));
-					const int checkv = RegisterMaskBits(RegisterGE(cx3, R_HALF_SPACE_EPSILON));
-
-					// Fully outside.
-					if (checkw == 0x0 || checku == 0x0 || checkv == 0x0)
-					{
-						cx = RegisterAdd(cx, movex);
-						cx1 = RegisterAdd(cx1, movex1);
-						cx2 = RegisterAdd(cx2, movex2);
-						cx3 = RegisterAdd(cx3, movex3);
-						continue;
-					}
-
-					// Fully covered blocks.
-					if (checkw == 0xF && checku == 0xF && checkv == 0xF)
-					{
-						R128 cyb = cx;
-						for (int by = 0; by < block; ++by)
-						{
-							R128 cxb = cyb;
-							for (int bx = 0; bx < block; ++bx)
-							{
-								// (1 / depth, gamma, alpha, beta )
-								const R128& zInverseAndInterpolation = cxb;
-								const float depth = 1.f / RegisterGetX(zInverseAndInterpolation);
-								const int index = (height - (y + by) - 1) * width + (x + bx);
-
-								// Z-depth testing.
-								if (GBuffer.depth.IsValid(index) && GBuffer.depth.GetPixel(index) < depth)
-								{
-									GBuffer.depth.SetPixel(index, depth);
-									VBuffer.SetPixel(index, triangle, RegisterMultiply(zInverseAndInterpolation, invZ));
-								}
-								cxb = RegisterAdd(cxb, i);
-							}
-							cyb = RegisterAdd(cyb, j);
-						}
-					}
-
-					// Partially covered blocks.
-					else
-					{
-						R128 cyb = cx;
-						for (int by = 0; by < block; ++by)
-						{
-							R128 cxb = cyb;
-							for (int bx = 0; bx < block; ++bx)
-							{
-								// if cx[1] > 0 and cx[2] > 0 and cx[3] > 0
-								if ((RegisterMaskBits(RegisterGE(cxb, R_HALF_SPACE_EPSILON)) & 0x0E) == 0x0E)
-								{
-									// (1 / depth, gamma, alpha, beta )
-									const R128& zInverseAndInterpolation = cxb;
-									const float depth = 1.f / RegisterGetX(zInverseAndInterpolation);
-									const int index = (height - (y + by) - 1) * width + (x + bx);
-
-									// Z-depth testing.
-									if (GBuffer.depth.IsValid(index) && GBuffer.depth.GetPixel(index) < depth)
-									{
-										GBuffer.depth.SetPixel(index, depth);
-										VBuffer.SetPixel(index, triangle, RegisterMultiply(zInverseAndInterpolation, invZ));
-									}
-								}
-								cxb = RegisterAdd(cxb, i);
-							}
-							cyb = RegisterAdd(cyb, j);
-						}
-					}
-
-					cx = RegisterAdd(cx, movex);
-					cx1 = RegisterAdd(cx1, movex1);
-					cx2 = RegisterAdd(cx2, movex2);
-					cx3 = RegisterAdd(cx3, movex3);
+					// NewVertex = vertex1 + t * (vertex2 - vertex1)
+					float t = (axis1W - CLIPPING_PLANE) / (axis1W - axis2W);
+					outVertices[newVertexNum++] = Lerp(t, *vertex1, *vertex2);
 				}
 
-				cy = RegisterAdd(cy, movey);
-				cy1 = RegisterAdd(cy1, movey1);
-				cy2 = RegisterAdd(cy2, movey2);
-				cy3 = RegisterAdd(cy3, movey3);
-			}
-		}
-	}
-	else
-	{
-		R128 cy = f;
-		for (int y = miny; y <= maxy; ++y)
-		{
-			R128 cx = cy;
-			for (int x = minx; x <= maxx; ++x)
-			{
-				// if cx[1] > 0 and cx[2] > 0 and cx[3] > 0
-				if ((RegisterMaskBits(RegisterGE(cx, R_HALF_SPACE_EPSILON)) & 0x0E) == 0x0E)
+				if (out2 > 0)
 				{
-					// (1 / depth, gamma, alpha, beta )
-					const R128& zInverseAndInterpolation = cx;
-					const float depth = 1.f / RegisterGetX(zInverseAndInterpolation);
-					const int index = (height - y - 1) * width + x;
-
-					// Z-depth testing.
-					if (GBuffer.depth.GetPixel(index) < depth)
-					{
-						GBuffer.depth.SetPixel(index, depth);
-
-						// update VBuffer.
-						Register8Copy(&triangle.vertices[0], &VBuffer.vertex1.GetPixel(index));
-						Register8Copy(&triangle.vertices[1], &VBuffer.vertex2.GetPixel(index));
-						Register8Copy(&triangle.vertices[2], &VBuffer.vertex3.GetPixel(index));
-						RegisterStoreAligned(RegisterMultiply(zInverseAndInterpolation, invZ), &VBuffer.interpolation.GetPixel(index));
-						VBuffer.materialid.SetPixel(index, triangle.material);
-					}
+					outVertices[newVertexNum++] = *vertex2;
 				}
-				cx = RegisterAdd(cx, i);
+
+				vertex1 = vertex2;
+				vertex2++;
 			}
-			cy = RegisterAdd(cy, j);
-		}
-	}
-}
+			inOutVertexNum = newVertexNum;
+		};
 
-bool Rasterizer::BackFaceCulling(const ShadingTriangle& triangle)
-{
-	// Disable culling during compilation.
-	if constexpr (!Config::bEnableBackFaceCulling)
-	{
-		return false;
-	}
-
-	// Back face culling in screen space.
-	const Vector4& a = triangle.vertices[0].screenspace.position;
-	const Vector4& b = triangle.vertices[1].screenspace.position;
-	const Vector4& c = triangle.vertices[2].screenspace.position;
-
-	const Vector2 ab = b.XY() - a.XY();
-	const Vector2 ac = c.XY() - a.XY();
-	return (ab ^ ac) < 0;
-}
-
-void Rasterizer::HomogeneousClipping(const ShadingTriangle& triangle, ShadingTriangle* outTriangles, int& triangleNum)
-{
-	// refer to https://fabiensanglard.net/polygon_codec/
-	using namespace Clipping;
-
-	// Disable Clipping during compilation.
-	if constexpr (!Config::bEnableHomogeneousClipping)
-	{
-		outTriangles[0] = triangle;
-		triangleNum = 1;
-		return;
-	}
-
-	// The function that determines whether triangle is in the canonical view volume,
-	// call it before perspective division.
-	auto PolygonVisible = [](const ShadingTriangle& triangle) -> bool
-	{
-		const Vector4& v1 = triangle.vertices[0].screenspace.position;
-		const Vector4& v2 = triangle.vertices[1].screenspace.position;
-		const Vector4& v3 = triangle.vertices[2].screenspace.position;
-
-		return
-			std::fabs(v1.x) <= -v1.w && std::fabs(v1.y) <= -v1.w && std::fabs(v1.z) <= -v1.w &&
-			std::fabs(v2.x) <= -v2.w && std::fabs(v2.y) <= -v2.w && std::fabs(v2.z) <= -v2.w &&
-			std::fabs(v3.x) <= -v3.w && std::fabs(v3.y) <= -v3.w && std::fabs(v3.z) <= -v3.w;
-	};
-
-	// The function that clip polygon in the `Axis-W` plane.
-	auto ClipPolygonForAxisW = [](int& inOutVertexNum, ShadingVertex* inVertices, ShadingVertex* outVertices) -> void
-	{
-		int newVertexNum = 0;
-		const ShadingVertex* vertex1 = &inVertices[inOutVertexNum - 1]; // edge tail
-		const ShadingVertex* vertex2 = &inVertices[0];					// edge head
-
-		while (inOutVertexNum-- > 0)
+		// The function that clip polygon in the `Axis` plane.
+		enum ClipAxis : unsigned int { X = 0, Y = 1, Z = 2, w = 3 };
+		auto ClipPolygonForAxis = [](ClipAxis&& axis, int&& sign, int& inOutVertexNum, ShadingVertex* inVertices, ShadingVertex* outVertices) -> void
 		{
-			const Vector4& position1 = vertex1->screenspace.position;
-			const Vector4& position2 = vertex2->screenspace.position;
-			const float& axis1W = position1.w;
-			const float& axis2W = position2.w;
+			// Clip against first plane if sign == 1
+			// Clip against opposite plane if sign == -1
+			if (inOutVertexNum <= 2) return;
 
-			const int out1 = axis1W > CLIPPING_PLANE ? -1 : 1;
-			const int out2 = axis2W > CLIPPING_PLANE ? -1 : 1;
+			int newVertexNum = 0;
+			const ShadingVertex* vertex1 = &inVertices[inOutVertexNum - 1]; // edge tail
+			const ShadingVertex* vertex2 = &inVertices[0];					// edge head
 
-			if ((out1 ^ out2) < 0)
+			while (inOutVertexNum-- > 0)
 			{
-				// NewVertex = vertex1 + t * (vertex2 - vertex1)
-				float t = (axis1W - CLIPPING_PLANE) / (axis1W - axis2W);
-				outVertices[newVertexNum++] = Lerp(t, *vertex1, *vertex2);
+				const Vector4& position1 = vertex1->screenspace.position;
+				const Vector4& position2 = vertex2->screenspace.position;
+
+				const float& axis1W = position1.w;
+				const float& axis2W = position2.w;
+				const float& axis1 = *(&position1.x + axis) * sign;
+				const float& axis2 = *(&position2.x + axis) * sign;
+
+				const int out1 = axis1 >= axis1W ? 1 : -1;
+				const int out2 = axis2 >= axis2W ? 1 : -1;
+
+				if ((out1 ^ out2) < 0)
+				{
+					// NewVertex = vertex1 + t * (vertex2 - vertex1)
+					float t = (axis1W - axis1) / ((axis1W - axis1) - (axis2W - axis2));
+					outVertices[newVertexNum++] = Lerp(t, *vertex1, *vertex2);
+				}
+
+				if (out2 > 0)
+				{
+					outVertices[newVertexNum++] = *vertex2;
+				}
+
+				vertex1 = vertex2;
+				vertex2++;
 			}
+			inOutVertexNum = newVertexNum;
+		};
 
-			if (out2 > 0)
-			{
-				outVertices[newVertexNum++] = *vertex2;
-			}
 
-			vertex1 = vertex2;
-			vertex2++;
-		}
-		inOutVertexNum = newVertexNum;
-	};
-
-	// The function that clip polygon in the `Axis` plane.
-	enum ClipAxis : unsigned int { X = 0, Y = 1, Z = 2, w = 3 };
-	auto ClipPolygonForAxis = [](ClipAxis&& axis, int&& sign, int& inOutVertexNum, ShadingVertex* inVertices, ShadingVertex* outVertices) -> void
-	{
-		// Clip against first plane if sign == 1
-		// Clip against opposite plane if sign == -1
-		if (inOutVertexNum <= 2) return;
-
-		int newVertexNum = 0;
-		const ShadingVertex* vertex1 = &inVertices[inOutVertexNum - 1]; // edge tail
-		const ShadingVertex* vertex2 = &inVertices[0];					// edge head
-
-		while (inOutVertexNum-- > 0)
+		// start to clip
+		if (PolygonVisible(triangle))
 		{
-			const Vector4& position1 = vertex1->screenspace.position;
-			const Vector4& position2 = vertex2->screenspace.position;
-
-			const float& axis1W = position1.w;
-			const float& axis2W = position2.w;
-			const float& axis1 = *(&position1.x + axis) * sign;
-			const float& axis2 = *(&position2.x + axis) * sign;
-
-			const int out1 = axis1 >= axis1W ? 1 : -1;
-			const int out2 = axis2 >= axis2W ? 1 : -1;
-
-			if ((out1 ^ out2) < 0)
-			{
-				// NewVertex = vertex1 + t * (vertex2 - vertex1)
-				float t = (axis1W - axis1) / ((axis1W - axis1) - (axis2W - axis2));
-				outVertices[newVertexNum++] = Lerp(t, *vertex1, *vertex2);
-			}
-
-			if (out2 > 0)
-			{
-				outVertices[newVertexNum++] = *vertex2;
-			}
-
-			vertex1 = vertex2;
-			vertex2++;
-		}
-		inOutVertexNum = newVertexNum;
-	};
-
-
-	// start to clip
-	if (PolygonVisible(triangle))
-	{
-		// The triangle is in the canonical view volume completely.
-		outTriangles[0] = triangle;
-		triangleNum = 1;
-	}
-	else
-	{
-		// Clip triangle.
-		ShadingVertex* vertices1 = gClippingVertexBuffer;
-		ShadingVertex* vertices2 = gClippingVertexBuffer + (sizeof(gClippingVertexBuffer) / sizeof(ShadingVertex) / 2);
-		int vertexNum = 0;
-
-		vertices1[vertexNum++] = triangle.vertices[0];
-		vertices1[vertexNum++] = triangle.vertices[1];
-		vertices1[vertexNum++] = triangle.vertices[2];
-
-		ClipPolygonForAxisW(vertexNum, vertices1, vertices2);
-
-		ClipPolygonForAxis(ClipAxis::X, +1, vertexNum, vertices2, vertices1);
-		ClipPolygonForAxis(ClipAxis::X, -1, vertexNum, vertices1, vertices2);
-
-		ClipPolygonForAxis(ClipAxis::Y, +1, vertexNum, vertices2, vertices1);
-		ClipPolygonForAxis(ClipAxis::Y, -1, vertexNum, vertices1, vertices2);
-
-		ClipPolygonForAxis(ClipAxis::Z, +1, vertexNum, vertices2, vertices1);
-		ClipPolygonForAxis(ClipAxis::Z, -1, vertexNum, vertices1, vertices2);
-
-		// triangle assembly.
-		if (vertexNum >= 3)
-		{
-			triangleNum = vertexNum - 2;
-			for (int index = 0; index < triangleNum; ++index)
-			{
-				new (outTriangles + index) ShadingTriangle(vertices2[0], vertices2[index + 1], vertices2[index + 2]);
-			}
+			// The triangle is in the canonical view volume completely.
+			outTriangles[0] = triangle;
+			triangleNum = 1;
 		}
 		else
 		{
-			triangleNum = 0;
+			// Clip triangle.
+			ShadingVertex* vertices1 = gClippingVertexBuffer;
+			ShadingVertex* vertices2 = gClippingVertexBuffer + (sizeof(gClippingVertexBuffer) / sizeof(ShadingVertex) / 2);
+			int vertexNum = 0;
+
+			vertices1[vertexNum++] = triangle.vertices[0];
+			vertices1[vertexNum++] = triangle.vertices[1];
+			vertices1[vertexNum++] = triangle.vertices[2];
+
+			ClipPolygonForAxisW(vertexNum, vertices1, vertices2);
+
+			ClipPolygonForAxis(ClipAxis::X, +1, vertexNum, vertices2, vertices1);
+			ClipPolygonForAxis(ClipAxis::X, -1, vertexNum, vertices1, vertices2);
+
+			ClipPolygonForAxis(ClipAxis::Y, +1, vertexNum, vertices2, vertices1);
+			ClipPolygonForAxis(ClipAxis::Y, -1, vertexNum, vertices1, vertices2);
+
+			ClipPolygonForAxis(ClipAxis::Z, +1, vertexNum, vertices2, vertices1);
+			ClipPolygonForAxis(ClipAxis::Z, -1, vertexNum, vertices1, vertices2);
+
+			// triangle assembly.
+			if (vertexNum >= 3)
+			{
+				triangleNum = vertexNum - 2;
+				for (int index = 0; index < triangleNum; ++index)
+				{
+					new (outTriangles + index) ShadingTriangle(vertices2[0], vertices2[index + 1], vertices2[index + 2]);
+				}
+			}
+			else
+			{
+				triangleNum = 0;
+			}
 		}
 	}
 }

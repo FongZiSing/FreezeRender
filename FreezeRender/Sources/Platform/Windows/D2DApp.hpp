@@ -18,203 +18,217 @@ using Microsoft::WRL::ComPtr;
 
 
 
-/**
- * @brief D2DApp template.
- */
-class D2DApp
+namespace Platform
 {
-public:
+	/**
+	 * @brief D2DApp template.
+	 */
+	class D2DApp
+	{
+	public:
 
-	D2DApp();
+		D2DApp();
 
-	virtual ~D2DApp();
+		virtual ~D2DApp();
 
-protected:
-	//~ Begin override message handle.
-	
-	virtual bool HandleCreateEvent(UINT width, UINT height) { return false; }
+	protected:
+		
+		//--------------------------------
+		//~ Begin override message handle.
 
-	virtual void HandleActivateEvent(WPARAM nFlags, HWND hwnd) {}
+		virtual bool HandleCreateEvent(UINT width, UINT height) { return false; }
 
-	virtual void HandleKeyDownEvent(WPARAM nKey) {}
+		virtual void HandleActivateEvent(WPARAM nFlags, HWND hwnd) {}
 
-	virtual void HandleKeyUpEvent(WPARAM nKey) {}
-	
-	virtual void HandleLeftMouseDownEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleKeyDownEvent(WPARAM nKey) {}
 
-	virtual void HandleLeftMouseUpEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleKeyUpEvent(WPARAM nKey) {}
 
-	virtual void HandleMiddleMouseDownEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleLeftMouseDownEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleMiddleMouseUpEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleLeftMouseUpEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleRightMouseDownEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleMiddleMouseDownEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleRightMouseUpEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleMiddleMouseUpEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleMouseMoveEvent(WPARAM nFlags, int x, int y) {}
+		virtual void HandleRightMouseDownEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleMouseWheelEvent(UINT nFlags, short zDelta, int x, int y) {}
+		virtual void HandleRightMouseUpEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleResizeEvent(UINT width, UINT height) {}
+		virtual void HandleMouseMoveEvent(WPARAM nFlags, int x, int y) {}
 
-	virtual void HandleDestroyEvent() {}
-	
-	//~ End override message handle.
+		virtual void HandleMouseWheelEvent(UINT nFlags, short zDelta, int x, int y) {}
 
+		virtual void HandleResizeEvent(UINT width, UINT height) {}
 
-	//~ Begin Engine.
+		virtual void HandleDestroyEvent() {}
 
-	virtual void Tick(const float deltaTime) = 0;
+		//~ End override message handle.
+		//--------------------------------
 
-	void Draw(
-		const unsigned char* bits,
-		unsigned int width,
-		unsigned int height,
-		unsigned int strides
-	);
 
-	void SlateDrawText(const wchar_t* text, int length, int offsetx, int offsety, int width, int height);
-	
-	virtual void ExecuteSlateDraw() {}
+		//--------------------------------
+		//~ Begin Engine.
 
-	//~ End Engine.
+		virtual void Tick(const float deltaTime) = 0;
 
-	bool IsResizing() const noexcept { return m_bResizing; }
+		void Draw(
+			const unsigned char* bits,
+			unsigned int width,
+			unsigned int height,
+			unsigned int strides
+		);
 
-	bool IsWindowMaximum() const noexcept { return m_bWindowMaximum; }
+		void SlateDrawText(const wchar_t* text, int length, int offsetx, int offsety, int width, int height);
 
-private:
-	// Initialize device-independent resources.
-	HRESULT CreateDeviceIndependentResources();
+		virtual void ExecuteSlateDraw() {}
 
-	// Initialize device-dependent resources.
-	HRESULT CreateDeviceResources();
+		//~ End Engine.
+		//--------------------------------
 
-	// Device-dependent resources when window resize.
-	void CreateWindowSizeDependentResources();
 
-	// Text resources.
-	HRESULT CreateDrawTextResources();
+		bool IsResizing() const noexcept { return m_bResizing; }
 
-	// Called every frames.
-	bool BeginDraw();
+		bool IsWindowMaximum() const noexcept { return m_bWindowMaximum; }
 
-	// Update frames info.
-	void UpdateFrameStats(const float& deltaTime, const unsigned int& elapsedTime);
+	private:
+		// Initialize device-independent resources.
+		HRESULT CreateDeviceIndependentResources();
 
-	// Called every frames.
-	void EndDraw();
+		// Initialize device-dependent resources.
+		HRESULT CreateDeviceResources();
 
-	//~ Begin internal message handle.
-	
-	HRESULT OnCreate();
+		// Device-dependent resources when window resize.
+		void CreateWindowSizeDependentResources();
 
-	LRESULT OnActivate(const WPARAM& nFlags, const HWND& hwnd);
+		// Text resources.
+		HRESULT CreateDrawTextResources();
 
-	LRESULT OnKeyDown(const WPARAM& nKey);
+		// Called every frames.
+		bool BeginDraw();
 
-	LRESULT OnKeyUp(const WPARAM& nKey);
-	
-	LRESULT OnLeftMouseDown(const WPARAM& nFlags, const int& x, const int& y);
+		// Update frames info.
+		void UpdateFrameStats(const float& deltaTime, const unsigned int& elapsedTime);
 
-	LRESULT OnLeftMouseUp(const WPARAM& nFlags, const int& x, const int& y);
+		// Called every frames.
+		void EndDraw();
 
-	LRESULT OnMiddleMouseDown(const WPARAM& nFlags, const int& x, const int& y);
+		//~ Begin internal message handle.
 
-	LRESULT OnMiddleMouseUp(const WPARAM& nFlags, const int& x, const int& y);
+		HRESULT OnCreate();
 
-	LRESULT OnRightMouseDown(const WPARAM& nFlags, const int& x, const int& y);
+		LRESULT OnActivate(const WPARAM& nFlags, const HWND& hwnd);
 
-	LRESULT OnRightMouseUp(const WPARAM& nFlags, const int& x, const int& y);
+		LRESULT OnKeyDown(const WPARAM& nKey);
 
-	LRESULT OnMouseMove(const WPARAM& nFlags, const int& x, const int& y);
+		LRESULT OnKeyUp(const WPARAM& nKey);
 
-	LRESULT OnMouseWheel(const UINT& nFlags, const short& zDelta, const int& x, const int& y);
+		LRESULT OnLeftMouseDown(const WPARAM& nFlags, const int& x, const int& y);
 
-	LRESULT OnSizing(const WPARAM& nFlags);
+		LRESULT OnLeftMouseUp(const WPARAM& nFlags, const int& x, const int& y);
 
-	LRESULT OnSize(const WPARAM& nFlags, const UINT& width, const UINT& height);
+		LRESULT OnMiddleMouseDown(const WPARAM& nFlags, const int& x, const int& y);
 
-	LRESULT OnExitSizeMove();
+		LRESULT OnMiddleMouseUp(const WPARAM& nFlags, const int& x, const int& y);
 
-	LRESULT OnDestroy();
-	
-	//~ End internal message handle.
+		LRESULT OnRightMouseDown(const WPARAM& nFlags, const int& x, const int& y);
 
+		LRESULT OnRightMouseUp(const WPARAM& nFlags, const int& x, const int& y);
 
-public:
-	// Register the window classand call methods for instantiating drawing resources.
-	HRESULT Initialize(HINSTANCE hInstance, int nCmdShow);
+		LRESULT OnMouseMove(const WPARAM& nFlags, const int& x, const int& y);
 
-	// Process and dispatch messages.
-	void Run();
+		LRESULT OnMouseWheel(const UINT& nFlags, const short& zDelta, const int& x, const int& y);
 
-	// Processes messages for the main window.
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+		LRESULT OnSizing(const WPARAM& nFlags);
 
+		LRESULT OnSize(const WPARAM& nFlags, const UINT& width, const UINT& height);
 
-protected:
+		LRESULT OnExitSizeMove();
 
-	HINSTANCE                   m_hAppInst = nullptr;
+		LRESULT OnDestroy();
 
-	HWND                        m_hWnd = nullptr;
+		//~ End internal message handle.
 
-	const wchar_t* const        m_wndCaption = L"FreezeRender";
 
-	UINT                        m_width = 700;
-	
-	UINT                        m_height = 700;
+	public:
+		// Register the window classand call methods for instantiating drawing resources.
+		HRESULT Initialize(HINSTANCE hInstance, int nCmdShow);
 
-	unsigned long long          m_frameCount = 0;
+		// Process and dispatch messages.
+		void Run();
 
-private:
-	//~ Begin D2D
+		// Processes messages for the main window.
+		static LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	D2D1_RECT_U                 m_rect = { 0, 0, m_width, m_height };
 
-	ComPtr<ID3D11Device>        m_pD3DDevice;
+	protected:
 
-	ComPtr<ID3D11DeviceContext> m_pD3DDeviceContext;
+		HINSTANCE                   m_hAppInst = nullptr;
 
-	ComPtr<ID2D1Factory4>       m_pD2DFactory;
+		HWND                        m_hWnd = nullptr;
 
-	ComPtr<ID2D1Device3>        m_pD2DDevice;
+		const wchar_t* const        m_wndCaption = L"FreezeRender";
 
-	ComPtr<ID2D1DeviceContext3> m_pD2DDeviceContext;
+		UINT                        m_width = 700;
 
-	ComPtr<ID2D1Bitmap1>        m_pD2DTargetBimtap;
+		UINT                        m_height = 700;
 
-	ComPtr<ID2D1Bitmap1>        m_pD2DRenderTarget;
+		unsigned long long          m_frameCount = 0;
 
-	ComPtr<IDXGISwapChain1>     m_pSwapChain;
+	private:
 
-	ComPtr<IDWriteFactory>      m_pWriteFactory;
+		//--------------------------------
+		//~ Begin D2D
 
-	ComPtr<IDWriteTextFormat>   m_pWriteTextFormat;
+		D2D1_RECT_U                 m_rect = { 0, 0, m_width, m_height };
 
-	D2D1_RECT_F                 m_textLayoutRect_FPS;
+		ComPtr<ID3D11Device>        m_pD3DDevice;
 
-	ComPtr<ID2D1SolidColorBrush> m_pBrush;
+		ComPtr<ID3D11DeviceContext> m_pD3DDeviceContext;
 
-	D3D_FEATURE_LEVEL           m_featureLevel;
+		ComPtr<ID2D1Factory4>       m_pD2DFactory;
 
-	DXGI_PRESENT_PARAMETERS     m_parameters;
+		ComPtr<ID2D1Device3>        m_pD2DDevice;
 
-	//~ End D2D
+		ComPtr<ID2D1DeviceContext3> m_pD2DDeviceContext;
 
+		ComPtr<ID2D1Bitmap1>        m_pD2DTargetBimtap;
 
-	//~ Begin operation.
+		ComPtr<ID2D1Bitmap1>        m_pD2DRenderTarget;
 
-	bool         m_bDestory = false;
+		ComPtr<IDXGISwapChain1>     m_pSwapChain;
 
-	bool         m_bResizing = false;
-	
-	bool         m_bWindowMaximum = false;
+		ComPtr<IDWriteFactory>      m_pWriteFactory;
 
-	bool         m_bWindowMinimum = false;
+		ComPtr<IDWriteTextFormat>   m_pWriteTextFormat;
 
-	unsigned int m_PressingMouseNum = 0;
+		D2D1_RECT_F                 m_textLayoutRect_FPS;
 
-	//~ End operation.
-};
+		ComPtr<ID2D1SolidColorBrush> m_pBrush;
+
+		D3D_FEATURE_LEVEL           m_featureLevel;
+
+		DXGI_PRESENT_PARAMETERS     m_parameters;
+
+		//~ End D2D
+		//--------------------------------
+
+
+		//--------------------------------
+		//~ Begin operation.
+
+		bool         m_bDestory = false;
+
+		bool         m_bResizing = false;
+
+		bool         m_bWindowMaximum = false;
+
+		bool         m_bWindowMinimum = false;
+
+		unsigned int m_PressingMouseNum = 0;
+
+		//~ End operation.
+		//--------------------------------
+	};
+}

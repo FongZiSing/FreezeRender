@@ -1,3 +1,11 @@
+//
+// Container/Bulkdata.hpp
+//
+//       Copyright (c) FreezeRender. All rights reserved.
+//       @Author FongZiSing
+//
+// Implemention of bulk data.
+//
 #pragma once
 
 #include <Common.hpp>
@@ -5,70 +13,78 @@
 
 
 
-/**
- * @brief The unique pointer class of bulk data. 
- */
-template<typename Type>
-class Bulkdata
+namespace Pluto
 {
-	// Check type during compilation.
-	static_assert(std::is_same_v<Type, std::decay_t<Type>>, "[FreezeRender] only support decay type!");
-
-	// The data pointer.
-	Type* ptr;
-
-	// The number of element. 
-	unsigned long long count;
-
-public:
-
-	/// Non-copyable.
-	Bulkdata(const Bulkdata&) = delete;
-	Bulkdata& operator=(const Bulkdata&) = delete;
-	/// Non-copyable.
-
-	/// Inline function.
-	Bulkdata() noexcept : ptr(nullptr), count(0) {}
-	~Bulkdata() { Deallocate(); }
-	constexpr explicit operator bool() const noexcept { return ptr != nullptr; }
-	constexpr bool operator ! () const noexcept { return ptr == nullptr; }
-	constexpr Type& operator [] (const int& index) { return ptr[index]; }
-	constexpr const Type& operator [] (const int& index) const { return ptr[index]; }
-	constexpr unsigned long long Size() const noexcept { return count; }
-	constexpr Type* Get() const noexcept { return ptr; }
-	constexpr Type* Get(long long offset) const noexcept { assert((signed)count > offset); return ptr + offset; }
-	constexpr void Swap(Bulkdata& rhs) const noexcept { std::swap(ptr, rhs.ptr); std::swap(count, rhs.count); }
-	/// Inline function.
-
 	/**
-	 * @brief Release old memory, reallocate new one manually.
+	 * @brief The unique pointer class of bulk data.
 	 */
-	inline void Reallocate(const unsigned long long count);
+	template<typename Type>
+	class Bulkdata
+	{
+		// Check type during compilation.
+		static_assert(std::is_same_v<Type, std::decay_t<Type>>, "[FreezeRender] only support decay type!");
 
-	/**
-	 * @brief Initalize the memory by calling constructor of `Type`.
-	 */
-	template<typename ...Args>
-	inline void Initialize(Args&& ...args);
+		// The data pointer.
+		Type* ptr;
 
-	/**
-	 * @brief Release memory manually.
-	 */
-	inline void Deallocate();
+		// The number of element. 
+		unsigned long long count;
 
-	/**
-	 * @brief Swap memory pointer and count.
-	 */
-	force_inline void Swap(Bulkdata<Type>& rhs) noexcept;
-};
+	public:
+
+		//--------------------------------
+		//~ Begin non-copyable.
+
+		Bulkdata(const Bulkdata&) = delete;
+		Bulkdata& operator=(const Bulkdata&) = delete;
+		
+		//~ End non-copyable.
+		//--------------------------------
+
+
+		//--------------------------------
+		//~ Begin inline function.
+
+		Bulkdata() noexcept : ptr(nullptr), count(0) {}
+		~Bulkdata() { Deallocate(); }
+		constexpr explicit operator bool() const noexcept { return ptr != nullptr; }
+		constexpr bool operator ! () const noexcept { return ptr == nullptr; }
+		constexpr Type& operator [] (const int& index) { return ptr[index]; }
+		constexpr const Type& operator [] (const int& index) const { return ptr[index]; }
+		constexpr unsigned long long Size() const noexcept { return count; }
+		constexpr Type* Get() const noexcept { return ptr; }
+		constexpr Type* Get(long long offset) const noexcept { assert((signed)count > offset); return ptr + offset; }
+		constexpr void Swap(Bulkdata& rhs) const noexcept { std::swap(ptr, rhs.ptr); std::swap(count, rhs.count); }
+		
+		//~ End inline function.
+		//--------------------------------
+
+
+		/**
+		 * @brief Release old memory, reallocate new one manually.
+		 */
+		inline void Reallocate(const unsigned long long count);
+
+		/**
+		 * @brief Initalize the memory by calling constructor of `Type`.
+		 */
+		template<typename ...Args>
+		inline void Initialize(Args&& ...args);
+
+		/**
+		 * @brief Release memory manually.
+		 */
+		inline void Deallocate();
+
+		/**
+		 * @brief Swap memory pointer and count.
+		 */
+		force_inline void Swap(Bulkdata<Type>& rhs) noexcept;
+	};
 
 
 
-/**
- * @brief The Detail implemention of `Bulkdata` class.
- */
-#ifndef BULKDATA_HPP_BULKDATA_IMPL
-#define BULKDATA_HPP_BULKDATA_IMPL
+#pragma region implemention
 
 	template<typename Type>
 	inline void Bulkdata<Type>::Reallocate(const unsigned long long count)
@@ -85,12 +101,12 @@ public:
 		unsigned long long ext = count % 8;
 		unsigned long long batch = count / 8;
 		Type* begin = ptr;
-		while (ext --> 0)
+		while (ext-- > 0)
 		{
 			*(begin++) = temp;
 		}
 
-		while (batch --> 0)
+		while (batch-- > 0)
 		{
 			*(begin++) = temp;
 			*(begin++) = temp;
@@ -125,4 +141,6 @@ public:
 		this->count = tempCount;
 	}
 
-#endif // !BULKDATA_HPP_BULKDATA_IMPL
+#pragma endregion implemention
+
+}

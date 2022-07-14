@@ -15,7 +15,7 @@ int APIENTRY wWinMain(
 	::HeapSetInformation(nullptr, HeapEnableTerminationOnCorruption, nullptr, 0);
 	if (SUCCEEDED(::CoInitialize(nullptr)))
 	{
-		Engine FreezeRender;
+		Pluto::Engine FreezeRender;
 		if (SUCCEEDED(FreezeRender.Initialize(hInstance, nCmdShow)))
 		{
 			// スタープラチナ·ザ・ワールド

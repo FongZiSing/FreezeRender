@@ -35,12 +35,10 @@
     <ClInclude Include="Sources\Asset\World\Loader\WorldLoaderLibrary.hpp" />
     <ClInclude Include="Sources\Asset\World\World.hpp" />
     <ClInclude Include="Sources\Common.hpp" />
-    <ClInclude Include="Sources\Core\Base\Algorithm\KahanSummation.hpp" />
+    <ClInclude Include="Sources\Core\Base\Algorithm\KahanSum.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\Array.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\Bulkdata.hpp" />
-    <ClInclude Include="Sources\Core\Base\Container\Detail\String.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\String.hpp" />
-    <ClInclude Include="Sources\Core\Base\Container\UnrolledLinkList.hpp" />
     <ClInclude Include="Sources\Core\Base\Pattern\Delegate.hpp" />
     <ClInclude Include="Sources\Core\Base\Pattern\Singleton.hpp" />
     <ClInclude Include="Sources\Core\Base\Thread\ParallelFor.hpp" />
@@ -60,10 +58,12 @@
     <ClInclude Include="Sources\Engine\Renderer\Raster\Rasterizer.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.hpp" />
     <ClInclude Include="Sources\Engine\Renderer\Renderer.hpp" />
+    <ClInclude Include="Sources\Engine\Render\RayTracing\BoundingVolumeHierarchy\BVH.hpp" />
     <ClInclude Include="Sources\Engine\Render\RayTracing\Ray.hpp" />
     <ClInclude Include="Sources\Engine\Render\RenderTarget.hpp" />
-    <ClInclude Include="Sources\Engine\Render\RenderVisibilityBuffer.hpp" />
-    <ClInclude Include="Sources\Engine\Render\RenderPixelFormat.hpp" />
+    <ClInclude Include="Sources\Engine\Render\Shading\Sampler.hpp" />
+    <ClInclude Include="Sources\Engine\Render\VisibilityBuffer.hpp" />
+    <ClInclude Include="Sources\Engine\Render\PixelFormat.hpp" />
     <ClInclude Include="Sources\Engine\Render\Shading\Camera.hpp" />
     <ClInclude Include="Sources\Engine\Render\Shading\Light.hpp" />
     <ClInclude Include="Sources\Engine\Render\Shading\Material.hpp" />
@@ -74,6 +74,8 @@
     <ClInclude Include="Sources\Engine\Shader\VertexShader.hpp" />
     <ClInclude Include="Sources\Engine\World\RenderWorld.hpp" />
     <ClInclude Include="Sources\Engine.hpp" />
+    <ClInclude Include="Sources\Platform\Async.hpp" />
+    <ClInclude Include="Sources\Platform\ParallelFor.hpp" />
     <ClInclude Include="Sources\Platform\Windows\D2DApp.hpp" />
     <ClInclude Include="Sources\Platform\Windows\resource.h" />
     <ClInclude Include="Sources\Platform\Windows\WindowsTargetVersion.h" />
@@ -84,7 +86,7 @@
     <ClCompile Include="Sources\Asset\Texture\Loader\TextureLoaderLibrary.cpp" />
     <ClCompile Include="Sources\Asset\Texture\Loader\WICTextureLoader.cpp" />
     <ClCompile Include="Sources\Asset\World\Loader\WorldLoaderLibrary.cpp" />
-    <ClCompile Include="Sources\Core\Math\AxisAlignedBoundingBox.hpp" />
+    <ClCompile Include="Sources\Core\Math\Box.hpp" />
     <ClCompile Include="Sources\Engine\Component\CameraComponent.cpp" />
     <ClCompile Include="Sources\Engine\Component\MeshletComponent.cpp" />
     <ClCompile Include="Sources\Engine\Component\PointLightComponent.cpp" />
@@ -92,7 +94,7 @@
     <ClCompile Include="Sources\Engine\Output\OutputSystem.cpp" />
     <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp" />
     <ClCompile Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.cpp" />
-    <ClCompile Include="Sources\Engine\Render\RenderGeometryBuffer.hpp" />
+    <ClCompile Include="Sources\Engine\Render\GeometryBuffer.hpp" />
     <ClCompile Include="Sources\Engine\Render\Shading\Meshlet.cpp" />
     <ClCompile Include="Sources\Engine\Shader\FragmentShader.cpp" />
     <ClCompile Include="Sources\Engine\Shader\VertexShader.cpp" />
