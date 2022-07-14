@@ -123,6 +123,16 @@ namespace Pluto
 			}
 			Start();
 		}
+
+		void Clear()
+		{
+			Wait();
+			background.materialid.Resize(2, 2);
+			background.depth.Resize(2, 2);
+			background.scene.Resize(2, 2);
+			this->width.store(2, std::memory_order::release);
+			this->height.store(2, std::memory_order::release);
+		}
 	};
 
 #pragma endregion parallel_raster
@@ -137,6 +147,11 @@ namespace Pluto
 		, GBuffer(2, 2)
 		, scene(2, 2)
 	{
+	}
+
+	Rasterizer::~Rasterizer()
+	{
+		DoubleBufferingTask::Get().Clear();
 	}
 
 	void Rasterizer::ScreenResize(int inWidth, int inHeight)

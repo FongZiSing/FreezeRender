@@ -44,6 +44,11 @@ namespace Pluto
 		};
 
 		/**
+		 * @brief virtual destructor.
+		 */
+		virtual ~MeshLoader() noexcept = default;
+
+		/**
 		 * @brief Determines whether the loading is successful.
 		 */
 		friend constexpr bool Success(Status status)

@@ -47,6 +47,8 @@ namespace Pluto
 	public:
 		Rasterizer();
 
+		virtual ~Rasterizer();
+
 		virtual void Startup(unsigned int screenWidth, unsigned int screenHeight) override { ScreenResize(screenWidth, screenHeight); }
 
 		virtual void Shutdown() override {}

@@ -57,6 +57,11 @@ namespace Pluto
 		}
 
 		/**
+		 * @brief virtual destructor.
+		 */
+		virtual ~TextureLoader() noexcept = default;
+
+		/**
 		 * @brief Returns the native path of the specified image file.
 		 */
 		virtual WideString GetNativeName() const = 0;

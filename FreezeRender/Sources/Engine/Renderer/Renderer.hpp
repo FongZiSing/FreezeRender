@@ -24,6 +24,8 @@ namespace Pluto
 	class interface_as Renderer
 	{
 	public:
+		virtual ~Renderer() noexcept = default;
+
 		virtual void Startup(unsigned int screenWidth, unsigned int screenHeight) = 0;
 
 		virtual void Shutdown() = 0;
