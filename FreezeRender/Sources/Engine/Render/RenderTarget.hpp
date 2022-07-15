@@ -85,7 +85,7 @@ namespace Pluto
 
 	struct Float2PixelTraits
 	{
-		using Type = Vector2;
+		using Type = Vector2f;
 		inline static const Type defaultPixelValue = { Number::FLOAT_NAN, Number::FLOAT_NAN };
 	}; typedef RenderTarget<Float2PixelTraits> Float2RenderTarget;
 
@@ -93,7 +93,7 @@ namespace Pluto
 
 	struct Float4PixelTraits
 	{
-		using Type = Vector4;
+		using Type = Vector4f;
 		inline static const Type defaultPixelValue = {
 			Number::FLOAT_NAN,
 			Number::FLOAT_NAN,

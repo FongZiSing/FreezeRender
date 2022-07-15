@@ -25,7 +25,7 @@ namespace Pluto
 		WideString id;
 		WideString name;
 
-		Matrix transform = Matrix::Identity;
+		Matrix44f transform = Matrix44f::Identity;
 
 		Array<AMaterial> materials;
 		Array<AVertex> vertices;

@@ -39,9 +39,9 @@ namespace Pluto
 	 */
 	struct alignas(16) ShadingPoint
 	{
-		Vector3 position; // viewspace
-		Vector3 normal;   // viewspace
-		Vector2 uv;       // localspace
+		Vector3f position; // viewspace
+		Vector3f normal;   // viewspace
+		Vector2f uv;       // localspace
 	};
 
 
@@ -54,21 +54,21 @@ namespace Pluto
 		//! the memory order must be [ position(viewspace) - normal(viewspace) - uv(localspace) ]
 		struct
 		{
-			Vector3 position;
-			Vector3 normal;
+			Vector3f position;
+			Vector3f normal;
 		}
 		viewspace;
 
 		struct
 		{
-			Vector2 uv;
+			Vector2f uv;
 			Color color; // unused.
 		}
 		localspace;
 
 		struct
 		{
-			Vector4 position;
+			Vector4f position;
 		}
 		screenspace;
 	};
@@ -131,9 +131,9 @@ namespace Pluto
 
 		warn_nodiscard inline Box2 GetBoundingBox(const int& width, const int& height) const
 		{
-			const Vector4& v1 = vertices[0].screenspace.position;
-			const Vector4& v2 = vertices[1].screenspace.position;
-			const Vector4& v3 = vertices[2].screenspace.position;
+			const Vector4f& v1 = vertices[0].screenspace.position;
+			const Vector4f& v2 = vertices[1].screenspace.position;
+			const Vector4f& v3 = vertices[2].screenspace.position;
 
 			Box2 box;
 			box.minX = (int)std::floor(std::min({ v1.x, v2.x, v3.x }));
@@ -150,25 +150,25 @@ namespace Pluto
 
 		inline decltype(auto) ScreenspacePosition() const
 		{
-			struct Batch { const Vector4& v1; const Vector4& v2; const Vector4& v3; };
+			struct Batch { const Vector4f& v1; const Vector4f& v2; const Vector4f& v3; };
 			return Batch{ vertices[0].screenspace.position, vertices[1].screenspace.position, vertices[2].screenspace.position };
 		}
 
 		inline decltype(auto) ViewspacePosition() const
 		{
-			struct Batch { const Vector3& l1; const Vector3& l2; const Vector3& l3; };
+			struct Batch { const Vector3f& l1; const Vector3f& l2; const Vector3f& l3; };
 			return Batch{ vertices[0].viewspace.position, vertices[1].viewspace.position, vertices[2].viewspace.position };
 		}
 
 		inline decltype(auto) ViewspaceNormal() const
 		{
-			struct Batch { const Vector3& n1; const Vector3& n2; const Vector3& n3; };
+			struct Batch { const Vector3f& n1; const Vector3f& n2; const Vector3f& n3; };
 			return Batch{ vertices[0].viewspace.normal, vertices[1].viewspace.normal, vertices[2].viewspace.normal };
 		}
 
 		inline decltype(auto) LocalspaceUV() const
 		{
-			struct Batch { const Vector2& uv1; const Vector2& uv2; const Vector2& uv3; };
+			struct Batch { const Vector2f& uv1; const Vector2f& uv2; const Vector2f& uv3; };
 			return Batch{ vertices[0].localspace.uv, vertices[1].localspace.uv, vertices[2].localspace.uv };
 		}
 	};

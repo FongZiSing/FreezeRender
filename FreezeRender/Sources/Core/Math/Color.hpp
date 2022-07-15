@@ -48,12 +48,12 @@ namespace Pluto
 		Color(const unsigned char& inR, const unsigned char& inG, const unsigned char& inB, const unsigned char& inA = 255) noexcept : r(inR), g(inG), b(inB), a(inA) {}
 		warn_nodiscard inline static Color FromLinearVector(const float& linearR, const float& linearG, const float& linearB, const float& linearA);
 		warn_nodiscard inline static Color FromLinearVector(const float& linearR, const float& linearG, const float& linearB);
-		warn_nodiscard force_inline static Color FromLinearVector(const Vector4& linearColor);
-		warn_nodiscard force_inline static Color FromLinearVector(const Vector3& linearColor);
-		warn_nodiscard inline static Color FromClampedVector(const Vector4& color);
-		warn_nodiscard inline static Color FromClampedVector(const Vector3& color);
-		warn_nodiscard inline static Color FromVector(const Vector4& color);
-		warn_nodiscard inline static Color FromVector(const Vector3& color);
+		warn_nodiscard force_inline static Color FromLinearVector(const Vector4f& linearColor);
+		warn_nodiscard force_inline static Color FromLinearVector(const Vector3f& linearColor);
+		warn_nodiscard inline static Color FromClampedVector(const Vector4f& color);
+		warn_nodiscard inline static Color FromClampedVector(const Vector3f& color);
+		warn_nodiscard inline static Color FromVector(const Vector4f& color);
+		warn_nodiscard inline static Color FromVector(const Vector3f& color);
 	
 		//~ End initialize.
 		//--------------------------------
@@ -108,17 +108,17 @@ namespace Pluto
 		};
 	}
 
-	force_inline Color Color::FromLinearVector(const Vector4& linearColor)
+	force_inline Color Color::FromLinearVector(const Vector4f& linearColor)
 	{
 		return FromLinearVector(linearColor.x, linearColor.y, linearColor.z, linearColor.w);
 	}
 
-	force_inline Color Color::FromLinearVector(const Vector3& linearColor)
+	force_inline Color Color::FromLinearVector(const Vector3f& linearColor)
 	{
 		return FromLinearVector(linearColor.x, linearColor.y, linearColor.z);
 	}
 
-	inline Color Color::FromClampedVector(const Vector4& color)
+	inline Color Color::FromClampedVector(const Vector4f& color)
 	{
 		return
 		{
@@ -129,7 +129,7 @@ namespace Pluto
 		};
 	}
 
-	inline Color Color::FromClampedVector(const Vector3& color)
+	inline Color Color::FromClampedVector(const Vector3f& color)
 	{
 		return
 		{
@@ -139,7 +139,7 @@ namespace Pluto
 		};
 	}
 
-	inline Color Color::FromVector(const Vector4& color)
+	inline Color Color::FromVector(const Vector4f& color)
 	{
 		return
 		{
@@ -150,7 +150,7 @@ namespace Pluto
 		};
 	}
 
-	inline Color Color::FromVector(const Vector3& color)
+	inline Color Color::FromVector(const Vector3f& color)
 	{
 		return
 		{

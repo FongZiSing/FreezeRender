@@ -17,9 +17,9 @@ namespace Pluto
 {
 	struct AVertex
 	{
-		Vector3 position;
-		Vector3 normal;
-		Vector2 uv;
+		Vector3f position;
+		Vector3f normal;
+		Vector2f uv;
 		Color color;
 	};
 

@@ -107,9 +107,9 @@ namespace Pluto
 		Array<Array<VertexAttributeIndex>> polygons;
 		polygons.Reserve(128);
 
-		Array<Vector3> positions;
-		Array<Vector3> normals;
-		Array<Vector2> uvs;
+		Array<Vector3f> positions;
+		Array<Vector3f> normals;
+		Array<Vector2f> uvs;
 		positions.Reserve(128);
 		normals.Reserve(128);
 		uvs.Reserve(128);

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <Common.hpp>
+#include <concepts>
 #include "Math.hpp"
 #include "Number.hpp"
 
@@ -16,23 +17,28 @@
 
 namespace Pluto
 {
-	struct Vector2;
-	struct Vector3;
-	struct Vector4;
-	struct Matrix;
+	template <typename T> concept is_floating = std::is_same_v<T, float> || std::is_same_v<T, double>;
+	template <typename T> concept is_integral = std::is_same_v<T, int>;
+	template<typename T> struct BasicMatrix;
 
 
 
-	struct Vector2
+	/**
+	 * @brief Templated vector2.
+	 */
+	template <typename T>
+	struct BasicVector2
 	{
-		float x, y;
+		static_assert(is_floating<T> || is_integral<T>, "[FreezeRender] type must be int, float, or double");
+		
+		T x, y;
 
 
 		//--------------------------------
 		//~ Begin constants.
 
-		static const Vector2 Zero;
-		static const Vector2 One;
+		static const BasicVector2 Zero;
+		static const BasicVector2 One;
 
 		//~ End constants.
 		//--------------------------------
@@ -41,11 +47,11 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin initialize.
 
-		Vector2() noexcept : x(0.f), y(0.f) {}
-		Vector2(const float& inValue) noexcept : x(inValue), y(inValue) {}
-		Vector2(const float& inX, const float& inY) noexcept : x(inX), y(inY) {}
-		Vector2(const Vector2& inValue) : x(inValue.x), y(inValue.y) {}
-		force_inline Vector2& operator = (const Vector2& inValue) noexcept;
+		BasicVector2() noexcept : x(0), y(0) {}
+		BasicVector2(const T& inValue) noexcept : x(inValue), y(inValue) {}
+		BasicVector2(const T& inX, const T& inY) noexcept : x(inX), y(inY) {}
+		BasicVector2(const BasicVector2& inValue) : x(inValue.x), y(inValue.y) {}
+		force_inline BasicVector2& operator = (const BasicVector2& inValue) noexcept;
 
 		//~ End initialize.
 		//--------------------------------
@@ -54,17 +60,17 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin self-related operations.
 
-		force_inline bool operator == (const Vector2& rhs) const;
-		force_inline bool operator != (const Vector2& rhs) const;
+		force_inline bool operator == (const BasicVector2& rhs) const;
+		force_inline bool operator != (const BasicVector2& rhs) const;
 
-		force_inline Vector2 operator + (const Vector2& rhs) const;
-		force_inline Vector2 operator - (const Vector2& rhs) const;
-		force_inline Vector2 operator * (const Vector2& rhs) const;
-		force_inline Vector2 operator / (const Vector2& rhs) const;
-		force_inline const Vector2& operator += (const Vector2& rhs);
-		force_inline const Vector2& operator -= (const Vector2& rhs);
-		force_inline const Vector2& operator *= (const Vector2& rhs);
-		force_inline const Vector2& operator /= (const Vector2& rhs);
+		force_inline BasicVector2 operator + (const BasicVector2& rhs) const;
+		force_inline BasicVector2 operator - (const BasicVector2& rhs) const;
+		force_inline BasicVector2 operator * (const BasicVector2& rhs) const;
+		force_inline BasicVector2 operator / (const BasicVector2& rhs) const;
+		force_inline const BasicVector2& operator += (const BasicVector2& rhs);
+		force_inline const BasicVector2& operator -= (const BasicVector2& rhs);
+		force_inline const BasicVector2& operator *= (const BasicVector2& rhs);
+		force_inline const BasicVector2& operator /= (const BasicVector2& rhs);
 
 		//~ End self-related operations.
 		//--------------------------------
@@ -73,14 +79,14 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin number-related operations.
 
-		force_inline Vector2 operator + (const float& rhs) const;
-		force_inline Vector2 operator - (const float& rhs) const;
-		force_inline Vector2 operator * (const float& rhs) const;
-		force_inline Vector2 operator / (const float& rhs) const;
-		force_inline const Vector2& operator += (const float& rhs);
-		force_inline const Vector2& operator -= (const float& rhs);
-		force_inline const Vector2& operator *= (const float& rhs);
-		force_inline const Vector2& operator /= (const float& rhs);
+		force_inline BasicVector2 operator + (const T& rhs) const;
+		force_inline BasicVector2 operator - (const T& rhs) const;
+		force_inline BasicVector2 operator * (const T& rhs) const;
+		force_inline BasicVector2 operator / (const T& rhs) const;
+		force_inline const BasicVector2& operator += (const T& rhs);
+		force_inline const BasicVector2& operator -= (const T& rhs);
+		force_inline const BasicVector2& operator *= (const T& rhs);
+		force_inline const BasicVector2& operator /= (const T& rhs);
 
 		//~ End number-related operations.
 		//--------------------------------
@@ -89,36 +95,49 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin bector operations.
 
-		force_inline float operator ^ (const Vector2& rhs) const;
-		force_inline float operator | (const Vector2& rhs) const;
-		warn_nodiscard force_inline float CrossProduct(const Vector2& rhs) const;
-		warn_nodiscard force_inline float DotProduct(const Vector2& rhs) const;
-		warn_nodiscard force_inline float Length() const;
-		warn_nodiscard force_inline float LengthSquared() const;
-
-		warn_nodiscard force_inline Vector2 Normalize(const float& tolerance = Number::SMALL_NUMBER) const;
-		force_inline void Normalized(const float& tolerance = Number::SMALL_NUMBER);
-		warn_nodiscard force_inline bool IsNormalized(const float& tolerance = Number::SMALL_NUMBER) const;
-
-		warn_nodiscard force_inline Matrix ToMatrix() const;
-		warn_nodiscard force_inline Matrix ToInvMatrix() const;
+		force_inline T operator ^ (const BasicVector2& rhs) const;
+		force_inline T operator | (const BasicVector2& rhs) const;
+		warn_nodiscard force_inline T CrossProduct(const BasicVector2& rhs) const;
+		warn_nodiscard force_inline T DotProduct(const BasicVector2& rhs) const;
+		
+		warn_nodiscard force_inline T Length() const requires is_floating<T>;
+		warn_nodiscard force_inline T LengthSquared() const requires is_floating<T>;
+		warn_nodiscard force_inline BasicVector2 Normalize(const float& tolerance = Number::SMALL_NUMBER) const requires is_floating<T>;
+		force_inline void Normalized(const float& tolerance = Number::SMALL_NUMBER) requires is_floating<T>;
+		warn_nodiscard force_inline bool IsNormalized(const float& tolerance = Number::SMALL_NUMBER) const requires is_floating<T>;
 
 		//~ End vector operations.
 		//--------------------------------
+
+		warn_nodiscard force_inline BasicMatrix<T> ToMatrix() const;
+		warn_nodiscard force_inline BasicMatrix<T> ToInvMatrix() const;
 	};
 
+	using Vector2i = BasicVector2<int>;
+	using Vector2f = BasicVector2<float>;
+	using Vector2d = BasicVector2<double>;
+	static_assert(sizeof(Vector2i) == 8, "[FreezeRender] Vector2i size is invalid!");
+	static_assert(sizeof(Vector2f) == 8, "[FreezeRender] Vector2f size is invalid!");
+	static_assert(sizeof(Vector2d) == 16, "[FreezeRender] Vector2d size is invalid!");
 
 
-	struct Vector3
+
+	/**
+	 * @brief Templated vector3.
+	 */
+	template <typename T>
+	struct BasicVector3
 	{
-		float x, y, z;
+		static_assert(is_floating<T> || is_integral<T>, "[FreezeRender] type must be int, float, or double");
+		
+		T x, y, z;
 
 
 		//--------------------------------
 		//~ Begin constants.
 
-		static const Vector3 Zero;
-		static const Vector3 One;
+		static const BasicVector3 Zero;
+		static const BasicVector3 One;
 
 		//~ End constants.
 		//--------------------------------
@@ -127,13 +146,13 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin initialize.
 
-		Vector3() noexcept : x(0.f), y(0.f), z(0.f) {}
-		Vector3(const float& inValue) noexcept : x(inValue), y(inValue), z(inValue) {}
-		Vector3(const float& inX, const float& inY, const float& inZ) noexcept : x(inX), y(inY), z(inZ) {}
-		Vector3(const Vector2& inValue, const float& inZ = 0.f) : x(inValue.x), y(inValue.y), z(inZ) {}
-		Vector3(const float& inX, const Vector2& inValue) : x(inX), y(inValue.x), z(inValue.y) {}
-		Vector3(const Vector3& inValue) : x(inValue.x), y(inValue.y), z(inValue.z) {}
-		force_inline Vector3& operator = (const Vector3& inValue) noexcept;
+		BasicVector3() noexcept : x(0), y(0), z(0) {}
+		BasicVector3(const T& inValue) noexcept : x(inValue), y(inValue), z(inValue) {}
+		BasicVector3(const T& inX, const T& inY, const T& inZ) noexcept : x(inX), y(inY), z(inZ) {}
+		BasicVector3(const BasicVector2<T>& inValue, const T& inZ = 0) : x(inValue.x), y(inValue.y), z(inZ) {}
+		BasicVector3(const T& inX, const BasicVector2<T>& inValue) : x(inX), y(inValue.x), z(inValue.y) {}
+		BasicVector3(const BasicVector3& inValue) : x(inValue.x), y(inValue.y), z(inValue.z) {}
+		force_inline BasicVector3& operator = (const BasicVector3& inValue) noexcept;
 	
 		//~ End initialize.
 		//--------------------------------
@@ -142,23 +161,23 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin self-related operations.
 
-		force_inline Vector2 XY();
-		force_inline Vector2 XZ();
-		force_inline Vector2 YZ();
-		force_inline Vector2 XYRef();
-		force_inline Vector2 YZRef();
+		force_inline BasicVector2<T> XY();
+		force_inline BasicVector2<T> XZ();
+		force_inline BasicVector2<T> YZ();
+		force_inline BasicVector2<T>& XYRef();
+		force_inline BasicVector2<T>& YZRef();
 
-		force_inline bool operator == (const Vector3& rhs) const;
-		force_inline bool operator != (const Vector3& rhs) const;
+		force_inline bool operator == (const BasicVector3& rhs) const;
+		force_inline bool operator != (const BasicVector3& rhs) const;
 
-		force_inline Vector3 operator + (const Vector3& rhs) const;
-		force_inline Vector3 operator - (const Vector3& rhs) const;
-		force_inline Vector3 operator * (const Vector3& rhs) const;
-		force_inline Vector3 operator / (const Vector3& rhs) const;
-		force_inline const Vector3& operator += (const Vector3& rhs);
-		force_inline const Vector3& operator -= (const Vector3& rhs);
-		force_inline const Vector3& operator *= (const Vector3& rhs);
-		force_inline const Vector3& operator /= (const Vector3& rhs);
+		force_inline BasicVector3 operator + (const BasicVector3& rhs) const;
+		force_inline BasicVector3 operator - (const BasicVector3& rhs) const;
+		force_inline BasicVector3 operator * (const BasicVector3& rhs) const;
+		force_inline BasicVector3 operator / (const BasicVector3& rhs) const;
+		force_inline const BasicVector3& operator += (const BasicVector3& rhs);
+		force_inline const BasicVector3& operator -= (const BasicVector3& rhs);
+		force_inline const BasicVector3& operator *= (const BasicVector3& rhs);
+		force_inline const BasicVector3& operator /= (const BasicVector3& rhs);
 
 		//~ End self-related operations.
 		//--------------------------------
@@ -167,14 +186,14 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin number-related operations.
 
-		force_inline Vector3 operator + (const float& rhs) const;
-		force_inline Vector3 operator - (const float& rhs) const;
-		force_inline Vector3 operator * (const float& rhs) const;
-		force_inline Vector3 operator / (const float& rhs) const;
-		force_inline const Vector3& operator += (const float& rhs);
-		force_inline const Vector3& operator -= (const float& rhs);
-		force_inline const Vector3& operator *= (const float& rhs);
-		force_inline const Vector3& operator /= (const float& rhs);
+		force_inline BasicVector3 operator + (const T& rhs) const;
+		force_inline BasicVector3 operator - (const T& rhs) const;
+		force_inline BasicVector3 operator * (const T& rhs) const;
+		force_inline BasicVector3 operator / (const T& rhs) const;
+		force_inline const BasicVector3& operator += (const T& rhs);
+		force_inline const BasicVector3& operator -= (const T& rhs);
+		force_inline const BasicVector3& operator *= (const T& rhs);
+		force_inline const BasicVector3& operator /= (const T& rhs);
 
 		//~ End number-related operations.
 		//--------------------------------
@@ -183,37 +202,49 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin vector operations.
 
-		force_inline Vector3 operator ^ (const Vector3& rhs) const;
-		force_inline float operator | (const Vector3& rhs) const;
-		force_inline void CrossProducted(const Vector3& rhs);
-		warn_nodiscard force_inline Vector3 CrossProduct(const Vector3& rhs) const;
-		warn_nodiscard force_inline float DotProduct(const Vector3& rhs) const;
-		warn_nodiscard force_inline float Length() const;
-		warn_nodiscard force_inline float LengthSquared() const;
-
-		warn_nodiscard force_inline Vector3 Normalize(const float& tolerance = Number::SMALL_NUMBER) const;
-		force_inline void Normalized(const float& tolerance = Number::SMALL_NUMBER);
-		warn_nodiscard force_inline bool IsNormalized(const float& tolerance = Number::SMALL_NUMBER) const;
-
-		warn_nodiscard force_inline Matrix ToMatrix() const;
-		warn_nodiscard force_inline Matrix ToInvMatrix() const;
+		force_inline BasicVector3 operator ^ (const BasicVector3& rhs) const;
+		force_inline T operator | (const BasicVector3& rhs) const;
+		force_inline void CrossProducted(const BasicVector3& rhs);
+		warn_nodiscard force_inline BasicVector3 CrossProduct(const BasicVector3& rhs) const;
+		warn_nodiscard force_inline T DotProduct(const BasicVector3& rhs) const;
+		
+		warn_nodiscard force_inline T Length() const requires is_floating<T>;
+		warn_nodiscard force_inline T LengthSquared() const requires is_floating<T>;
+		warn_nodiscard force_inline BasicVector3 Normalize(const float& tolerance = Number::SMALL_NUMBER) const requires is_floating<T>;
+		force_inline void Normalized(const float& tolerance = Number::SMALL_NUMBER) requires is_floating<T>;
+		warn_nodiscard force_inline bool IsNormalized(const float& tolerance = Number::SMALL_NUMBER) const requires is_floating<T>;
 
 		//~ End vector operations.
 		//--------------------------------
+
+		warn_nodiscard force_inline BasicMatrix<T> ToMatrix() const;
+		warn_nodiscard force_inline BasicMatrix<T> ToInvMatrix() const;
 	};
 
+	using Vector3i = BasicVector3<int>;
+	using Vector3f = BasicVector3<float>;
+	using Vector3d = BasicVector3<double>;
+	static_assert(sizeof(Vector3i) == 12, "[FreezeRender] Vector3i size is invalid!");
+	static_assert(sizeof(Vector3f) == 12, "[FreezeRender] Vector3f size is invalid!");
+	static_assert(sizeof(Vector3d) == 24, "[FreezeRender] Vector3d size is invalid!");
 
 
-	struct alignas(16) Vector4
+
+	/**
+	 * @brief Templated vector4.
+	 */
+	template <typename T>
+	struct alignas(16) BasicVector4
 	{
-		float x, y, z, w;
+		static_assert(is_floating<T> || is_integral<T>, "[FreezeRender] type must be int, float, or double");
+		T x, y, z, w;
 
 
 		//--------------------------------
 		//~ Begin constants.
 
-		static const Vector4 Zero;
-		static const Vector4 One;
+		static const BasicVector4 Zero;
+		static const BasicVector4 One;
 
 		//~ End constants.
 		//--------------------------------
@@ -222,16 +253,16 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin initialize.
 
-		Vector4() noexcept : x(0.f), y(0.f), z(0.f), w(0.f) {}
-		Vector4(const float& inValue) noexcept : x(inValue), y(inValue), z(inValue), w(inValue) {}
-		Vector4(const float& inX, const float& inY, const float& inZ, const float& inW) noexcept : x(inX), y(inY), z(inZ), w(inW) {}
-		Vector4(const Vector2& inValue, const float& inZ = 0.f, const float& inW = 0.f) : x(inValue.x), y(inValue.y), z(inZ), w(inW) {}
-		Vector4(const float& inX, const float& inY, const Vector2& inValue) : x(inX), y(inY), z(inValue.x), w(inValue.y) {}
-		Vector4(const Vector2& in0, const Vector2& in1) : x(in0.x), y(in0.y), z(in1.x), w(in1.y) {}
-		Vector4(const float& inX, const Vector3& inValue) : x(inX), y(inValue.x), z(inValue.y), w(inValue.z) {}
-		Vector4(const Vector3& inValue, const float& inW = 0.f) : x(inValue.x), y(inValue.y), z(inValue.z), w(inW) {}
-		Vector4(const Vector4& inValue) : x(inValue.x), y(inValue.y), z(inValue.z), w(inValue.w) {}
-		force_inline Vector4& operator = (const Vector4& inValue) noexcept;
+		BasicVector4() noexcept : x(0), y(0), z(0), w(0) {}
+		BasicVector4(const T& inValue) noexcept : x(inValue), y(inValue), z(inValue), w(inValue) {}
+		BasicVector4(const T& inX, const T& inY, const T& inZ, const T& inW) noexcept : x(inX), y(inY), z(inZ), w(inW) {}
+		BasicVector4(const BasicVector2<T>& inValue, const T& inZ = 0, const T& inW = 0) : x(inValue.x), y(inValue.y), z(inZ), w(inW) {}
+		BasicVector4(const T& inX, const T& inY, const BasicVector2<T>& inValue) : x(inX), y(inY), z(inValue.x), w(inValue.y) {}
+		BasicVector4(const BasicVector2<T>& in0, const BasicVector2<T>& in1) : x(in0.x), y(in0.y), z(in1.x), w(in1.y) {}
+		BasicVector4(const T& inX, const BasicVector3<T>& inValue) : x(inX), y(inValue.x), z(inValue.y), w(inValue.z) {}
+		BasicVector4(const BasicVector3<T>& inValue, const T& inW = 0) : x(inValue.x), y(inValue.y), z(inValue.z), w(inW) {}
+		BasicVector4(const BasicVector4& inValue) : x(inValue.x), y(inValue.y), z(inValue.z), w(inValue.w) {}
+		force_inline BasicVector4& operator = (const BasicVector4& inValue) noexcept;
 
 		//~ End initialize.
 		//--------------------------------
@@ -240,26 +271,26 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin self-related operations.
 
-		force_inline Vector2 XY() const;
-		force_inline Vector2 ZW() const;
-		force_inline Vector3 XYZ() const;
-		force_inline Vector3 YZW() const;
-		force_inline Vector2& XYRef() const;
-		force_inline Vector2& ZWRef() const;
-		force_inline Vector3& XYZRef() const;
-		force_inline Vector3& YZWRef() const;
+		force_inline BasicVector2<T> XY() const;
+		force_inline BasicVector2<T> ZW() const;
+		force_inline BasicVector3<T> XYZ() const;
+		force_inline BasicVector3<T> YZW() const;
+		force_inline BasicVector2<T>& XYRef() const;
+		force_inline BasicVector2<T>& ZWRef() const;
+		force_inline BasicVector3<T>& XYZRef() const;
+		force_inline BasicVector3<T>& YZWRef() const;
 
-		force_inline bool operator == (const Vector4& rhs) const;
-		force_inline bool operator != (const Vector4& rhs) const;
+		force_inline bool operator == (const BasicVector4& rhs) const;
+		force_inline bool operator != (const BasicVector4& rhs) const;
 
-		force_inline Vector4 operator + (const Vector4& rhs) const;
-		force_inline Vector4 operator - (const Vector4& rhs) const;
-		force_inline Vector4 operator * (const Vector4& rhs) const;
-		force_inline Vector4 operator / (const Vector4& rhs) const;
-		force_inline const Vector4& operator += (const Vector4& rhs);
-		force_inline const Vector4& operator -= (const Vector4& rhs);
-		force_inline const Vector4& operator *= (const Vector4& rhs);
-		force_inline const Vector4& operator /= (const Vector4& rhs);
+		force_inline BasicVector4 operator + (const BasicVector4& rhs) const;
+		force_inline BasicVector4 operator - (const BasicVector4& rhs) const;
+		force_inline BasicVector4 operator * (const BasicVector4& rhs) const;
+		force_inline BasicVector4 operator / (const BasicVector4& rhs) const;
+		force_inline const BasicVector4& operator += (const BasicVector4& rhs);
+		force_inline const BasicVector4& operator -= (const BasicVector4& rhs);
+		force_inline const BasicVector4& operator *= (const BasicVector4& rhs);
+		force_inline const BasicVector4& operator /= (const BasicVector4& rhs);
 	
 		//~ End self-related operations.
 		//--------------------------------
@@ -268,14 +299,14 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin number-related operations.
 
-		force_inline Vector4 operator + (const float& rhs) const;
-		force_inline Vector4 operator - (const float& rhs) const;
-		force_inline Vector4 operator * (const float& rhs) const;
-		force_inline Vector4 operator / (const float& rhs) const;
-		force_inline const Vector4& operator += (const float& rhs);
-		force_inline const Vector4& operator -= (const float& rhs);
-		force_inline const Vector4& operator *= (const float& rhs);
-		force_inline const Vector4& operator /= (const float& rhs);
+		force_inline BasicVector4 operator + (const T& rhs) const;
+		force_inline BasicVector4 operator - (const T& rhs) const;
+		force_inline BasicVector4 operator * (const T& rhs) const;
+		force_inline BasicVector4 operator / (const T& rhs) const;
+		force_inline const BasicVector4& operator += (const T& rhs);
+		force_inline const BasicVector4& operator -= (const T& rhs);
+		force_inline const BasicVector4& operator *= (const T& rhs);
+		force_inline const BasicVector4& operator /= (const T& rhs);
 
 		//~ End number-related operations.
 		//--------------------------------
@@ -284,34 +315,44 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin vector operations.
 
-		force_inline float operator | (const Vector4& rhs) const;
-		force_inline float DotProduct(const Vector4& rhs) const;
-		warn_nodiscard force_inline float Length() const;
-		warn_nodiscard force_inline float LengthSquared() const;
-	
+		force_inline T operator | (const BasicVector4& rhs) const;
+		force_inline T DotProduct(const BasicVector4& rhs) const;
+
+		warn_nodiscard force_inline T Length() const requires is_floating<T>;
+		warn_nodiscard force_inline T LengthSquared() const requires is_floating<T>;
+		warn_nodiscard force_inline BasicVector4 Normalize(const float& tolerance = Number::SMALL_NUMBER) const requires is_floating<T>;
+		force_inline void Normalized(const float& tolerance = Number::SMALL_NUMBER) requires is_floating<T>;
+		warn_nodiscard force_inline bool IsNormalized(const float& tolerance = Number::SMALL_NUMBER) const requires is_floating<T>;
+
 		//~ End bector operations.
 		//--------------------------------
-
-
-		warn_nodiscard force_inline Vector4 Normalize(const float& tolerance = Number::SMALL_NUMBER) const;
-		force_inline void Normalized(const float& tolerance = Number::SMALL_NUMBER);
-		warn_nodiscard force_inline bool IsNormalized(const float& tolerance = Number::SMALL_NUMBER) const;
 	};
 
+	using Vector4i = BasicVector4<int>;
+	using Vector4f = BasicVector4<float>;
+	using Vector4d = BasicVector4<double>;
+	static_assert(sizeof(Vector4i) == sizeof(R128i) && sizeof(Vector4i) == 16, "[FreezeRender] Vector4i size is invalid!");
+	static_assert(sizeof(Vector4f) == sizeof(R128)  && sizeof(Vector4f) == 16, "[FreezeRender] Vector4f size is invalid!");
+	static_assert(sizeof(Vector4d) == sizeof(R256)  && sizeof(Vector4d) == 32, "[FreezeRender] Vector4d size is invalid!");
 
 
-	struct Matrix
+
+	/**
+	 * @brief Templated matrix.
+	 */
+	template<typename T>
+	struct BasicMatrix
 	{
 		union
 		{
-			alignas(16) float m[4][4];
+			alignas(16) T m[4][4];
 		};
 
 
 		//--------------------------------
 		//~ Begin constants.
 
-		static const Matrix Identity;
+		static const BasicMatrix Identity;
 
 		//~ End constants.
 		//--------------------------------
@@ -320,14 +361,14 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin initialize.
 
-		Matrix() = default;
-		force_inline Matrix(const float& value) noexcept;
-		force_inline Matrix(const Vector3& row0, const Vector3& row1, const Vector3& row2, const Vector3& row3);
-		force_inline Matrix(const Vector4& row0, const Vector4& row1, const Vector4& row2, const Vector4& row3);
-		force_inline Matrix(const Matrix& value);
-		force_inline Matrix& operator = (const Matrix& value);
-		force_inline Matrix(const Matrix&& value) noexcept;
-		force_inline Matrix& operator = (const Matrix&& value) noexcept;
+		BasicMatrix() = default;
+		force_inline BasicMatrix(const T& value) noexcept;
+		force_inline BasicMatrix(const BasicVector3<T>& row0, const BasicVector3<T>& row1, const BasicVector3<T>& row2, const BasicVector3<T>& row3);
+		force_inline BasicMatrix(const BasicVector4<T>& row0, const BasicVector4<T>& row1, const BasicVector4<T>& row2, const BasicVector4<T>& row3);
+		force_inline BasicMatrix(const BasicMatrix& value);
+		force_inline BasicMatrix& operator = (const BasicMatrix& value);
+		force_inline BasicMatrix(const BasicMatrix&& value) noexcept;
+		force_inline BasicMatrix& operator = (const BasicMatrix&& value) noexcept;
 		
 		//~ End initialize.
 		//--------------------------------
@@ -336,18 +377,18 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin self-related operations.
 
-		force_inline bool operator == (const Matrix& rhs) const;
-		force_inline bool operator != (const Matrix& rhs) const;
+		force_inline bool operator == (const BasicMatrix& rhs) const;
+		force_inline bool operator != (const BasicMatrix& rhs) const;
 
-		force_inline Matrix operator + (const Matrix& rhs) const;
-		force_inline Matrix operator - (const Matrix& rhs) const;
-		force_inline Matrix operator * (const Matrix& rhs) const;
-		force_inline const Matrix& operator += (const Matrix& rhs);
-		force_inline const Matrix& operator -= (const Matrix& rhs);
-		force_inline const Matrix& operator *= (const Matrix& rhs);
+		force_inline BasicMatrix operator + (const BasicMatrix& rhs) const;
+		force_inline BasicMatrix operator - (const BasicMatrix& rhs) const;
+		force_inline BasicMatrix operator * (const BasicMatrix& rhs) const requires is_floating<T>;
+		force_inline const BasicMatrix& operator += (const BasicMatrix& rhs);
+		force_inline const BasicMatrix& operator -= (const BasicMatrix& rhs);
+		force_inline const BasicMatrix& operator *= (const BasicMatrix& rhs) requires is_floating<T>;
 
-		warn_nodiscard force_inline Matrix Transpose() const;
-		warn_nodiscard force_inline Matrix Inverse() const;
+		warn_nodiscard force_inline BasicMatrix Transpose() const;
+		warn_nodiscard force_inline BasicMatrix Inverse() const requires is_floating<T>;
 
 		//~ End self-related operations.
 		//--------------------------------
@@ -356,10 +397,10 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin number-related operations.
 	
-		force_inline Matrix operator * (const float& rhs) const;
-		force_inline Matrix operator / (const float& rhs) const;
-		force_inline const Matrix& operator *= (const float& rhs);
-		force_inline const Matrix& operator /= (const float& rhs);
+		force_inline BasicMatrix operator * (const T& rhs) const;
+		force_inline BasicMatrix operator / (const T& rhs) const;
+		force_inline const BasicMatrix& operator *= (const T& rhs);
+		force_inline const BasicMatrix& operator /= (const T& rhs);
 	
 		//~ End number-related operations.
 		//--------------------------------
@@ -368,27 +409,60 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin vector operations.
 
-		warn_deprecated("** Performance issues **") force_inline Vector3 operator * (const Vector3& rhs) const;
-		warn_deprecated("** Performance issues **") force_inline Vector4 operator * (const Vector4& rhs) const;
+		warn_deprecated("** Performance issues **") force_inline BasicVector3<T> operator * (const BasicVector3<T>& rhs) const requires is_floating<T>;
+		warn_deprecated("** Performance issues **") force_inline BasicVector4<T> operator * (const BasicVector4<T>& rhs) const requires is_floating<T>;
 
-		//~ End bector operations.
+		//~ End vector operations.
 		//--------------------------------
 	};
 
+	using Matrix44i = BasicMatrix<int>;
+	using Matrix44f = BasicMatrix<float>;
+	using Matrix44d = BasicMatrix<double>;
+	static_assert(sizeof(Matrix44i) == sizeof(R128i) * 4 && sizeof(Matrix44i) == 64, "[FreezeRender] matrix44i size is invalid!");
+	static_assert(sizeof(Matrix44f) == sizeof(R128) * 4  && sizeof(Matrix44f) == 64, "[FreezeRender] matrix44f size is invalid!");
+	static_assert(sizeof(Matrix44d) == sizeof(R256) * 4  && sizeof(Matrix44d) == 128, "[FreezeRender] matrix44d size is invalid!");
 
 
 #pragma region contants
 
-	const inline_variable Vector2 Vector2::One  = { 1.f, 1.f };
-	const inline_variable Vector2 Vector2::Zero = {};
+	const inline_variable Vector2i Vector2i::Zero = {};
+	const inline_variable Vector2i Vector2i::One = { 1, 1 };
 
-	const inline_variable Vector3 Vector3::Zero = {};
-	const inline_variable Vector3 Vector3::One  = { 1.f, 1.f, 1.f };
+	const inline_variable Vector2f Vector2f::Zero = {};
+	const inline_variable Vector2f Vector2f::One  = { 1.f, 1.f };
 
-	const inline_variable Vector4 Vector4::Zero = {};
-	const inline_variable Vector4 Vector4::One  = { 1.f, 1.f, 1.f, 1.f };
+	const inline_variable Vector2d Vector2d::Zero = {};
+	const inline_variable Vector2d Vector2d::One = { 1.0, 1.0 };
 
-	const inline_variable Matrix Matrix::Identity = 1.f;
+
+
+	const inline_variable Vector3i Vector3i::Zero = {};
+	const inline_variable Vector3i Vector3i::One = { 1, 1, 1 };
+
+	const inline_variable Vector3f Vector3f::Zero = {};
+	const inline_variable Vector3f Vector3f::One  = { 1.f, 1.f, 1.f };
+
+	const inline_variable Vector3d Vector3d::Zero = {};
+	const inline_variable Vector3d Vector3d::One = { 1.0, 1.0, 1.0 };
+
+
+
+	const inline_variable Vector4i Vector4i::Zero = {};
+	const inline_variable Vector4i Vector4i::One = { 1, 1, 1, 1 };
+
+	const inline_variable Vector4f Vector4f::Zero = {};
+	const inline_variable Vector4f Vector4f::One  = { 1.f, 1.f, 1.f, 1.f };
+
+	const inline_variable Vector4d Vector4d::Zero = {};
+	const inline_variable Vector4d Vector4d::One = { 1.0, 1.0, 1.0, 1.0 };
+
+
+	const inline_variable Matrix44i Matrix44i::Identity = 1;
+
+	const inline_variable Matrix44f Matrix44f::Identity = 1.f;
+
+	const inline_variable Matrix44d Matrix44d::Identity = 1.0;
 
 #pragma endregion contants
 
@@ -396,40 +470,41 @@ namespace Pluto
 
 #pragma region vector2_implemention
 
-	force_inline Vector2& Vector2::operator = (const Vector2& inValue) noexcept {  x = inValue.x; y = inValue.y; return *this; }
+	template <typename T> force_inline BasicVector2<T>& BasicVector2<T>::operator = (const BasicVector2<T>& inValue) noexcept { x = inValue.x; y = inValue.y; return *this; }
 
-	force_inline bool Vector2::operator == (const Vector2& rhs) const { return x == rhs.x && y == rhs.y; }
-	force_inline bool Vector2::operator != (const Vector2& rhs) const { return x != rhs.x || y != rhs.y; }
+	template <typename T> force_inline bool BasicVector2<T>::operator == (const BasicVector2<T>& rhs) const { return x == rhs.x && y == rhs.y; }
+	template <typename T> force_inline bool BasicVector2<T>::operator != (const BasicVector2<T>& rhs) const { return x != rhs.x || y != rhs.y; }
 
-	force_inline Vector2 Vector2::operator + (const Vector2& rhs) const { return Vector2(x + rhs.x, y + rhs.y); }
-	force_inline Vector2 Vector2::operator - (const Vector2& rhs) const { return Vector2(x - rhs.x, y - rhs.y); }
-	force_inline Vector2 Vector2::operator * (const Vector2& rhs) const { return Vector2(x * rhs.x, y * rhs.y); }
-	force_inline Vector2 Vector2::operator / (const Vector2& rhs) const { return Vector2(x / rhs.x, y / rhs.y); }
-	force_inline const Vector2& Vector2::operator += (const Vector2& rhs) { x += rhs.x; y += rhs.y; return *this; }
-	force_inline const Vector2& Vector2::operator -= (const Vector2& rhs) { x -= rhs.x; y -= rhs.y; return *this; }
-	force_inline const Vector2& Vector2::operator *= (const Vector2& rhs) { x *= rhs.x; y *= rhs.y; return *this; }
-	force_inline const Vector2& Vector2::operator /= (const Vector2& rhs) { x /= rhs.x; y /= rhs.y; return *this; }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator + (const BasicVector2<T>& rhs) const { return BasicVector2<T>(x + rhs.x, y + rhs.y); }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator - (const BasicVector2<T>& rhs) const { return BasicVector2<T>(x - rhs.x, y - rhs.y); }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator * (const BasicVector2<T>& rhs) const { return BasicVector2<T>(x * rhs.x, y * rhs.y); }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator / (const BasicVector2<T>& rhs) const { return BasicVector2<T>(x / rhs.x, y / rhs.y); }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator += (const BasicVector2<T>& rhs) { x += rhs.x; y += rhs.y; return *this; }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator -= (const BasicVector2<T>& rhs) { x -= rhs.x; y -= rhs.y; return *this; }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator *= (const BasicVector2<T>& rhs) { x *= rhs.x; y *= rhs.y; return *this; }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator /= (const BasicVector2<T>& rhs) { x /= rhs.x; y /= rhs.y; return *this; }
 
-	force_inline Vector2 Vector2::operator + (const float& rhs) const { return Vector2(x + rhs, y + rhs); }
-	force_inline Vector2 Vector2::operator - (const float& rhs) const { return Vector2(x - rhs, y - rhs); }
-	force_inline Vector2 Vector2::operator * (const float& rhs) const { return Vector2(x * rhs, y * rhs); }
-	force_inline Vector2 Vector2::operator / (const float& rhs) const { return Vector2(x / rhs, y / rhs); }
-	force_inline const Vector2& Vector2::operator += (const float& rhs) { x += rhs; y += rhs; return *this; }
-	force_inline const Vector2& Vector2::operator -= (const float& rhs) { x -= rhs; y -= rhs; return *this; }
-	force_inline const Vector2& Vector2::operator *= (const float& rhs) { x *= rhs; y *= rhs; return *this; }
-	force_inline const Vector2& Vector2::operator /= (const float& rhs) { x /= rhs; y /= rhs; return *this; }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator + (const T& rhs) const { return BasicVector2<T>(x + rhs, y + rhs); }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator - (const T& rhs) const { return BasicVector2<T>(x - rhs, y - rhs); }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator * (const T& rhs) const { return BasicVector2<T>(x * rhs, y * rhs); }
+	template <typename T> force_inline BasicVector2<T> BasicVector2<T>::operator / (const T& rhs) const { return BasicVector2<T>(x / rhs, y / rhs); }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator += (const T& rhs) { x += rhs; y += rhs; return *this; }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator -= (const T& rhs) { x -= rhs; y -= rhs; return *this; }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator *= (const T& rhs) { x *= rhs; y *= rhs; return *this; }
+	template <typename T> force_inline const BasicVector2<T>& BasicVector2<T>::operator /= (const T& rhs) { x /= rhs; y /= rhs; return *this; }
 
-	force_inline float Vector2::operator ^ (const Vector2& rhs) const { return x * rhs.y - y * rhs.x; }
-	force_inline float Vector2::operator | (const Vector2& rhs) const { return x * rhs.x + y * rhs.y; }
-	force_inline float Vector2::CrossProduct(const Vector2& rhs) const { return (*this) ^ rhs; }
-	force_inline float Vector2::DotProduct(const Vector2& rhs) const { return (*this) | rhs; }
-	force_inline float Vector2::Length() const { return std::sqrtf(x * x + y * y); }
-	force_inline float Vector2::LengthSquared() const { return x * x + y * y; }
+	template <typename T> force_inline T BasicVector2<T>::operator ^ (const BasicVector2<T>& rhs) const { return x * rhs.y - y * rhs.x; }
+	template <typename T> force_inline T BasicVector2<T>::operator | (const BasicVector2<T>& rhs) const { return x * rhs.x + y * rhs.y; }
+	template <typename T> force_inline T BasicVector2<T>::CrossProduct(const BasicVector2<T>& rhs) const { return (*this) ^ rhs; }
+	template <typename T> force_inline T BasicVector2<T>::DotProduct(const BasicVector2<T>& rhs) const { return (*this) | rhs; }
+	template <typename T> force_inline T BasicVector2<T>::Length() const requires is_floating<T> { return std::sqrt(x * x + y * y); }
+	template <typename T> force_inline T BasicVector2<T>::LengthSquared() const requires is_floating<T> { return x * x + y * y; }
 
-	force_inline Vector2 Vector2::Normalize(const float& tolerance) const
+	template <typename T>
+	force_inline BasicVector2<T> BasicVector2<T>::Normalize(const float& tolerance) const requires is_floating<T>
 	{
-		Vector2 result = *this;
-		const float squareSum = result.x * result.x + result.y * result.y;
+		BasicVector2<T> result = *this;
+		const T squareSum = result.x * result.x + result.y * result.y;
 		if (squareSum > tolerance)
 		{
 			const float scale = Math::InvSqrt(squareSum);
@@ -439,26 +514,29 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline void Vector2::Normalized(const float& tolerance)
+	template <typename T>
+	force_inline void BasicVector2<T>::Normalized(const float& tolerance) requires is_floating<T>
 	{
-		const float squareSum = x * x + y * y;
+		const T squareSum = x * x + y * y;
 		if (squareSum > tolerance)
 		{
-			const float scale = Math::InvSqrt(squareSum);
+			const T scale = Math::InvSqrt(squareSum);
 			x *= scale;
 			y *= scale;
 		}
 	}
 
-	force_inline bool Vector2::IsNormalized(const float& tolerance) const
+	template <typename T>
+	force_inline bool BasicVector2<T>::IsNormalized(const float& tolerance) const requires is_floating<T>
 	{
-		const float squareSum = x * x + y * y;
-		return (std::abs(1.f - squareSum) < tolerance);
+		const T squareSum = x * x + y * y;
+		return (std::abs(static_cast<T>(1) - squareSum) < tolerance);
 	}
 
-	force_inline Matrix Vector2::ToMatrix() const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicVector2<T>::ToMatrix() const
 	{
-		return Matrix {
+		return BasicMatrix<T> {
 			{ 1, 0, 0, x },
 			{ 0, 1, 0, y },
 			{ 0, 0, 1, 0 },
@@ -466,9 +544,10 @@ namespace Pluto
 		};
 	}
 
-	force_inline Matrix Vector2::ToInvMatrix() const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicVector2<T>::ToInvMatrix() const
 	{
-		return Matrix {
+		return BasicMatrix<T> {
 			{ 1, 0, 0, -x },
 			{ 0, 1, 0, -y },
 			{ 0, 0, 1, 0  },
@@ -482,50 +561,51 @@ namespace Pluto
 
 #pragma region vector3_implemention
 
-	force_inline Vector3& Vector3::operator = (const Vector3& inValue) noexcept { x = inValue.x; y = inValue.y; z = inValue.z; return *this; }
+	template <typename T> force_inline BasicVector3<T>& BasicVector3<T>::operator = (const BasicVector3<T>& inValue) noexcept { x = inValue.x; y = inValue.y; z = inValue.z; return *this; }
 
-	force_inline Vector2 Vector3::XY() { return Vector2(x, y); }
-	force_inline Vector2 Vector3::XZ() { return Vector2(x, z); }
-	force_inline Vector2 Vector3::YZ() { return Vector2(y, z); }
-	force_inline Vector2 Vector3::XYRef() { return *(Vector2*)(&x); }
-	force_inline Vector2 Vector3::YZRef() { return *(Vector2*)(&y); }
+	template <typename T> force_inline BasicVector2<T> BasicVector3<T>::XY() { return BasicVector2<T>(x, y); }
+	template <typename T> force_inline BasicVector2<T> BasicVector3<T>::XZ() { return BasicVector2<T>(x, z); }
+	template <typename T> force_inline BasicVector2<T> BasicVector3<T>::YZ() { return BasicVector2<T>(y, z); }
+	template <typename T> force_inline BasicVector2<T>& BasicVector3<T>::XYRef() { return *(BasicVector2<T>*)(&x); }
+	template <typename T> force_inline BasicVector2<T>& BasicVector3<T>::YZRef() { return *(BasicVector2<T>*)(&y); }
 
-	force_inline bool Vector3::operator == (const Vector3& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
-	force_inline bool Vector3::operator != (const Vector3& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z; }
+	template <typename T> force_inline bool BasicVector3<T>::operator == (const BasicVector3<T>& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z; }
+	template <typename T> force_inline bool BasicVector3<T>::operator != (const BasicVector3<T>& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z; }
 
-	force_inline Vector3 Vector3::operator + (const Vector3& rhs) const { return Vector3(x + rhs.x, y + rhs.y, z + rhs.z); }
-	force_inline Vector3 Vector3::operator - (const Vector3& rhs) const { return Vector3(x - rhs.x, y - rhs.y, z - rhs.z); }
-	force_inline Vector3 Vector3::operator * (const Vector3& rhs) const { return Vector3(x * rhs.x, y * rhs.y, z * rhs.z); }
-	force_inline Vector3 Vector3::operator / (const Vector3& rhs) const { return Vector3(x / rhs.x, y / rhs.y, z / rhs.z); }
-	force_inline const Vector3& Vector3::operator += (const Vector3& rhs) { x += rhs.x; y += rhs.y; z += rhs.z; return *this; }
-	force_inline const Vector3& Vector3::operator -= (const Vector3& rhs) { x -= rhs.x; y -= rhs.y; z -= rhs.z; return *this; }
-	force_inline const Vector3& Vector3::operator *= (const Vector3& rhs) { x *= rhs.x; y *= rhs.y; z *= rhs.z; return *this; }
-	force_inline const Vector3& Vector3::operator /= (const Vector3& rhs) { x /= rhs.x; y /= rhs.y; z /= rhs.z; return *this; }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator + (const BasicVector3<T>& rhs) const { return BasicVector3<T>(x + rhs.x, y + rhs.y, z + rhs.z); }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator - (const BasicVector3<T>& rhs) const { return BasicVector3<T>(x - rhs.x, y - rhs.y, z - rhs.z); }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator * (const BasicVector3<T>& rhs) const { return BasicVector3<T>(x * rhs.x, y * rhs.y, z * rhs.z); }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator / (const BasicVector3<T>& rhs) const { return BasicVector3<T>(x / rhs.x, y / rhs.y, z / rhs.z); }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator += (const BasicVector3<T>& rhs) { x += rhs.x; y += rhs.y; z += rhs.z; return *this; }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator -= (const BasicVector3<T>& rhs) { x -= rhs.x; y -= rhs.y; z -= rhs.z; return *this; }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator *= (const BasicVector3<T>& rhs) { x *= rhs.x; y *= rhs.y; z *= rhs.z; return *this; }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator /= (const BasicVector3<T>& rhs) { x /= rhs.x; y /= rhs.y; z /= rhs.z; return *this; }
 
-	force_inline Vector3 Vector3::operator + (const float& rhs) const { return Vector3(x + rhs, y + rhs, z + rhs); }
-	force_inline Vector3 Vector3::operator - (const float& rhs) const { return Vector3(x - rhs, y - rhs, z - rhs); }
-	force_inline Vector3 Vector3::operator * (const float& rhs) const { return Vector3(x * rhs, y * rhs, z * rhs); }
-	force_inline Vector3 Vector3::operator / (const float& rhs) const { return Vector3(x / rhs, y / rhs, z / rhs); }
-	force_inline const Vector3& Vector3::operator += (const float& rhs) { x += rhs; y += rhs; z += rhs; return *this; }
-	force_inline const Vector3& Vector3::operator -= (const float& rhs) { x -= rhs; y -= rhs; z -= rhs; return *this; }
-	force_inline const Vector3& Vector3::operator *= (const float& rhs) { x *= rhs; y *= rhs; z *= rhs; return *this; }
-	force_inline const Vector3& Vector3::operator /= (const float& rhs) { x /= rhs; y /= rhs; z /= rhs; return *this; }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator + (const T& rhs) const { return BasicVector3<T>(x + rhs, y + rhs, z + rhs); }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator - (const T& rhs) const { return BasicVector3<T>(x - rhs, y - rhs, z - rhs); }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator * (const T& rhs) const { return BasicVector3<T>(x * rhs, y * rhs, z * rhs); }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator / (const T& rhs) const { return BasicVector3<T>(x / rhs, y / rhs, z / rhs); }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator += (const T& rhs) { x += rhs; y += rhs; z += rhs; return *this; }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator -= (const T& rhs) { x -= rhs; y -= rhs; z -= rhs; return *this; }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator *= (const T& rhs) { x *= rhs; y *= rhs; z *= rhs; return *this; }
+	template <typename T> force_inline const BasicVector3<T>& BasicVector3<T>::operator /= (const T& rhs) { x /= rhs; y /= rhs; z /= rhs; return *this; }
 
-	force_inline Vector3 Vector3::operator ^ (const Vector3& rhs) const { return Vector3(y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z, x * rhs.y - y * rhs.x); }
-	force_inline float Vector3::operator | (const Vector3& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z; }
-	force_inline void Vector3::CrossProducted(const Vector3& rhs) { (*this) = (*this) ^ rhs; }
-	force_inline Vector3 Vector3::CrossProduct(const Vector3& rhs) const { return (*this) ^ rhs; }
-	force_inline float Vector3::DotProduct(const Vector3& rhs) const { return (*this) | rhs; }
-	force_inline float Vector3::Length() const { return std::sqrtf(x * x + y * y + z * z); }
-	force_inline float Vector3::LengthSquared() const { return x * x + y * y + z * z; }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::operator ^ (const BasicVector3<T>& rhs) const { return BasicVector3<T>(y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z, x * rhs.y - y * rhs.x); }
+	template <typename T> force_inline T BasicVector3<T>::operator | (const BasicVector3<T>& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z; }
+	template <typename T> force_inline void BasicVector3<T>::CrossProducted(const BasicVector3<T>& rhs) { (*this) = (*this) ^ rhs; }
+	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::CrossProduct(const BasicVector3<T>& rhs) const { return (*this) ^ rhs; }
+	template <typename T> force_inline T BasicVector3<T>::DotProduct(const BasicVector3<T>& rhs) const { return (*this) | rhs; }
+	template <typename T> force_inline T BasicVector3<T>::Length() const requires is_floating<T> { return std::sqrtf(x * x + y * y + z * z); }
+	template <typename T> force_inline T BasicVector3<T>::LengthSquared() const requires is_floating<T> { return x * x + y * y + z * z; }
 
-	force_inline Vector3 Vector3::Normalize(const float& tolerance) const
+	template <typename T>
+	force_inline BasicVector3<T> BasicVector3<T>::Normalize(const float& tolerance) const requires is_floating<T>
 	{
-		Vector3 result = *this;
-		const float squareSum = result.x * result.x + result.y * result.y + result.z * result.z;
+		BasicVector3<T> result = *this;
+		const T squareSum = result.x * result.x + result.y * result.y + result.z * result.z;
 		if (squareSum > tolerance)
 		{
-			const float scale = Math::InvSqrt(squareSum);
+			const T scale = Math::InvSqrt(squareSum);
 			result.x *= scale;
 			result.y *= scale;
 			result.z *= scale;
@@ -533,27 +613,30 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline void Vector3::Normalized(const float& tolerance)
+	template <typename T>
+	force_inline void BasicVector3<T>::Normalized(const float& tolerance) requires is_floating<T>
 	{
-		const float squareSum = x * x + y * y + z * z;
+		const T squareSum = x * x + y * y + z * z;
 		if (squareSum > tolerance)
 		{
-			const float scale = Math::InvSqrt(squareSum);
+			const T scale = Math::InvSqrt(squareSum);
 			x *= scale;
 			y *= scale;
 			z *= scale;
 		}
 	}
 
-	force_inline bool Vector3::IsNormalized(const float& tolerance) const
+	template <typename T>
+	force_inline bool BasicVector3<T>::IsNormalized(const float& tolerance) const requires is_floating<T>
 	{
-		const float squareSum = x * x + y * y + z * z;
-		return (std::abs(1.f - squareSum) < tolerance);
+		const T squareSum = x * x + y * y + z * z;
+		return (std::abs(static_cast<T>(1) - squareSum) < tolerance);
 	}
 
-	force_inline Matrix Vector3::ToMatrix() const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicVector3<T>::ToMatrix() const
 	{
-		return Matrix{
+		return BasicMatrix<T>{
 			{ 1, 0, 0, x },
 			{ 0, 1, 0, y },
 			{ 0, 0, 1, z },
@@ -561,9 +644,10 @@ namespace Pluto
 		};
 	}
 
-	force_inline Matrix Vector3::ToInvMatrix() const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicVector3<T>::ToInvMatrix() const
 	{
-		return Matrix{
+		return BasicMatrix<T>{
 			{ 1, 0, 0, -x },
 			{ 0, 1, 0, -y },
 			{ 0, 0, 1, -z },
@@ -577,52 +661,51 @@ namespace Pluto
 
 #pragma region vector4_implemention
 
-	static_assert(sizeof(Vector4) == sizeof(R128), "[FreezeRender] Vector4 size is invalid!");
+	template <typename T> force_inline BasicVector4<T>& BasicVector4<T>::operator = (const BasicVector4<T>& inValue) noexcept { x = inValue.x; y = inValue.y; z = inValue.z; w = inValue.w; return *this; }
 
-	force_inline Vector4& Vector4::operator = (const Vector4& inValue) noexcept { x = inValue.x; y = inValue.y; z = inValue.z; w = inValue.w; return *this; }
+	template <typename T> force_inline BasicVector2<T> BasicVector4<T>::XY() const { return BasicVector2<T>(x, y); }
+	template <typename T> force_inline BasicVector2<T> BasicVector4<T>::ZW() const { return BasicVector2<T>(z, w); }
+	template <typename T> force_inline BasicVector3<T> BasicVector4<T>::XYZ() const { return BasicVector3<T>(x, y, z); }
+	template <typename T> force_inline BasicVector3<T> BasicVector4<T>::YZW() const { return BasicVector3<T>(y, z, w); }
+	template <typename T> force_inline BasicVector2<T>& BasicVector4<T>::XYRef() const { return *(BasicVector2<T>*)(&x); }
+	template <typename T> force_inline BasicVector2<T>& BasicVector4<T>::ZWRef() const { return *(BasicVector2<T>*)(&z); }
+	template <typename T> force_inline BasicVector3<T>& BasicVector4<T>::XYZRef() const { return *(BasicVector3<T>*)(&x); }
+	template <typename T> force_inline BasicVector3<T>& BasicVector4<T>::YZWRef() const { return *(BasicVector3<T>*)(&y); }
 
-	force_inline Vector2 Vector4::XY() const { return Vector2(x, y); }
-	force_inline Vector2 Vector4::ZW() const { return Vector2(z, w); }
-	force_inline Vector3 Vector4::XYZ() const { return Vector3(x, y, z); }
-	force_inline Vector3 Vector4::YZW() const { return Vector3(y, z, w); }
-	force_inline Vector2& Vector4::XYRef() const { return *(Vector2*)(&x); }
-	force_inline Vector2& Vector4::ZWRef() const { return *(Vector2*)(&z); }
-	force_inline Vector3& Vector4::XYZRef() const { return *(Vector3*)(&x); }
-	force_inline Vector3& Vector4::YZWRef() const { return *(Vector3*)(&y); }
+	template <typename T> force_inline bool BasicVector4<T>::operator == (const BasicVector4<T>& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
+	template <typename T> force_inline bool BasicVector4<T>::operator != (const BasicVector4<T>& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w; }
 
-	force_inline bool Vector4::operator == (const Vector4& rhs) const { return x == rhs.x && y == rhs.y && z == rhs.z && w == rhs.w; }
-	force_inline bool Vector4::operator != (const Vector4& rhs) const { return x != rhs.x || y != rhs.y || z != rhs.z || w != rhs.w; }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator + (const BasicVector4<T>& rhs) const { return BasicVector4<T>(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w); }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator - (const BasicVector4<T>& rhs) const { return BasicVector4<T>(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w); }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator * (const BasicVector4<T>& rhs) const { return BasicVector4<T>(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator / (const BasicVector4<T>& rhs) const { return BasicVector4<T>(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w); }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator += (const BasicVector4<T>& rhs) { x += rhs.x; y += rhs.y; z += rhs.z; w += rhs.w; return *this; }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator -= (const BasicVector4<T>& rhs) { x -= rhs.x; y -= rhs.y; z -= rhs.z; w -= rhs.w; return *this; }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator *= (const BasicVector4<T>& rhs) { x *= rhs.x; y *= rhs.y; z *= rhs.z; w *= rhs.w; return *this; }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator /= (const BasicVector4<T>& rhs) { x /= rhs.x; y /= rhs.y; z /= rhs.z; w /= rhs.w; return *this; }
 
-	force_inline Vector4 Vector4::operator + (const Vector4& rhs) const { return Vector4(x + rhs.x, y + rhs.y, z + rhs.z, w + rhs.w); }
-	force_inline Vector4 Vector4::operator - (const Vector4& rhs) const { return Vector4(x - rhs.x, y - rhs.y, z - rhs.z, w - rhs.w); }
-	force_inline Vector4 Vector4::operator * (const Vector4& rhs) const { return Vector4(x * rhs.x, y * rhs.y, z * rhs.z, w * rhs.w); }
-	force_inline Vector4 Vector4::operator / (const Vector4& rhs) const { return Vector4(x / rhs.x, y / rhs.y, z / rhs.z, w / rhs.w); }
-	force_inline const Vector4& Vector4::operator += (const Vector4& rhs) { x += rhs.x; y += rhs.y; z += rhs.z; w += rhs.w; return *this; }
-	force_inline const Vector4& Vector4::operator -= (const Vector4& rhs) { x -= rhs.x; y -= rhs.y; z -= rhs.z; w -= rhs.w; return *this; }
-	force_inline const Vector4& Vector4::operator *= (const Vector4& rhs) { x *= rhs.x; y *= rhs.y; z *= rhs.z; w *= rhs.w; return *this; }
-	force_inline const Vector4& Vector4::operator /= (const Vector4& rhs) { x /= rhs.x; y /= rhs.y; z /= rhs.z; w /= rhs.w; return *this; }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator + (const T& rhs) const { return BasicVector4<T>(x + rhs, y + rhs, z + rhs, w + rhs); }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator - (const T& rhs) const { return BasicVector4<T>(x - rhs, y - rhs, z - rhs, w - rhs); }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator * (const T& rhs) const { return BasicVector4<T>(x * rhs, y * rhs, z * rhs, w * rhs); }
+	template <typename T> force_inline BasicVector4<T> BasicVector4<T>::operator / (const T& rhs) const { return BasicVector4<T>(x / rhs, y / rhs, z / rhs, w / rhs); }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator += (const T& rhs) { x += rhs; y += rhs; z += rhs; w += rhs; return *this; }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator -= (const T& rhs) { x -= rhs; y -= rhs; z -= rhs; w -= rhs; return *this; }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator *= (const T& rhs) { x *= rhs; y *= rhs; z *= rhs; w *= rhs; return *this; }
+	template <typename T> force_inline const BasicVector4<T>& BasicVector4<T>::operator /= (const T& rhs) { x /= rhs; y /= rhs; z /= rhs; w /= rhs; return *this; }
 
-	force_inline Vector4 Vector4::operator + (const float& rhs) const { return Vector4(x + rhs, y + rhs, z + rhs, w + rhs); }
-	force_inline Vector4 Vector4::operator - (const float& rhs) const { return Vector4(x - rhs, y - rhs, z - rhs, w - rhs); }
-	force_inline Vector4 Vector4::operator * (const float& rhs) const { return Vector4(x * rhs, y * rhs, z * rhs, w * rhs); }
-	force_inline Vector4 Vector4::operator / (const float& rhs) const { return Vector4(x / rhs, y / rhs, z / rhs, w / rhs); }
-	force_inline const Vector4& Vector4::operator += (const float& rhs) { x += rhs; y += rhs; z += rhs; w += rhs; return *this; }
-	force_inline const Vector4& Vector4::operator -= (const float& rhs) { x -= rhs; y -= rhs; z -= rhs; w -= rhs; return *this; }
-	force_inline const Vector4& Vector4::operator *= (const float& rhs) { x *= rhs; y *= rhs; z *= rhs; w *= rhs; return *this; }
-	force_inline const Vector4& Vector4::operator /= (const float& rhs) { x /= rhs; y /= rhs; z /= rhs; w /= rhs; return *this; }
+	template <typename T> force_inline T BasicVector4<T>::operator | (const BasicVector4<T>& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w; }
+	template <typename T> force_inline T BasicVector4<T>::DotProduct(const BasicVector4<T>& rhs) const { return (*this) | rhs; }
+	template <typename T> force_inline T BasicVector4<T>::Length() const requires is_floating<T> { return std::sqrtf(x * x + y * y + z * z + w * w); }
+	template <typename T> force_inline T BasicVector4<T>::LengthSquared() const requires is_floating<T> { return x * x + y * y + z * z + w * w; }
 
-	force_inline float Vector4::operator | (const Vector4& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w; }
-	force_inline float Vector4::DotProduct(const Vector4& rhs) const { return (*this) | rhs; }
-	force_inline float Vector4::Length() const { return std::sqrtf(x * x + y * y + z * z + w * w); }
-	force_inline float Vector4::LengthSquared() const { return x * x + y * y + z * z + w * w; }
-
-	force_inline Vector4 Vector4::Normalize(const float& tolerance) const
+	template <typename T>
+	force_inline BasicVector4<T> BasicVector4<T>::Normalize(const float& tolerance) const requires is_floating<T>
 	{
-		Vector4 result = *this;
-		const float squareSum = result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w;
+		BasicVector4<T> result = *this;
+		const T squareSum = result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w;
 		if (squareSum > tolerance)
 		{
-			const float scale = Math::InvSqrt(squareSum);
+			const T scale = Math::InvSqrt(squareSum);
 			result.x *= scale;
 			result.y *= scale;
 			result.z *= scale;
@@ -631,12 +714,13 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline void Vector4::Normalized(const float& tolerance)
+	template <typename T>
+	force_inline void BasicVector4<T>::Normalized(const float& tolerance) requires is_floating<T>
 	{
-		const float squareSum = x * x + y * y + z * z + w * w;
+		const T squareSum = x * x + y * y + z * z + w * w;
 		if (squareSum > tolerance)
 		{
-			const float scale = Math::InvSqrt(squareSum);
+			const T scale = Math::InvSqrt(squareSum);
 			x *= scale;
 			y *= scale;
 			z *= scale;
@@ -644,10 +728,11 @@ namespace Pluto
 		}
 	}
 
-	force_inline bool Vector4::IsNormalized(const float& tolerance) const
+	template <typename T>
+	force_inline bool BasicVector4<T>::IsNormalized(const float& tolerance) const requires is_floating<T>
 	{
-		const float squareSum = x * x + y * y + z * z + w * w;
-		return (std::abs(1.f - squareSum) < Number::SMALL_NUMBER);
+		const T squareSum = x * x + y * y + z * z + w * w;
+		return (std::abs(static_cast<T>(1) - squareSum) < Number::SMALL_NUMBER);
 	}
 
 #pragma endregion vector4_implemention
@@ -656,25 +741,26 @@ namespace Pluto
 
 #pragma region matrix_implemention
 
-	static_assert(sizeof(Matrix) == sizeof(R128) * 4, "[FreezeRender] matrix size is invalid!");
-
-	force_inline Matrix::Matrix(const float& value) noexcept
+	template <typename T>
+	force_inline BasicMatrix<T>::BasicMatrix(const T& value) noexcept
 	{
-		m[0][0] = value;  m[0][1] = 0.f;    m[0][2] = 0.f;    m[0][3] = 0.f;
-		m[1][0] = 0.f;    m[1][1] = value;  m[1][2] = 0.f;    m[1][3] = 0.f;
-		m[2][0] = 0.f;    m[2][1] = 0.f;    m[2][2] = value;  m[2][3] = 0.f;
-		m[3][0] = 0.f;    m[3][1] = 0.f;    m[3][2] = 0.f;    m[3][3] = 1.f;
+		m[0][0] = value;  m[0][1] = 0;      m[0][2] = 0;      m[0][3] = 0;
+		m[1][0] = 0;      m[1][1] = value;  m[1][2] = 0;      m[1][3] = 0;
+		m[2][0] = 0;      m[2][1] = 0;      m[2][2] = value;  m[2][3] = 0;
+		m[3][0] = 0;      m[3][1] = 0;      m[3][2] = 0;      m[3][3] = 1;
 	}
 
-	force_inline Matrix::Matrix(const Vector3& row0, const Vector3& row1, const Vector3& row2, const Vector3& row3)
+	template <typename T>
+	force_inline BasicMatrix<T>::BasicMatrix(const BasicVector3<T>& row0, const BasicVector3<T>& row1, const BasicVector3<T>& row2, const BasicVector3<T>& row3)
 	{
-		m[0][0] = row0.x; m[0][1] = row0.y;  m[0][2] = row0.z;  m[0][3] = 0.f;
-		m[1][0] = row1.x; m[1][1] = row1.y;  m[1][2] = row1.z;  m[1][3] = 0.f;
-		m[2][0] = row2.x; m[2][1] = row2.y;  m[2][2] = row2.z;  m[2][3] = 0.f;
-		m[3][0] = row3.x; m[3][1] = row3.y;  m[3][2] = row3.z;  m[3][3] = 1.f;
+		m[0][0] = row0.x; m[0][1] = row0.y;  m[0][2] = row0.z;  m[0][3] = 0;
+		m[1][0] = row1.x; m[1][1] = row1.y;  m[1][2] = row1.z;  m[1][3] = 0;
+		m[2][0] = row2.x; m[2][1] = row2.y;  m[2][2] = row2.z;  m[2][3] = 0;
+		m[3][0] = row3.x; m[3][1] = row3.y;  m[3][2] = row3.z;  m[3][3] = 1;
 	}
 
-	force_inline Matrix::Matrix(const Vector4& row0, const Vector4& row1, const Vector4& row2, const Vector4& row3)
+	template <typename T>
+	force_inline BasicMatrix<T>::BasicMatrix(const BasicVector4<T>& row0, const BasicVector4<T>& row1, const BasicVector4<T>& row2, const BasicVector4<T>& row3)
 	{
 		m[0][0] = row0.x; m[0][1] = row0.y;  m[0][2] = row0.z;  m[0][3] = row0.w;
 		m[1][0] = row1.x; m[1][1] = row1.y;  m[1][2] = row1.z;  m[1][3] = row1.w;
@@ -682,20 +768,43 @@ namespace Pluto
 		m[3][0] = row3.x; m[3][1] = row3.y;  m[3][2] = row3.z;  m[3][3] = row3.w;
 	}
 
-	force_inline Matrix::Matrix(const Matrix& value)
+	template <typename T>
+	force_inline BasicMatrix<T>::BasicMatrix(const BasicMatrix<T>& value)
 	{
-		Register8Copy(&value.m[0][0], &m[0][0]);
-		Register8Copy(&value.m[2][0], &m[2][0]);
+		if constexpr (std::is_same_v<T, float>)
+		{
+			Register8Copy(&value.m[0][0], &m[0][0]);
+			Register8Copy(&value.m[2][0], &m[2][0]);
+		}
+		else
+		{
+			m[0][0] = value.m[0][0]; m[0][1] = value.m[0][1];  m[0][2] = value.m[0][2];  m[0][3] = value.m[0][3];
+			m[1][0] = value.m[1][0]; m[1][1] = value.m[1][1];  m[1][2] = value.m[1][2];  m[1][3] = value.m[1][3];
+			m[2][0] = value.m[2][0]; m[2][1] = value.m[2][1];  m[2][2] = value.m[2][2];  m[2][3] = value.m[2][3];
+			m[3][0] = value.m[3][0]; m[3][1] = value.m[3][1];  m[3][2] = value.m[3][2];  m[3][3] = value.m[3][3];
+		}
 	}
 
-	force_inline Matrix& Matrix::operator = (const Matrix& value)
+	template <typename T>
+	force_inline BasicMatrix<T>& BasicMatrix<T>::operator = (const BasicMatrix<T>& value)
 	{
-		Register8Copy(&value.m[0][0], &m[0][0]);
-		Register8Copy(&value.m[2][0], &m[2][0]);
+		if constexpr (std::is_same_v<T, float>)
+		{
+			Register8Copy(&value.m[0][0], &m[0][0]);
+			Register8Copy(&value.m[2][0], &m[2][0]);
+		}
+		else
+		{
+			m[0][0] = value.m[0][0]; m[0][1] = value.m[0][1];  m[0][2] = value.m[0][2];  m[0][3] = value.m[0][3];
+			m[1][0] = value.m[1][0]; m[1][1] = value.m[1][1];  m[1][2] = value.m[1][2];  m[1][3] = value.m[1][3];
+			m[2][0] = value.m[2][0]; m[2][1] = value.m[2][1];  m[2][2] = value.m[2][2];  m[2][3] = value.m[2][3];
+			m[3][0] = value.m[3][0]; m[3][1] = value.m[3][1];  m[3][2] = value.m[3][2];  m[3][3] = value.m[3][3];
+		}
 		return *this;
 	}
 
-	force_inline Matrix::Matrix(const Matrix&& value) noexcept
+	template <typename T>
+	force_inline BasicMatrix<T>::BasicMatrix(const BasicMatrix<T>&& value) noexcept
 	{
 		m[0][0] = value.m[0][0]; m[0][1] = value.m[0][1];  m[0][2] = value.m[0][2];  m[0][3] = value.m[0][3];
 		m[1][0] = value.m[1][0]; m[1][1] = value.m[1][1];  m[1][2] = value.m[1][2];  m[1][3] = value.m[1][3];
@@ -703,7 +812,8 @@ namespace Pluto
 		m[3][0] = value.m[3][0]; m[3][1] = value.m[3][1];  m[3][2] = value.m[3][2];  m[3][3] = value.m[3][3];
 	}
 
-	force_inline Matrix& Matrix::operator = (const Matrix&& value) noexcept
+	template <typename T>
+	force_inline BasicMatrix<T>& BasicMatrix<T>::operator = (const BasicMatrix<T>&& value) noexcept
 	{
 		m[0][0] = value.m[0][0]; m[0][1] = value.m[0][1];  m[0][2] = value.m[0][2];  m[0][3] = value.m[0][3];
 		m[1][0] = value.m[1][0]; m[1][1] = value.m[1][1];  m[1][2] = value.m[1][2];  m[1][3] = value.m[1][3];
@@ -712,144 +822,200 @@ namespace Pluto
 		return *this;
 	}
 
-	force_inline bool Matrix::operator == (const Matrix& rhs) const
+	template <typename T>
+	force_inline bool BasicMatrix<T>::operator == (const BasicMatrix<T>& rhs) const
 	{
-		const float* scope_restrict lhsPtr = &m[0][0];
-		const float* scope_restrict rhsPtr = &rhs.m[0][0];
+		const T* scope_restrict lhsPtr = &m[0][0];
+		const T* scope_restrict rhsPtr = &rhs.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, rhsPtr++)
 			if (*rhsPtr != *lhsPtr) return false;
 		return true;
 	}
 
-	force_inline bool Matrix::operator != (const Matrix& rhs) const
+	template <typename T>
+	force_inline bool BasicMatrix<T>::operator != (const BasicMatrix<T>& rhs) const
 	{
 		return !(*this == rhs);
 	}
 
-	force_inline Matrix Matrix::operator + (const Matrix& rhs) const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::operator + (const BasicMatrix<T>& rhs) const
 	{
-		Matrix result;
-		const float* scope_restrict lhsPtr = &m[0][0];
-		const float* scope_restrict rhsPtr = &rhs.m[0][0];
-		float* scope_restrict outPtr = &result.m[0][0];
+		BasicMatrix<T> result;
+		const T* scope_restrict lhsPtr = &m[0][0];
+		const T* scope_restrict rhsPtr = &rhs.m[0][0];
+		T* scope_restrict outPtr = &result.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, rhsPtr++, outPtr++)
 			*outPtr = *lhsPtr + *rhsPtr;
 		return result;
 	}
 
-	force_inline Matrix Matrix::operator - (const Matrix& rhs) const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::operator - (const BasicMatrix<T>& rhs) const
 	{
-		Matrix result;
-		const float* scope_restrict lhsPtr = &m[0][0];
-		const float* scope_restrict rhsPtr = &rhs.m[0][0];
-		float* scope_restrict outPtr = &result.m[0][0];
+		BasicMatrix<T> result;
+		const T* scope_restrict lhsPtr = &m[0][0];
+		const T* scope_restrict rhsPtr = &rhs.m[0][0];
+		T* scope_restrict outPtr = &result.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, rhsPtr++, outPtr++)
 			*outPtr = *lhsPtr - *rhsPtr;
 		return result;
 	}
 
-	force_inline Matrix Matrix::operator * (const Matrix& rhs) const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::operator * (const BasicMatrix<T>& rhs) const requires is_floating<T>
 	{
-		Matrix result;
-		Math::MatrixMultiplyMatrix(this, &rhs, &result);
+		BasicMatrix<T> result;
+		if constexpr (std::is_same_v<T, float>)
+			Math::MatrixMultiplyMatrix(this, &rhs, &result);
+		else
+			force_softbreak; // TODO
 		return result;
 	}
 
-	force_inline const Matrix& Matrix::operator += (const Matrix& rhs)
+	template <typename T>
+	force_inline const BasicMatrix<T>& BasicMatrix<T>::operator += (const BasicMatrix<T>& rhs)
 	{
-		float* scope_restrict lhsPtr = &m[0][0];
-		const float* scope_restrict rhsPtr = &rhs.m[0][0];
+		T* scope_restrict lhsPtr = &m[0][0];
+		const T* scope_restrict rhsPtr = &rhs.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, rhsPtr++)
 			*lhsPtr += *rhsPtr;
 		return *this;
 	}
 
-	force_inline const Matrix& Matrix::operator -= (const Matrix& rhs)
+	template <typename T>
+	force_inline const BasicMatrix<T>& BasicMatrix<T>::operator -= (const BasicMatrix<T>& rhs)
 	{
-		float* scope_restrict lhsPtr = &m[0][0];
-		const float* scope_restrict rhsPtr = &rhs.m[0][0];
+		T* scope_restrict lhsPtr = &m[0][0];
+		const T* scope_restrict rhsPtr = &rhs.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, rhsPtr++)
 			*lhsPtr -= *rhsPtr;
 		return *this;
 	}
 
-	force_inline const Matrix& Matrix::operator *= (const Matrix& rhs)
+	template <typename T>
+	force_inline const BasicMatrix<T>& BasicMatrix<T>::operator *= (const BasicMatrix<T>& rhs) requires is_floating<T>
 	{
-		Math::MatrixMultiplyMatrix(this, &rhs, this);
+		if constexpr (std::is_same_v<T, float>)
+			Math::MatrixMultiplyMatrix(this, &rhs, this);
+		else
+			force_softbreak; // TODO
+		
 		return *this;
 	}
 
-	force_inline Matrix Matrix::Transpose() const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::Transpose() const
 	{
-		Matrix result = *this;
-		Math::MatrixTranspose(&result);
-		return result;
+		if constexpr (std::is_same_v<T, float>)
+		{
+			BasicMatrix<T> result = *this;
+			Math::MatrixTranspose(&result);
+			return result;
+		}
+		else
+		{
+			BasicMatrix<T> result;
+			result.m[0][0] = m[0][0]; result.m[0][1] = m[1][0];  result.m[0][2] = m[2][0];  result.m[0][3] = m[3][0];
+			result.m[1][0] = m[0][1]; result.m[1][1] = m[1][1];  result.m[1][2] = m[2][1];  result.m[1][3] = m[3][1];
+			result.m[2][0] = m[0][2]; result.m[2][1] = m[1][2];  result.m[2][2] = m[2][2];  result.m[2][3] = m[3][2];
+			result.m[3][0] = m[0][3]; result.m[3][1] = m[1][3];  result.m[3][2] = m[2][3];  result.m[3][3] = m[3][3];
+			return result;
+		}
 	}
 
-	force_inline Matrix Matrix::Inverse() const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::Inverse() const requires is_floating<T>
 	{
-		Matrix result;
-		Math::MatrixInverse(this, &result);
-		return result;
+		if constexpr (std::is_same_v<T, float>)
+		{
+			BasicMatrix<T> result;
+			Math::MatrixInverse(this, &result);
+			return result;
+		}
+		else
+		{
+			force_softbreak; // TODO
+		}
 	}
 
-	force_inline Matrix Matrix::operator * (const float& rhs) const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::operator * (const T& rhs) const
 	{
-		Matrix result;
-		const float* scope_restrict lhsPtr = &m[0][0];
-		float* scope_restrict outPtr = &result.m[0][0];
+		BasicMatrix<T> result;
+		const T* scope_restrict lhsPtr = &m[0][0];
+		T* scope_restrict outPtr = &result.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, outPtr++)
 			*outPtr = *lhsPtr * rhs;
 		return result;
 	}
 
-	force_inline Matrix Matrix::operator / (const float& rhs) const
+	template <typename T>
+	force_inline BasicMatrix<T> BasicMatrix<T>::operator / (const T& rhs) const
 	{
-		Matrix result;
-		const float* scope_restrict lhsPtr = &m[0][0];
-		float* scope_restrict outPtr = &result.m[0][0];
+		BasicMatrix<T> result;
+		const T* scope_restrict lhsPtr = &m[0][0];
+		T* scope_restrict outPtr = &result.m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++, outPtr++)
 			*outPtr = *lhsPtr / rhs;
 		return result;
 	}
 
-	force_inline const Matrix& Matrix::operator *= (const float& rhs)
+	template <typename T>
+	force_inline const BasicMatrix<T>& BasicMatrix<T>::operator *= (const T& rhs)
 	{
-		float* scope_restrict lhsPtr = &m[0][0];
+		T* scope_restrict lhsPtr = &m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++)
 			*lhsPtr *= rhs;
 		return *this;
 	}
 
-	force_inline const Matrix& Matrix::operator /= (const float& rhs)
+	template <typename T>
+	force_inline const BasicMatrix<T>& BasicMatrix<T>::operator /= (const T& rhs)
 	{
-		float* scope_restrict lhsPtr = &m[0][0];
+		T* scope_restrict lhsPtr = &m[0][0];
 
 		for (int i = 0; i < 16; i++, lhsPtr++)
 			*lhsPtr /= rhs;
 		return *this;
 	}
 
-	force_inline Vector3 Matrix::operator * (const Vector3& rhs) const
+	template <typename T>
+	force_inline BasicVector3<T> BasicMatrix<T>::operator * (const BasicVector3<T>& rhs) const requires is_floating<T>
 	{
-		Vector4 result(rhs, 1.f);
-		Math::MatrixMulitplyVectorH(this, &result, &result);
-		return result.XYZ();
+		if constexpr (std::is_same_v<T, float>)
+		{
+			Vector4f result(rhs, 1.f);
+			Math::MatrixMulitplyVectorH(this, &result, &result);
+			return result.XYZ();
+		}
+		else
+		{
+			force_softbreak; // TODO
+		}
 	}
 
-	force_inline Vector4 Matrix::operator * (const Vector4& rhs) const
+	template <typename T>
+	force_inline BasicVector4<T> BasicMatrix<T>::operator * (const BasicVector4<T>& rhs) const requires is_floating<T>
 	{
-		Vector4 result;
-		Math::MatrixMulitplyVector(this, &rhs, &result);
-		return result;
+		if constexpr (std::is_same_v<T, float>)
+		{
+			Vector4f result;
+			Math::MatrixMulitplyVector(this, &rhs, &result);
+			return result;
+		}
+		else
+		{
+			force_softbreak; // TODO
+		}
 	}
 
 #pragma endregion matrix_implemention

@@ -37,7 +37,7 @@ namespace Pluto
 
 		Thread::ParallelFor(0u, (unsigned int)width * height, [&](const unsigned int& worklistIndex)
 			{
-				const Matrix& view = viewBuffer.view;
+				const Matrix44f& view = viewBuffer.view;
 				const Ray& ray = primitiveRay[worklistIndex];
 
 				for (auto& perMeshlet : meshletBuffer)
@@ -48,7 +48,7 @@ namespace Pluto
 					}
 
 					AMeshlet& meshlet = perMeshlet.data;
-					const Matrix mv = view * meshlet.transform;
+					const Matrix44f mv = view * meshlet.transform;
 
 					for (Meshlet::Iterator It = perMeshlet.CreateIterator(); It; ++It)
 					{
@@ -74,7 +74,7 @@ namespace Pluto
 								const float& beta = result.beta;
 								const float& gamma = result.gamma;
 								const float& alpha = 1 - beta - gamma;
-								Vector2 uv = triangle.vertices[0].localspace.uv * alpha
+								Vector2f uv = triangle.vertices[0].localspace.uv * alpha
 									+ triangle.vertices[1].localspace.uv * beta
 									+ triangle.vertices[2].localspace.uv * gamma;
 								scene.SetPixel(worklistIndex, triangle.material->diffuse.sampler(uv));

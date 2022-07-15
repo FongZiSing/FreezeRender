@@ -30,15 +30,15 @@ namespace Pluto
 		if (Success(MeshLoaderLibrary::Load(obj, &mesh)))
 		{
 			const float Angle = Math::Degrees2Radians(140.f);
-			const Matrix Rotation =
+			const Matrix44f Rotation =
 			{
 				{  std::cos(Angle),  0.f,  std::sin(Angle),  0.f },
 				{      0.f,          1.f,      0.f,          0.f },
 				{ -std::sin(Angle),  0.f,  std::cos(Angle),  0.f },
 				{      0.f,          0.f,      0.f,          1.f }
 			};
-			const Matrix Scale = 2;
-			const Matrix& Translate = Matrix::Identity;
+			const Matrix44f Scale = 2;
+			const Matrix44f& Translate = Matrix44f::Identity;
 			mesh.transform = Translate * Rotation * Scale;
 
 			auto& material = mesh.materials.Emplace();

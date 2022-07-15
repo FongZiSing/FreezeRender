@@ -17,8 +17,8 @@ namespace Pluto
 	struct Camera
 	{
 		ACamera& data;
-		Matrix view = Matrix::Identity;
-		Matrix projection = Matrix::Identity;
+		Matrix44f view = Matrix44f::Identity;
+		Matrix44f projection = Matrix44f::Identity;
 		float halfFOV = 0; // The half of horizontal field of view (in radians).
 
 
@@ -42,7 +42,7 @@ namespace Pluto
 
 		inline void UpdateViewMatrix()
 		{
-			Vector3& location = data.location;
+			Vector3f& location = data.location;
 			Rotator& rotation = data.rotation;
 			auto invRotation = rotation.ToInvMatrix();
 			auto invTranslation = location.ToInvMatrix();
@@ -67,7 +67,7 @@ namespace Pluto
 			const float r22 = n_add_f / n_sub_f;
 			const float r23 = -2.f * n * f / n_sub_f;
 
-			// projection = Matrix(
+			// projection = Matrix44f(
 			//	{ r00,  0,   0,   0  },
 			//	{ 0,   r11,  0,   0  },
 			//	{ 0,    0,  r22, r23 },
@@ -78,7 +78,7 @@ namespace Pluto
 			projection.m[2][3] = r23;
 		}
 
-		inline Vector2 GetNdcToScreen() const noexcept
+		inline Vector2f GetNdcToScreen() const noexcept
 		{
 			return {
 				(data.farPlane - data.nearPlane) / 2.f,

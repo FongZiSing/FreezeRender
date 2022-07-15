@@ -51,10 +51,10 @@ namespace Pluto
 
 		Rotator() noexcept : yaw(0.f), pitch(0.f), roll(0.f) {}
 		Rotator(const float& inYaw, const float& inPitch = 0.f, const float& inRoll = 0.f) noexcept : yaw(inYaw), pitch(inPitch), roll(inRoll) {}
-		Rotator(const Vector2& inValue, const float& inRoll = 0.f) : yaw(inValue.x), pitch(inValue.y), roll(inRoll) {}
-		Rotator(const float& inYaw, const Vector2& in) : yaw(inYaw), pitch(in.x), roll(in.y) {}
+		Rotator(const Vector2f& inValue, const float& inRoll = 0.f) : yaw(inValue.x), pitch(inValue.y), roll(inRoll) {}
+		Rotator(const float& inYaw, const Vector2f& in) : yaw(inYaw), pitch(in.x), roll(in.y) {}
 		Rotator(const Rotator& inValue) : yaw(inValue.yaw), pitch(inValue.pitch), roll(inValue.roll) {}
-		Rotator(const Vector3& euler) : yaw(euler.z), pitch(euler.y), roll(euler.x) {}
+		Rotator(const Vector3f& euler) : yaw(euler.z), pitch(euler.y), roll(euler.x) {}
 		force_inline Rotator& operator = (const Rotator& inValue);
 
 		//~ End initialize.
@@ -64,7 +64,7 @@ namespace Pluto
 		//--------------------------------
 		//~ Begin self-related operations.
 
-		force_inline Vector3 Euler();
+		force_inline Vector3f Euler();
 		force_inline bool operator == (const Rotator& rhs);
 		force_inline bool operator != (const Rotator& rhs);
 		force_inline Rotator operator + (const Rotator& rhs);
@@ -110,12 +110,12 @@ namespace Pluto
 		warn_nodiscard force_inline Rotator Normalize() const;
 		force_inline void Normalized();
 
-		warn_nodiscard force_inline Matrix ToMatrix() const;
-		warn_nodiscard force_inline Matrix ToInvMatrix() const;
+		warn_nodiscard force_inline Matrix44f ToMatrix() const;
+		warn_nodiscard force_inline Matrix44f ToInvMatrix() const;
 
-		warn_nodiscard force_inline Vector3 GetForwardVector() const; // the same as `ToMatrix() * Vector3( 0, 0, -1 )`.
-		warn_nodiscard force_inline Vector3 GetRightVector() const;   // the same as `ToMatrix() * Vector3( 1, 0,  0 )`.
-		warn_nodiscard force_inline Vector3 GetUpVector() const;      // the same as `ToMatrix() * Vector3( 0, 1,  0 )`
+		warn_nodiscard force_inline Vector3f GetForwardVector() const; // the same as `ToMatrix() * Vector3f( 0, 0, -1 )`.
+		warn_nodiscard force_inline Vector3f GetRightVector() const;   // the same as `ToMatrix() * Vector3f( 1, 0,  0 )`.
+		warn_nodiscard force_inline Vector3f GetUpVector() const;      // the same as `ToMatrix() * Vector3f( 0, 1,  0 )`
 
 		//~ End rotator operations.
 		//--------------------------------
@@ -130,7 +130,7 @@ namespace Pluto
 
 	force_inline Rotator& Rotator::operator = (const Rotator& inValue) { yaw = inValue.yaw; pitch = inValue.pitch; roll = inValue.roll; return *this; }
 
-	force_inline Vector3 Rotator::Euler() { return Vector3(roll, pitch, yaw); }
+	force_inline Vector3f Rotator::Euler() { return Vector3f(roll, pitch, yaw); }
 	force_inline bool Rotator::operator == (const Rotator& rhs) { return rhs.yaw == yaw && rhs.pitch == pitch && rhs.roll == roll; }
 	force_inline bool Rotator::operator != (const Rotator& rhs) { return rhs.yaw != yaw || rhs.pitch != pitch || rhs.roll != roll; }
 	force_inline Rotator Rotator::operator + (const Rotator& rhs) { return Rotator(yaw + rhs.yaw, pitch + rhs.pitch, roll + rhs.roll); }
@@ -171,12 +171,12 @@ namespace Pluto
 		Math::NormalizeRotator(this, this);
 	}
 
-	force_inline Matrix Rotator::ToMatrix() const
+	force_inline Matrix44f Rotator::ToMatrix() const
 	{
 		// NOTE: intrinsic rotation.
-		Matrix result;
-		Vector4 radians;
-		Vector4 degrees{ 0, yaw, pitch, roll };
+		Matrix44f result;
+		Vector4f radians;
+		Vector4f degrees{ 0, yaw, pitch, roll };
 		Math::Degrees2Radians(&degrees, &radians);
 
 		alignas(16) float s[4]; // ( Unused, yaw, pitch, roll )
@@ -206,11 +206,11 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline Matrix Rotator::ToInvMatrix() const
+	force_inline Matrix44f Rotator::ToInvMatrix() const
 	{
-		Matrix result;
-		Vector4 radians;
-		Vector4 degrees{ 0, yaw, pitch, roll };
+		Matrix44f result;
+		Vector4f radians;
+		Vector4f degrees{ 0, yaw, pitch, roll };
 		Math::Degrees2Radians(&degrees, &radians);
 
 		alignas(16) float s[4]; // ( Unused, yaw, pitch, roll )
@@ -240,11 +240,11 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline Vector3 Rotator::GetForwardVector() const
+	force_inline Vector3f Rotator::GetForwardVector() const
 	{
-		Vector3 result;
-		Vector4 radians;
-		Vector4 degrees{ 0, yaw, pitch, roll };
+		Vector3f result;
+		Vector4f radians;
+		Vector4f degrees{ 0, yaw, pitch, roll };
 		Math::Degrees2Radians(&degrees, &radians);
 
 		alignas(16) float s[4]; // ( Unused, yaw, pitch, roll )
@@ -258,11 +258,11 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline Vector3 Rotator::GetRightVector() const
+	force_inline Vector3f Rotator::GetRightVector() const
 	{
-		Vector3 result;
-		Vector4 radians;
-		Vector4 degrees{ 0, yaw, pitch, roll };
+		Vector3f result;
+		Vector4f radians;
+		Vector4f degrees{ 0, yaw, pitch, roll };
 		Math::Degrees2Radians(&degrees, &radians);
 
 		alignas(16) float s[4]; // ( Unused, yaw, pitch, roll )
@@ -276,11 +276,11 @@ namespace Pluto
 		return result;
 	}
 
-	force_inline Vector3 Rotator::GetUpVector() const
+	force_inline Vector3f Rotator::GetUpVector() const
 	{
-		Vector3 result;
-		Vector4 radians;
-		Vector4 degrees{ 0, yaw, pitch, roll };
+		Vector3f result;
+		Vector4f radians;
+		Vector4f degrees{ 0, yaw, pitch, roll };
 		Math::Degrees2Radians(&degrees, &radians);
 
 		alignas(16) float s[4]; // ( Unused, yaw, pitch, roll )

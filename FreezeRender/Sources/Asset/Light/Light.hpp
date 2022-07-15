@@ -22,7 +22,7 @@ namespace Pluto
 	{
 		float intensity;
 
-		Vector3 location;
+		Vector3f location;
 	};
 
 

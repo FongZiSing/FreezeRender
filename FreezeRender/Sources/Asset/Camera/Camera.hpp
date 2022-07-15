@@ -27,7 +27,7 @@ namespace Pluto
 			Max,
 		};
 
-		Vector3 location      = { 0.f, 0.f, 10.f };
+		Vector3f location     = { 0.f, 0.f, 10.f };
 		Rotator rotation      = { 0.f, 0.f, 0.f  };
 		int resolutionX       = 0;
 		int resolutionY       = 0;

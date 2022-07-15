@@ -49,22 +49,22 @@ namespace Pluto
 
 	struct Ray
 	{
-		Vector3 origin;
-		Vector3 direction;
+		Vector3f origin;
+		Vector3f direction;
 
 		HitResult Intersect(const ShadingTriangle& triangle) const
 		{
 			constexpr float EPSILON = 0.000001f;
 
-			const Vector3& v1 = triangle.vertices[0].viewspace.position;
-			const Vector3& v2 = triangle.vertices[1].viewspace.position;
-			const Vector3& v3 = triangle.vertices[2].viewspace.position;
+			const Vector3f& v1 = triangle.vertices[0].viewspace.position;
+			const Vector3f& v2 = triangle.vertices[1].viewspace.position;
+			const Vector3f& v3 = triangle.vertices[2].viewspace.position;
 
-			const Vector3 e1 = v2 - v1;
-			const Vector3 e2 = v3 - v1;
-			const Vector3 s = origin - v1;
-			const Vector3 s1 = direction ^ e2;
-			const Vector3 s2 = s ^ e1;
+			const Vector3f e1 = v2 - v1;
+			const Vector3f e2 = v3 - v1;
+			const Vector3f s = origin - v1;
+			const Vector3f s1 = direction ^ e2;
+			const Vector3f s2 = s ^ e1;
 			const float coeff = s1 | e1;
 
 
@@ -158,7 +158,7 @@ namespace Pluto
 					{
 						float x = (2.f * (w + 0.5f) / (float)width - 1.f) * aspectRatio * scale;
 						float y = (1.f - 2 * (h + 0.5f) / (float)height) * scale;
-						data[index++] = { Vector3::Zero, Vector3(x, y, -1).Normalize() };
+						data[index++] = { Vector3f::Zero, Vector3f(x, y, -1).Normalize() };
 					}
 				}
 

@@ -22,13 +22,13 @@ namespace Pluto
 		struct VertexPayload
 		{
 			const ShadingTriangle& triangle;
-			const Matrix& modelViewMatrix;
-			const Matrix& modelViewInvMatrix;
-			const Matrix& modelViewProjectionMatrix;
+			const Matrix44f& modelViewMatrix;
+			const Matrix44f& modelViewInvMatrix;
+			const Matrix44f& modelViewProjectionMatrix;
 
 
 			// Initialize.
-			VertexPayload(ShadingTriangle& inOutTriange, const Matrix& inModelViewMatrix, const Matrix& inModelViewInvMatrix, const Matrix& inModelViewProjectionMatrix)
+			VertexPayload(ShadingTriangle& inOutTriange, const Matrix44f& inModelViewMatrix, const Matrix44f& inModelViewInvMatrix, const Matrix44f& inModelViewProjectionMatrix)
 				: triangle(inOutTriange)
 				, modelViewMatrix(inModelViewMatrix)
 				, modelViewInvMatrix(inModelViewInvMatrix)

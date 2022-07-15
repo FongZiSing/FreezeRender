@@ -24,10 +24,10 @@ namespace Pluto
 		struct DeferredFragmentPayload
 		{
 			const Array<PointLight>* pointlights;
-			Vector3 viewpoint;
-			Vector3 shadingpoint;
+			Vector3f viewpoint;
+			Vector3f shadingpoint;
 
-			Vector3 normal;
+			Vector3f normal;
 			Color diffuse;
 		};
 

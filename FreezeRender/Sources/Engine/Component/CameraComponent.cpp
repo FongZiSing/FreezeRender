@@ -10,7 +10,7 @@ namespace Pluto
 {
 	void CameraComponent::TickComponent(float deltaTime)
 	{
-		Vector3 deltaLocation = Vector3::Zero;
+		Vector3f deltaLocation = Vector3f::Zero;
 		bool bMoving = false;
 
 		if (GInput->IsKeyPressing(InputSystem::VK_W))

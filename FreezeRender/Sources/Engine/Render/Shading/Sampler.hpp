@@ -289,7 +289,7 @@ namespace Pluto
 		// Clamp to [0, 255].
 		temp = RegisterSelect(RegisterGT(temp, Number::R_255F), Number::R_255F, temp);
 		temp = RegisterSelect(RegisterLT(temp, Number::R_ZERO), Number::R_ZERO, temp);
-		Vector4 result;
+		Vector4f result;
 		RegisterStoreAligned(temp, &result);
 		return Color::FromClampedVector(result);
 	}
@@ -399,7 +399,7 @@ namespace Pluto
 			}
 		}
 
-		force_inline Color operator() (const Vector2& uv) const noexcept { return sampler(target, uv.x, uv.y); }
+		force_inline Color operator() (const Vector2f& uv) const noexcept { return sampler(target, uv.x, uv.y); }
 		
 		force_inline Color operator() (const float& u, const float& v) const noexcept { return sampler(target, u, v); }
 	};

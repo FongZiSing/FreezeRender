@@ -188,10 +188,10 @@ namespace Pluto
 		//****************************************************************
 		using namespace Clipping;
 
-		const Matrix& projection = viewBuffer.projection;
-		const Matrix& view = viewBuffer.view;
-		const Matrix vp = projection * view;
-		const Vector2 ndc2screen = viewBuffer.GetNdcToScreen();
+		const Matrix44f& projection = viewBuffer.projection;
+		const Matrix44f& view = viewBuffer.view;
+		const Matrix44f vp = projection * view;
+		const Vector2f ndc2screen = viewBuffer.GetNdcToScreen();
 
 		for (auto& perMeshlet : meshletBuffer)
 		{
@@ -201,9 +201,9 @@ namespace Pluto
 			}
 
 			AMeshlet& meshlet = perMeshlet.data;
-			const Matrix mvp = vp * meshlet.transform;
-			const Matrix mv = view * meshlet.transform;
-			const Matrix _mv = mv.Inverse().Transpose();
+			const Matrix44f mvp = vp * meshlet.transform;
+			const Matrix44f mv = view * meshlet.transform;
+			const Matrix44f _mv = mv.Inverse().Transpose();
 
 			for (Meshlet::Iterator It = perMeshlet.CreateIterator(); It; ++It)
 			{
@@ -231,9 +231,9 @@ namespace Pluto
 					ShadingTriangle& clippedTriangle = gClippingTriangleBuffer[triangleNum];
 					for (ShadingVertex& vertex : clippedTriangle.vertices)
 					{
-						Vector4& position = vertex.screenspace.position;
-						Vector3& location = vertex.viewspace.position;
-						Vector3& normal = vertex.viewspace.normal;
+						Vector4f& position = vertex.screenspace.position;
+						Vector3f& location = vertex.viewspace.position;
+						Vector3f& normal = vertex.viewspace.normal;
 
 						// Perspective division.
 						// homogeneous clip space to normalized device coordinates(NDC) space.
@@ -250,7 +250,7 @@ namespace Pluto
 						// view transformation.
 						// local space to view space.
 						location = mv * location;
-						normal = (_mv * Vector4(normal, 0.f)).XYZ().Normalize();
+						normal = (_mv * Vector4f(normal, 0.f)).XYZ().Normalize();
 					}
 
 					if (BackFaceCulling(clippedTriangle))
@@ -596,12 +596,12 @@ namespace Pluto
 		}
 
 		// Back face culling in screen space.
-		const Vector4& a = triangle.vertices[0].screenspace.position;
-		const Vector4& b = triangle.vertices[1].screenspace.position;
-		const Vector4& c = triangle.vertices[2].screenspace.position;
+		const Vector4f& a = triangle.vertices[0].screenspace.position;
+		const Vector4f& b = triangle.vertices[1].screenspace.position;
+		const Vector4f& c = triangle.vertices[2].screenspace.position;
 
-		const Vector2 ab = b.XY() - a.XY();
-		const Vector2 ac = c.XY() - a.XY();
+		const Vector2f ab = b.XY() - a.XY();
+		const Vector2f ac = c.XY() - a.XY();
 		return (ab ^ ac) < 0;
 	}
 
@@ -622,9 +622,9 @@ namespace Pluto
 		// call it before perspective division.
 		auto PolygonVisible = [](const ShadingTriangle& triangle) -> bool
 		{
-			const Vector4& v1 = triangle.vertices[0].screenspace.position;
-			const Vector4& v2 = triangle.vertices[1].screenspace.position;
-			const Vector4& v3 = triangle.vertices[2].screenspace.position;
+			const Vector4f& v1 = triangle.vertices[0].screenspace.position;
+			const Vector4f& v2 = triangle.vertices[1].screenspace.position;
+			const Vector4f& v3 = triangle.vertices[2].screenspace.position;
 
 			return
 				std::fabs(v1.x) <= -v1.w && std::fabs(v1.y) <= -v1.w && std::fabs(v1.z) <= -v1.w &&
@@ -641,8 +641,8 @@ namespace Pluto
 
 			while (inOutVertexNum-- > 0)
 			{
-				const Vector4& position1 = vertex1->screenspace.position;
-				const Vector4& position2 = vertex2->screenspace.position;
+				const Vector4f& position1 = vertex1->screenspace.position;
+				const Vector4f& position2 = vertex2->screenspace.position;
 				const float& axis1W = position1.w;
 				const float& axis2W = position2.w;
 
@@ -681,8 +681,8 @@ namespace Pluto
 
 			while (inOutVertexNum-- > 0)
 			{
-				const Vector4& position1 = vertex1->screenspace.position;
-				const Vector4& position2 = vertex2->screenspace.position;
+				const Vector4f& position1 = vertex1->screenspace.position;
+				const Vector4f& position2 = vertex2->screenspace.position;
 
 				const float& axis1W = position1.w;
 				const float& axis2W = position2.w;
