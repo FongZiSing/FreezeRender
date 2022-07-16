@@ -129,22 +129,22 @@ namespace Pluto
 			material = target;
 		}
 
-		warn_nodiscard inline Box2 GetBoundingBox(const int& width, const int& height) const
+		warn_nodiscard inline Box2i GetBoundingBox(const int& width, const int& height) const
 		{
 			const Vector4f& v1 = vertices[0].screenspace.position;
 			const Vector4f& v2 = vertices[1].screenspace.position;
 			const Vector4f& v3 = vertices[2].screenspace.position;
 
-			Box2 box;
-			box.minX = (int)std::floor(std::min({ v1.x, v2.x, v3.x }));
-			box.maxX = (int)std::ceil(std::max({ v1.x, v2.x, v3.x }));
-			box.minY = (int)std::floor(std::min({ v1.y, v2.y, v3.y }));
-			box.maxY = (int)std::ceil(std::max({ v1.y, v2.y, v3.y }));
+			Box2i box;
+			box.min.x = (int)std::floor(std::min({ v1.x, v2.x, v3.x }));
+			box.max.x = (int)std::ceil(std::max({ v1.x, v2.x, v3.x }));
+			box.min.y = (int)std::floor(std::min({ v1.y, v2.y, v3.y }));
+			box.max.y = (int)std::ceil(std::max({ v1.y, v2.y, v3.y }));
 
-			box.minX = std::max(0, box.minX);
-			box.maxX = std::min(width - 1, box.maxX);
-			box.minY = std::max(0, box.minY);
-			box.maxY = std::min(height - 1, box.maxY);
+			box.min.x = std::max(0,          box.min.x);
+			box.max.x = std::min(width - 1,  box.max.x);
+			box.min.y = std::max(0,          box.min.y);
+			box.max.y = std::min(height - 1, box.max.y);
 			return box;
 		}
 

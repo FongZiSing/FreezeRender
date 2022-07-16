@@ -25,10 +25,10 @@ namespace Pluto
 		struct Text
 		{
 			WideString context;
-			int offsetX;
-			int offsetY;
-			int rectWidth;
-			int rectHeight;
+			int offsetX = 0;
+			int offsetY = 0;
+			int rectWidth = 0;
+			int rectHeight = 0;
 		};
 
 		void PrintText(Text text);
@@ -42,7 +42,7 @@ namespace Pluto
 			Text text;
 			while (PopTextImpl(text))
 			{
-				pred(std::move(text));
+				pred(text);
 			}
 		}
 

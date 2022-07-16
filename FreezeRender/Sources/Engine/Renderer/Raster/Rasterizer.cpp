@@ -345,9 +345,9 @@ namespace Pluto
 		const auto&& [n1, n2, n3] = triangle.ViewspaceNormal();
 		const auto&& [uv1, uv2, uv3] = triangle.LocalspaceUV();
 
-		const auto&& [minx, maxx, miny, maxy] = triangle.GetBoundingBox(width, height);
-		R128 startx = MakeRegister(minx + 0.5f);
-		R128 starty = MakeRegister(miny + 0.5f);
+		const auto&& [ min, max ] = triangle.GetBoundingBox(width, height);
+		R128 startx = MakeRegister(min.x + 0.5f);
+		R128 starty = MakeRegister(min.y + 0.5f);
 
 		R128 v123x = MakeRegister(1.f, v1.x, v2.x, v3.x);
 		R128 v123y = MakeRegister(1.f, v1.y, v2.y, v3.y);
@@ -389,8 +389,8 @@ namespace Pluto
 		if constexpr (Config::bEnableAdaptiveHalfSpaceRaster)
 		{
 			constexpr static const int block = 4;
-			const int boxX = (maxx - minx);
-			const int boxY = (maxy - miny);
+			const int boxX = (max.x - min.x);
+			const int boxY = (max.y - min.y);
 			const float cost = boxX * 1.f / boxY;
 
 			const bool adapt = cost > 0.40f && cost < 1.60f;
@@ -400,10 +400,10 @@ namespace Pluto
 			if (strategy == Strategy::HalfSpace)
 			{
 				R128 cy = f;
-				for (int y = miny; y <= maxy; ++y)
+				for (int y = min.y; y <= max.y; ++y)
 				{
 					R128 cx = cy;
-					for (int x = minx; x <= maxx; ++x)
+					for (int x = min.x; x <= max.x; ++x)
 					{
 						// if cx[1] > 0 and cx[2] > 0 and cx[3] > 0
 						if ((RegisterMaskBits(RegisterGE(cx, R_HALF_SPACE_EPSILON)) & 0x0E) == 0x0E)
@@ -460,13 +460,13 @@ namespace Pluto
 				R128 cy2 = RegisterAdd(RegisterReplicate(f, 2), RegisterAdd(offsetx2, offsety2));
 				R128 cy3 = RegisterAdd(RegisterReplicate(f, 3), RegisterAdd(offsetx3, offsety3));
 
-				for (int y = miny; y <= maxy; y += block)
+				for (int y = min.y; y <= max.y; y += block)
 				{
 					R128 cx = cy;
 					R128 cx1 = cy1;
 					R128 cx2 = cy2;
 					R128 cx3 = cy3;
-					for (int x = minx; x <= maxx; x += block)
+					for (int x = min.x; x <= max.x; x += block)
 					{
 						const int checkw = RegisterMaskBits(RegisterGE(cx1, R_HALF_SPACE_EPSILON));
 						const int checku = RegisterMaskBits(RegisterGE(cx2, R_HALF_SPACE_EPSILON));
@@ -554,10 +554,10 @@ namespace Pluto
 		else
 		{
 			R128 cy = f;
-			for (int y = miny; y <= maxy; ++y)
+			for (int y = min.y; y <= max.y; ++y)
 			{
 				R128 cx = cy;
-				for (int x = minx; x <= maxx; ++x)
+				for (int x = min.x; x <= max.x; ++x)
 				{
 					// if cx[1] > 0 and cx[2] > 0 and cx[3] > 0
 					if ((RegisterMaskBits(RegisterGE(cx, R_HALF_SPACE_EPSILON)) & 0x0E) == 0x0E)

@@ -44,7 +44,7 @@ namespace Pluto
 	class UniqueResource
 	{
 	private:
-		Derived* resource;
+		Derived* resource = nullptr;
 		Thread::AtomicSpinLock scope;
 
 	public:
