@@ -22,11 +22,17 @@ namespace Pluto
 	// 128-bit integer register.
 	using R128i = __m128i;
 
+	// 128-bit double floating register.
+	using R128d = __m128d;
+
 	// 256-bit register.
 	using R256 = __m256;
 
 	// 256-bit integer register.
 	using R256i = __m256i;
+
+	// 256-bit double floating register.
+	using R256d = __m256d;
 
 
 
@@ -75,6 +81,25 @@ namespace Pluto
 			return result;
 		}
 
+		force_inline constexpr R128d MakeRegister(const double& x, const double& y)
+		{
+			R128d result{};
+			result.m128d_f64[0] = x;
+			result.m128d_f64[1] = y;
+			return result;
+		}
+
+		force_inline constexpr __m128d MakeRegister(const double& x)
+		{
+			R128d result{};
+			result.m128d_f64[0] = x;
+			result.m128d_f64[1] = x;
+			return result;
+		}
+
+		//--------------------------------
+		//~ Begin 4-floating constants.
+
 		constexpr const R128 R_ZERO          = MakeRegister(  0.f );
 		constexpr const R128 R_ONE           = MakeRegister(  1.f );
 		constexpr const R128 R_NEGONE        = MakeRegister( -1.f );
@@ -107,6 +132,21 @@ namespace Pluto
 		constexpr const R128 R_YZWMASK       = MakeRegister(     0u,      0xffffffffu, 0xffffffffu, 0xffffffffu );
 
 		constexpr const R128 R_255F          = MakeRegister( 255.f );
+
+		//~ End 4-floating constants.
+		//--------------------------------
+
+
+		
+		//--------------------------------
+		//~ Begin 2-floating constants.
+
+		constexpr const R128d R_ZEROd = MakeRegister(0.0);
+		constexpr const R128d R_ONEd  = MakeRegister(1.0);
+		constexpr const R128d R_HALFd = MakeRegister(0.5);
+
+		//~ End 4-floating constants.
+		//--------------------------------
 	}
 
 
@@ -520,6 +560,99 @@ namespace Pluto
 			return _mm256_insertf128_ps(result, v, 1);
 		}
 	}
+
+	/**
+	 * @brief Load a R256d from aligned memory.
+	 */
+	#define Register4dLoadAligned( ptr )                _mm256_load_pd( (const double*)(ptr) )
+	
+	/**
+	 * @brief Stores a R256d to aligned memory.
+	 */
+	#define Register4dStoreAligned( reg, ptr )          _mm256_store_pd( (double*)(ptr), reg )
+
+	/**
+	 * @brief Copy 4 double floating-point.
+	 */
+	#define Register4dCopy( src, dst )                  _mm256_store_pd( (double*)(dst), *(__m256d*)(src) )
+
+	/**
+	 * @brief set zero.
+	 */
+	#define Register4dSetZero( dst )                    _mm256_store_pd( (double*)(dst), _mm256_setzero_pd() )
+
+	/**
+	 * @brief Adds two R256d.
+	 * @return        ( reg1.x + reg2.x, same for yzw )
+	 */
+
+	#define Register4dAdd( reg1, reg2 )                 _mm256_add_pd( (reg1), (reg2) )
+
+	/**
+	 * @brief Subtracts two R256d.
+	 * @return        ( reg1.x - reg2.x, same for yzw )
+	 */
+	#define Register4dSubtract( reg1, reg2 )            _mm256_sub_pd( (reg1), (reg2) )
+
+	/**
+	 * @brief Multiplies two R256d.
+	 * @return        ( reg1.x * reg2.x, same for yzw )
+	 */
+	#define Register4dMultiply( reg1, reg2 )            _mm256_mul_pd( (reg1), (reg2) )
+
+	/**
+	 * @brief Divides two R256d.
+	 * @return        ( reg1.x / reg2.x, same for yzw )
+	 */
+	#define Register4dDivide( reg1, reg2 )              _mm256_div_pd( (reg1), (reg2) )
+
+	/**
+	 * @brief Multiplies two R256d, adds in the third R256d.
+	 * @return        ( reg1.x * reg2.x + reg3.x, same for yzw )
+	 */
+	#define Register4dMultiplyAdd( reg1, reg2, reg3 )   _mm256_add_pd( _mm256_mul_pd( (reg1), (reg2) ), (reg3) )
+
+	/**
+	 * @brief Multiplies two R256d, then adds each result.
+	 * @return        ( reg1.x * reg2.x + reg3.x * reg4.x, same for yzw )
+	 */
+	#define Register4dMultiplyAddMultiply( reg1, reg2, reg3, reg4 )   _mm256_add_pd( _mm256_mul_pd( (reg1), (reg2) ), _mm256_mul_pd( (reg3), (reg4) ) )
+
+	 /**
+	  * @brief Replicates one element into all four elements and returns the new R256d.
+	  * @return        ( reg[index], reg[index], reg[index], reg[index] )
+	  */
+	
+	template <int index>
+	force_inline R256d Register4dReplicate(const R256d& reg)
+	{
+		if constexpr (index == 0)
+		{
+
+			R128d temp = _mm256_extractf128_pd(_mm256_movedup_pd(reg), 0);
+			R256d result = _mm256_broadcast_pd(&temp);
+			return result;
+		}
+		else if constexpr (index == 1)
+		{
+			R128d temp = _mm256_extractf128_pd(_mm256_permute_pd(reg, 0b1111), 0);
+			R256d result = _mm256_broadcast_pd(&temp);
+			return result;
+		}
+		else if constexpr (index == 2)
+		{
+			R128d temp = _mm256_extractf128_pd(_mm256_permute_pd(reg, 0), 1);
+			R256d result = _mm256_broadcast_pd(&temp);
+			return result;
+		}
+		else if constexpr (index == 3)
+		{
+			R128d temp = _mm256_extractf128_pd(_mm256_permute_pd(reg, 0b1111), 1);
+			R256d result = _mm256_broadcast_pd(&temp);
+			return result;
+		}
+	}
+
 
 #pragma endregion sse
 }

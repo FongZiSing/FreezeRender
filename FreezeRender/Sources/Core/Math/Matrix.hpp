@@ -27,7 +27,7 @@ namespace Pluto
 	 * @brief Templated vector2.
 	 */
 	template <typename T>
-	struct BasicVector2
+	struct alignas(8) BasicVector2
 	{
 		static_assert(is_floating<T> || is_integral<T>, "[FreezeRender] type must be int, float, or double");
 		
@@ -595,7 +595,7 @@ namespace Pluto
 	template <typename T> force_inline void BasicVector3<T>::CrossProducted(const BasicVector3<T>& rhs) { (*this) = (*this) ^ rhs; }
 	template <typename T> force_inline BasicVector3<T> BasicVector3<T>::CrossProduct(const BasicVector3<T>& rhs) const { return (*this) ^ rhs; }
 	template <typename T> force_inline T BasicVector3<T>::DotProduct(const BasicVector3<T>& rhs) const { return (*this) | rhs; }
-	template <typename T> force_inline T BasicVector3<T>::Length() const requires is_floating<T> { return std::sqrtf(x * x + y * y + z * z); }
+	template <typename T> force_inline T BasicVector3<T>::Length() const requires is_floating<T> { return std::sqrt(x * x + y * y + z * z); }
 	template <typename T> force_inline T BasicVector3<T>::LengthSquared() const requires is_floating<T> { return x * x + y * y + z * z; }
 
 	template <typename T>
@@ -695,7 +695,7 @@ namespace Pluto
 
 	template <typename T> force_inline T BasicVector4<T>::operator | (const BasicVector4<T>& rhs) const { return x * rhs.x + y * rhs.y + z * rhs.z + w * rhs.w; }
 	template <typename T> force_inline T BasicVector4<T>::DotProduct(const BasicVector4<T>& rhs) const { return (*this) | rhs; }
-	template <typename T> force_inline T BasicVector4<T>::Length() const requires is_floating<T> { return std::sqrtf(x * x + y * y + z * z + w * w); }
+	template <typename T> force_inline T BasicVector4<T>::Length() const requires is_floating<T> { return std::sqrt(x * x + y * y + z * z + w * w); }
 	template <typename T> force_inline T BasicVector4<T>::LengthSquared() const requires is_floating<T> { return x * x + y * y + z * z + w * w; }
 
 	template <typename T>
@@ -870,7 +870,9 @@ namespace Pluto
 	{
 		BasicMatrix<T> result;
 		if constexpr (std::is_same_v<T, float>)
-			Math::MatrixMultiplyMatrix(this, &rhs, &result);
+			Math::Matrix44fMultiplyMatrix44f(this, &rhs, &result);
+		else if constexpr (std::is_same_v<T, double>)
+			Math::Matrix44dMultiplyMatrix44d(this, &rhs, &result);
 		else
 			force_softbreak; // TODO
 		return result;
@@ -902,7 +904,9 @@ namespace Pluto
 	force_inline const BasicMatrix<T>& BasicMatrix<T>::operator *= (const BasicMatrix<T>& rhs) requires is_floating<T>
 	{
 		if constexpr (std::is_same_v<T, float>)
-			Math::MatrixMultiplyMatrix(this, &rhs, this);
+			Math::Matrix44fMultiplyMatrix44f(this, &rhs, this);
+		else if constexpr (std::is_same_v<T, double>)
+			Math::Matrix44dMultiplyMatrix44d(this, &rhs, this);
 		else
 			force_softbreak; // TODO
 		
@@ -912,10 +916,16 @@ namespace Pluto
 	template <typename T>
 	force_inline BasicMatrix<T> BasicMatrix<T>::Transpose() const
 	{
-		if constexpr (std::is_same_v<T, float>)
+		if constexpr (std::is_same_v<T, float> || std::is_same_v<T, int>)
 		{
 			BasicMatrix<T> result = *this;
-			Math::MatrixTranspose(&result);
+			Math::Matrix44fTranspose(&result);
+			return result;
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			BasicMatrix<T> result = *this;
+			Math::Matrix44dTranspose(&result);
 			return result;
 		}
 		else
@@ -935,7 +945,13 @@ namespace Pluto
 		if constexpr (std::is_same_v<T, float>)
 		{
 			BasicMatrix<T> result;
-			Math::MatrixInverse(this, &result);
+			Math::Matrix44fInverse(this, &result);
+			return result;
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			BasicMatrix<T> result;
+			Math::Matrix44dInverse(this, &result);
 			return result;
 		}
 		else
@@ -994,7 +1010,13 @@ namespace Pluto
 		if constexpr (std::is_same_v<T, float>)
 		{
 			Vector4f result(rhs, 1.f);
-			Math::MatrixMulitplyVectorH(this, &result, &result);
+			Math::Matrix44fMulitplyVector4fH(this, &result, &result);
+			return result.XYZ();
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			Vector4d result(rhs, 1.0);
+			Math::Matrix44dMulitplyVector4dH(this, &result, &result);
 			return result.XYZ();
 		}
 		else
@@ -1009,7 +1031,13 @@ namespace Pluto
 		if constexpr (std::is_same_v<T, float>)
 		{
 			Vector4f result;
-			Math::MatrixMulitplyVector(this, &rhs, &result);
+			Math::Matrix44fMulitplyVector4f(this, &rhs, &result);
+			return result;
+		}
+		else if constexpr (std::is_same_v<T, double>)
+		{
+			Vector4d result;
+			Math::Matrix44dMulitplyVector4d(this, &rhs, &result);
 			return result;
 		}
 		else

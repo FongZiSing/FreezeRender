@@ -200,24 +200,66 @@ namespace Pluto
 			// This final form has one more operation than the legacy factorization (x1 = 0.5*x0*(3-(Y*x0)*x0)
 			// but retains better accuracy (namely InvSqrt(1) = 1 exactly).
 
-			const R128 oneHalf = _mm_set_ss(0.5f);
 			R128 x0, y0, x1, x2, fOver2;
 
 			y0 = _mm_set_ss(inValue);
 			x0 = _mm_rsqrt_ss(y0);	// 1/sqrt estimate (12 bits)
-			fOver2 = _mm_mul_ss(y0, oneHalf);
+			fOver2 = _mm_mul_ss(y0, Number::R_HALF);
 
 			// 1st Newton-Raphson iteration
 			x1 = _mm_mul_ss(x0, x0);
-			x1 = _mm_sub_ss(oneHalf, _mm_mul_ss(fOver2, x1));
+			x1 = _mm_sub_ss(Number::R_HALF, _mm_mul_ss(fOver2, x1));
 			x1 = _mm_add_ss(x0, _mm_mul_ss(x0, x1));
 
 			// 2nd Newton-Raphson iteration
 			x2 = _mm_mul_ss(x1, x1);
-			x2 = _mm_sub_ss(oneHalf, _mm_mul_ss(fOver2, x2));
+			x2 = _mm_sub_ss(Number::R_HALF, _mm_mul_ss(fOver2, x2));
 			x2 = _mm_add_ss(x1, _mm_mul_ss(x1, x2));
 
 			return x2.m128_f32[0];
+		}
+
+
+
+		/**
+		 * @brief Fast Inverse Square Root.
+		 * @return        ( 1 / sqrt(inValue) )
+		 */
+		force_inline double InvSqrt(const double inValue)
+		{
+			// Performs two passes of Newton-Raphson iteration on the hardware estimate
+			//    v^-0.5 = x
+			// => x^2 = v^-1
+			// => 1/(x^2) = v
+			// => F(x) = x^-2 - v
+			//    F'(x) = -2x^-3
+
+			//    x1 = x0 - F(x0)/F'(x0)
+			// => x1 = x0 + 0.5 * (x0^-2 - vec) * x0^3
+			// => x1 = x0 + 0.5 * (x0 - vec * x0^3)
+			// => x1 = x0 + x0 * (0.5 - 0.5 * vec * x0^2)
+			//
+			// This final form has one more operation than the legacy factorization (x1 = 0.5*x0*(3-(Y*x0)*x0)
+			// but retains better accuracy (namely InvSqrt(1) = 1 exactly).
+
+			R128d x0, y0, x1, x2, fOver2;
+
+			y0 = _mm_set_sd(inValue);
+			x0 = _mm_sqrt_sd(Number::R_ONEd, y0);
+			x0 = _mm_div_sd(Number::R_ONEd, x0);	// 1/sqrt estimate (12 bits)
+			fOver2 = _mm_mul_sd(y0, Number::R_HALFd);
+
+			// 1st Newton-Raphson iteration
+			x1 = _mm_mul_sd(x0, x0);
+			x1 = _mm_sub_sd(Number::R_HALFd, _mm_mul_sd(fOver2, x1));
+			x1 = _mm_add_sd(x0, _mm_mul_sd(x0, x1));
+
+			// 2nd Newton-Raphson iteration
+			x2 = _mm_mul_sd(x1, x1);
+			x2 = _mm_sub_sd(Number::R_HALFd, _mm_mul_sd(fOver2, x2));
+			x2 = _mm_add_sd(x1, _mm_mul_sd(x1, x2));
+
+			return x2.m128d_f64[0];
 		}
 
 
@@ -375,10 +417,29 @@ namespace Pluto
 		/**
 		 * @brief Transpose a 4x4 matrix.
 		 */
-		force_inline void MatrixTranspose(void* InOutMatrix)
+		force_inline void Matrix44fTranspose(void* InOutMatrix)
 		{
-			R128* M = static_cast<R128*>(InOutMatrix);
-			_MM_TRANSPOSE4_PS(M[0], M[1], M[2], M[3]);
+			R128* m = static_cast<R128*>(InOutMatrix);
+			_MM_TRANSPOSE4_PS(m[0], m[1], m[2], m[3]);
+		}
+
+		/**
+		 * @brief Transpose a 4x4 matrix.
+		 */
+		force_inline void Matrix44dTranspose(void* InOutMatrix)
+		{
+			R256d* m = static_cast<R256d*>(InOutMatrix);
+			R256d temp0, temp1, temp2, temp3;
+	
+			temp0 = _mm256_shuffle_pd(m[0], m[1], 15);
+			temp1 = _mm256_shuffle_pd(m[0], m[1], 0);
+			temp2 = _mm256_shuffle_pd(m[2], m[3], 15);
+			temp3 = _mm256_shuffle_pd(m[2], m[3], 0);
+	
+			m[0] = _mm256_permute2f128_pd(temp1, temp3, 32);
+			m[1] = _mm256_permute2f128_pd(temp0, temp2, 32);
+			m[2] = _mm256_permute2f128_pd(temp1, temp3, 49);
+			m[3] = _mm256_permute2f128_pd(temp0, temp2, 49);
 		}
 
 
@@ -386,7 +447,7 @@ namespace Pluto
 		/**
 		 * @brief Inverse a 4x4 matrix.
 		 */
-		force_inline void MatrixInverse(const void* inMatrix, void* outMatrix)
+		force_inline void Matrix44fInverse(const void* inMatrix, void* outMatrix)
 		{
 			// use block matrix method
 			// A is a matrix, then
@@ -468,10 +529,98 @@ namespace Pluto
 
 
 		/**
+		 * @brief Inverse a 4x4 matrix.
+		 */
+		force_inline void Matrix44dInverse(const void* inMatrix, void* outMatrix)
+		{
+			// TODO
+			typedef double Double4x4[4][4];
+			const Double4x4& m = *((const Double4x4*)inMatrix);
+			Double4x4& result = *((Double4x4*)outMatrix);
+			Double4x4 tmp;
+			double det[4];
+
+			tmp[0][0] = m[2][2] * m[3][3] - m[2][3] * m[3][2];
+			tmp[0][1] = m[1][2] * m[3][3] - m[1][3] * m[3][2];
+			tmp[0][2] = m[1][2] * m[2][3] - m[1][3] * m[2][2];
+
+			tmp[1][0] = m[2][2] * m[3][3] - m[2][3] * m[3][2];
+			tmp[1][1] = m[0][2] * m[3][3] - m[0][3] * m[3][2];
+			tmp[1][2] = m[0][2] * m[2][3] - m[0][3] * m[2][2];
+
+			tmp[2][0] = m[1][2] * m[3][3] - m[1][3] * m[3][2];
+			tmp[2][1] = m[0][2] * m[3][3] - m[0][3] * m[3][2];
+			tmp[2][2] = m[0][2] * m[1][3] - m[0][3] * m[1][2];
+
+			tmp[3][0] = m[1][2] * m[2][3] - m[1][3] * m[2][2];
+			tmp[3][1] = m[0][2] * m[2][3] - m[0][3] * m[2][2];
+			tmp[3][2] = m[0][2] * m[1][3] - m[0][3] * m[1][2];
+
+			det[0] = m[1][1] * tmp[0][0] - m[2][1] * tmp[0][1] + m[3][1] * tmp[0][2];
+			det[1] = m[0][1] * tmp[1][0] - m[2][1] * tmp[1][1] + m[3][1] * tmp[1][2];
+			det[2] = m[0][1] * tmp[2][0] - m[1][1] * tmp[2][1] + m[3][1] * tmp[2][2];
+			det[3] = m[0][1] * tmp[3][0] - m[1][1] * tmp[3][1] + m[2][1] * tmp[3][2];
+
+			const double Determinant = m[0][0] * det[0] - m[1][0] * det[1] + m[2][0] * det[2] - m[3][0] * det[3];
+			const double	RDet = 1.0 / Determinant;
+
+			result[0][0] = RDet * det[0];
+			result[0][1] = -RDet * det[1];
+			result[0][2] = RDet * det[2];
+			result[0][3] = -RDet * det[3];
+			result[1][0] = -RDet * (m[1][0] * tmp[0][0] - m[2][0] * tmp[0][1] + m[3][0] * tmp[0][2]);
+			result[1][1] = RDet * (m[0][0] * tmp[1][0] - m[2][0] * tmp[1][1] + m[3][0] * tmp[1][2]);
+			result[1][2] = -RDet * (m[0][0] * tmp[2][0] - m[1][0] * tmp[2][1] + m[3][0] * tmp[2][2]);
+			result[1][3] = RDet * (m[0][0] * tmp[3][0] - m[1][0] * tmp[3][1] + m[2][0] * tmp[3][2]);
+			result[2][0] = RDet * (
+				m[1][0] * (m[2][1] * m[3][3] - m[2][3] * m[3][1]) -
+				m[2][0] * (m[1][1] * m[3][3] - m[1][3] * m[3][1]) +
+				m[3][0] * (m[1][1] * m[2][3] - m[1][3] * m[2][1])
+				);
+			result[2][1] = -RDet * (
+				m[0][0] * (m[2][1] * m[3][3] - m[2][3] * m[3][1]) -
+				m[2][0] * (m[0][1] * m[3][3] - m[0][3] * m[3][1]) +
+				m[3][0] * (m[0][1] * m[2][3] - m[0][3] * m[2][1])
+				);
+			result[2][2] = RDet * (
+				m[0][0] * (m[1][1] * m[3][3] - m[1][3] * m[3][1]) -
+				m[1][0] * (m[0][1] * m[3][3] - m[0][3] * m[3][1]) +
+				m[3][0] * (m[0][1] * m[1][3] - m[0][3] * m[1][1])
+				);
+			result[2][3] = -RDet * (
+				m[0][0] * (m[1][1] * m[2][3] - m[1][3] * m[2][1]) -
+				m[1][0] * (m[0][1] * m[2][3] - m[0][3] * m[2][1]) +
+				m[2][0] * (m[0][1] * m[1][3] - m[0][3] * m[1][1])
+				);
+			result[3][0] = -RDet * (
+				m[1][0] * (m[2][1] * m[3][2] - m[2][2] * m[3][1]) -
+				m[2][0] * (m[1][1] * m[3][2] - m[1][2] * m[3][1]) +
+				m[3][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+				);
+			result[3][1] = RDet * (
+				m[0][0] * (m[2][1] * m[3][2] - m[2][2] * m[3][1]) -
+				m[2][0] * (m[0][1] * m[3][2] - m[0][2] * m[3][1]) +
+				m[3][0] * (m[0][1] * m[2][2] - m[0][2] * m[2][1])
+				);
+			result[3][2] = -RDet * (
+				m[0][0] * (m[1][1] * m[3][2] - m[1][2] * m[3][1]) -
+				m[1][0] * (m[0][1] * m[3][2] - m[0][2] * m[3][1]) +
+				m[3][0] * (m[0][1] * m[1][2] - m[0][2] * m[1][1])
+				);
+			result[3][3] = RDet * (
+				m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+				m[1][0] * (m[0][1] * m[2][2] - m[0][2] * m[2][1]) +
+				m[2][0] * (m[0][1] * m[1][2] - m[0][2] * m[1][1])
+				);
+		}
+
+
+
+		/**
 		 * @brief Multiplies two 4x4 matrices.
 		 * @param outMatrix    - inMatrix1 * inMatrix2
 		 */
-		force_inline void MatrixMultiplyMatrix(const void* inMatrix1, const void* inMatrix2, void* outMatrix)
+		force_inline void Matrix44fMultiplyMatrix44f(const void* inMatrix1, const void* inMatrix2, void* outMatrix)
 		{
 			const R128* m1 = static_cast<const R128*>(inMatrix1);
 			const R128* m2 = static_cast<const R128*>(inMatrix2);
@@ -512,10 +661,54 @@ namespace Pluto
 
 
 		/**
+		 * @brief Multiplies two 4x4 matrices.
+		 * @param outMatrix    - inMatrix1 * inMatrix2
+		 */
+		force_inline void Matrix44dMultiplyMatrix44d(const void* inMatrix1, const void* inMatrix2, void* outMatrix)
+		{
+			const R256d* m1 = static_cast<const R256d*>(inMatrix1);
+			const R256d* m2 = static_cast<const R256d*>(inMatrix2);
+			R256d* result = (R256d*)outMatrix;
+			R256d temp, r0, r1, r2, r3;
+
+			// First row of result (inMatrix1[0] * inMatrix2).
+			temp = Register4dMultiply(Register4dReplicate<0>(m1[0]), m2[0]);
+			temp = Register4dMultiplyAdd(Register4dReplicate<1>(m1[0]), m2[1], temp);
+			temp = Register4dMultiplyAdd(Register4dReplicate<2>(m1[0]), m2[2], temp);
+			r0 = Register4dMultiplyAdd(Register4dReplicate<3>(m1[0]), m2[3], temp);
+
+			// Second row of result (inMatrix1[1] * inMatrix2).
+			temp = Register4dMultiply(Register4dReplicate<0>(m1[1]), m2[0]);
+			temp = Register4dMultiplyAdd(Register4dReplicate<1>(m1[1]), m2[1], temp);
+			temp = Register4dMultiplyAdd(Register4dReplicate<2>(m1[1]), m2[2], temp);
+			r1 = Register4dMultiplyAdd(Register4dReplicate<3>(m1[1]), m2[3], temp);
+
+			// Third row of result (inMatrix1[2] * inMatrix2).
+			temp = Register4dMultiply(Register4dReplicate<0>(m1[2]), m2[0]);
+			temp = Register4dMultiplyAdd(Register4dReplicate<1>(m1[2]), m2[1], temp);
+			temp = Register4dMultiplyAdd(Register4dReplicate<2>(m1[2]), m2[2], temp);
+			r2 = Register4dMultiplyAdd(Register4dReplicate<3>(m1[2]), m2[3], temp);
+
+			// Fourth row of result (inMatrix1[3] * inMatrix2).
+			temp = Register4dMultiply(Register4dReplicate<0>(m1[3]), m2[0]);
+			temp = Register4dMultiplyAdd(Register4dReplicate<1>(m1[3]), m2[1], temp);
+			temp = Register4dMultiplyAdd(Register4dReplicate<2>(m1[3]), m2[2], temp);
+			r3 = Register4dMultiplyAdd(Register4dReplicate<3>(m1[3]), m2[3], temp);
+
+			// Store result.
+			result[0] = r0;
+			result[1] = r1;
+			result[2] = r2;
+			result[3] = r3;
+		}
+
+
+
+		/**
 		 * @brief Multiplies 1x4 vector and 4x4 matrix.
 		 * @param outVec    - inVec * inMatrix
 		 */
-		force_inline void VectorMulitplyMatrix(const void* inVec, const void* inMatrix, void* outVec)
+		force_inline void Vector4fMulitplyMatrix44f(const void* inVec, const void* inMatrix, void* outVec)
 		{
 			const R128& v = *static_cast<const R128*>(inVec);
 			const R128* scope_restrict m = static_cast<const R128*>(inMatrix);
@@ -545,10 +738,43 @@ namespace Pluto
 
 
 		/**
+		 * @brief Multiplies 1x4 vector and 4x4 matrix.
+		 * @param outVec    - inVec * inMatrix
+		 */
+		force_inline void Vector4dMulitplyMatrix44d(const void* inVec, const void* inMatrix, void* outVec)
+		{
+			const R256d& v = *static_cast<const R256d*>(inVec);
+			const R256d* scope_restrict m = static_cast<const R256d*>(inMatrix);
+			R256d tempX, tempY, tempZ, tempW;
+
+			// Splat x,y,z and w
+			tempX = Register4dReplicate<0>(v);
+			tempY = Register4dReplicate<1>(v);
+			tempZ = Register4dReplicate<2>(v);
+			tempW = Register4dReplicate<3>(v);
+
+			// Mul by the matrix
+			tempX = Register4dMultiply(tempX, m[0]);
+			tempY = Register4dMultiply(tempY, m[1]);
+			tempZ = Register4dMultiply(tempZ, m[2]);
+			tempW = Register4dMultiply(tempW, m[3]);
+
+			// Add them all together
+			tempX = Register4dAdd(tempX, tempY);
+			tempZ = Register4dAdd(tempZ, tempW);
+			tempX = Register4dAdd(tempX, tempZ);
+
+			// Store result.
+			Register4dStoreAligned(tempX, outVec);
+		}
+
+
+
+		/**
 		 * @brief Multiplies 4x4 matrix and 4x1 vector.
 		 * @param outVec    - inMatrix * inVec
 		 */
-		force_inline void MatrixMulitplyVector(const void* inMatrix, const void* inVec, void* outVec)
+		force_inline void Matrix44fMulitplyVector4f(const void* inMatrix, const void* inVec, void* outVec)
 		{
 			const R128& v = *static_cast<const R128*>(inVec);
 			const R128* scope_restrict m = static_cast<const R128*>(inMatrix);
@@ -573,10 +799,48 @@ namespace Pluto
 
 
 		/**
+		 * @brief Multiplies 4x4 matrix and 4x1 vector.
+		 * @param outVec    - inMatrix * inVec
+		 */
+		force_inline void Matrix44dMulitplyVector4d(const void* inMatrix, const void* inVec, void* outVec)
+		{
+			const R256d& v = *static_cast<const R256d*>(inVec);
+			const R256d* scope_restrict m = static_cast<const R256d*>(inMatrix);
+			R256d tempX, tempY, tempZ, tempW;
+
+			// Mul by the matrix
+			tempX = Register4dMultiply(m[0], v);
+			tempY = Register4dMultiply(m[1], v);
+			tempZ = Register4dMultiply(m[2], v);
+			tempW = Register4dMultiply(m[3], v);
+
+			// Add them all together
+			R256d temp0, temp1, temp2, temp3;
+			temp0 = _mm256_shuffle_pd(tempX, tempY, 15);
+			temp1 = _mm256_shuffle_pd(tempX, tempY, 0);
+			temp2 = _mm256_shuffle_pd(tempZ, tempW, 15);
+			temp3 = _mm256_shuffle_pd(tempZ, tempW, 0);
+
+			tempX = _mm256_permute2f128_pd(temp1, temp3, 32);
+			tempY = _mm256_permute2f128_pd(temp0, temp2, 32);
+			tempZ = _mm256_permute2f128_pd(temp1, temp3, 49);
+			tempW = _mm256_permute2f128_pd(temp0, temp2, 49);
+
+			tempX = Register4dAdd(tempX, tempY);
+			tempZ = Register4dAdd(tempZ, tempW);
+			tempX = Register4dAdd(tempX, tempZ);
+
+			// Store result.
+			Register4dStoreAligned(tempX, outVec);
+		}
+
+
+
+		/**
 		 * @brief Multiplies 4x4 matrix and 4x1 vector, and do perspective division.
 		 * @param outVec    - inMatrix * inVec
 		 */
-		force_inline void MatrixMulitplyVectorH(const void* inMatrix, const void* inVec, void* outVec)
+		force_inline void Matrix44fMulitplyVector4fH(const void* inMatrix, const void* inVec, void* outVec)
 		{
 			const R128& v = *static_cast<const R128*>(inVec);
 			const R128* scope_restrict m = static_cast<const R128*>(inMatrix);
@@ -600,6 +864,49 @@ namespace Pluto
 
 			// Store result.
 			RegisterStoreAligned(tempX, outVec);
+		}
+
+
+
+		/**
+		 * @brief Multiplies 4x4 matrix and 4x1 vector, and do perspective division.
+		 * @param outVec    - inMatrix * inVec
+		 */
+		force_inline void Matrix44dMulitplyVector4dH(const void* inMatrix, const void* inVec, void* outVec)
+		{
+			const R256d& v = *static_cast<const R256d*>(inVec);
+			const R256d* scope_restrict m = static_cast<const R256d*>(inMatrix);
+			R256d tempX, tempY, tempZ, tempW;
+
+			// Mul by the matrix
+			tempX = Register4dMultiply(m[0], v);
+			tempY = Register4dMultiply(m[1], v);
+			tempZ = Register4dMultiply(m[2], v);
+			tempW = Register4dMultiply(m[3], v);
+
+			// Add them all together
+			R256d temp0, temp1, temp2, temp3;
+			temp0 = _mm256_shuffle_pd(tempX, tempY, 15);
+			temp1 = _mm256_shuffle_pd(tempX, tempY, 0);
+			temp2 = _mm256_shuffle_pd(tempZ, tempW, 15);
+			temp3 = _mm256_shuffle_pd(tempZ, tempW, 0);
+
+			tempX = _mm256_permute2f128_pd(temp1, temp3, 32);
+			tempY = _mm256_permute2f128_pd(temp0, temp2, 32);
+			tempZ = _mm256_permute2f128_pd(temp1, temp3, 49);
+			tempW = _mm256_permute2f128_pd(temp0, temp2, 49);
+
+
+			tempX = Register4dAdd(tempX, tempY);
+			tempZ = Register4dAdd(tempZ, tempW);
+			tempX = Register4dAdd(tempX, tempZ);
+
+			// perspective division
+			tempZ = Register4dReplicate<3>(tempX);
+			tempX = Register4dDivide(tempX, tempZ);
+
+			// Store result.
+			Register4dStoreAligned(tempX, outVec);
 		}
 
 
