@@ -7,7 +7,7 @@
 // Definitions of useful mathematical constants.
 //
 #pragma once
-
+#include <limits>
 
 
 namespace Pluto
@@ -17,6 +17,9 @@ namespace Pluto
 	 */
 	namespace Number
 	{
+		//--------------------------------
+		//~ Begin contants.
+
 		constexpr const float E                    = static_cast<float>(2.71828182845904523536);   // e
 		constexpr const float LOG2E                = static_cast<float>(1.44269504088896340736);   // log2(e)
 		constexpr const float LOG10E               = static_cast<float>(0.434294481903251827651);  // log10(e)
@@ -36,10 +39,48 @@ namespace Pluto
 	
 		constexpr const float FLOAT_NON_FRACTIONAL = 8388608.f;
 
-		constexpr const float SMALL_NUMBER         = 1e-6f;
-		constexpr const float FLOAT_NAN            = __builtin_nanf("0");
-		constexpr const float FLOAT_SIGNAL_NAN     = __builtin_nansf("1");
-		constexpr const float FLOAT_INF            = __builtin_huge_valf();
-		constexpr const float FLOAT_NEG_INF        = -__builtin_huge_valf();
+		//~ End contants.
+		//--------------------------------
+
+
+
+		//--------------------------------
+		//~ Begin 32-bits integer limits.
+
+		constexpr const int INTEGER_MIN = ((int)0x80000000); // -2147483648
+		constexpr const int INTEGER_MAX = ((int)0x7fffffff); //  2147483647
+
+		//~ End 32-bits integer point limits.
+		//--------------------------------
+
+
+
+		//--------------------------------
+		//~ Begin single-precision floating point limits.
+
+		constexpr const float SMALL_NUMBER     = 1e-6f;
+
+		constexpr const float FLOAT_NAN        = __builtin_nanf("0");
+		constexpr const float FLOAT_SIGNAL_NAN = __builtin_nansf("1");
+		constexpr const float FLOAT_INF        = __builtin_huge_valf();
+		constexpr const float FLOAT_NEG_INF    = -__builtin_huge_valf();
+		
+		constexpr const float FLOAT_MIN        = 1.175494351e-38f;
+		constexpr const float FLOAT_MAX        = 3.402823466e+38f;
+
+		//~ End single-precision floating point limits.
+		//--------------------------------
+
+
+
+		//--------------------------------
+		//~ Begin single-precision floating point limits.
+
+		constexpr const double DOUBLE_MIN = 2.2250738585072014e-308;
+		constexpr const double DOUBLE_MAX = 1.7976931348623158e+308;
+
+		//~ End double-precision floating point limits.
+		//--------------------------------
+
 	}
 }

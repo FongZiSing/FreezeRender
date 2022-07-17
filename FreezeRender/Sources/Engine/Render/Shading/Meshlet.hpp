@@ -41,8 +41,8 @@ namespace Pluto
 		{
 		private:
 			const Meshlet& mesh;
-			const AVertexIndex* begin;
-			const AVertexIndex* end;
+			const unsigned int* begin;
+			const unsigned int* end;
 
 		public:
 			explicit Iterator(const Meshlet& target)
@@ -60,9 +60,9 @@ namespace Pluto
 			ShadingTriangle Assembly() const
 			{
 				return ShadingTriangle(
-					begin[0].ptr,
-					begin[1].ptr,
-					begin[2].ptr,
+					mesh.data.vertices[begin[0]],
+					mesh.data.vertices[begin[1]],
+					mesh.data.vertices[begin[2]],
 					&mesh.materials[mesh.data.GetMaterialIndex(*begin)]
 				);
 			}

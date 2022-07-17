@@ -29,7 +29,7 @@ namespace Pluto
 
 		Array<AMaterial> materials;
 		Array<AVertex> vertices;
-		Array<AVertexIndex> indices;
+		Array<unsigned int> indices;
 		Array<AVertexCluster> clusters;
 
 
@@ -38,12 +38,12 @@ namespace Pluto
 			return !vertices.IsEmpty() && !indices.IsEmpty() && !materials.IsEmpty() && !clusters.IsEmpty();
 		}
 
-		unsigned int GetMaterialIndex(const AVertexIndex& target)
+		unsigned int GetMaterialIndex(const unsigned int& target)
 		{
 			for (auto& cluster : clusters)
 			{
-				if (target.index >= cluster.beginVertexIndex &&
-					target.index < cluster.endVertexIndex &&
+				if (target >= cluster.beginVertexIndex &&
+					target < cluster.endVertexIndex &&
 					cluster.materialIndex < materials.Size())
 				{
 					return cluster.materialIndex;

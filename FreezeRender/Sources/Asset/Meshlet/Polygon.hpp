@@ -25,14 +25,6 @@ namespace Pluto
 
 
 
-	struct AVertexIndex
-	{
-		unsigned int index = 0;
-		AVertex* ptr = nullptr;
-	};
-
-
-
 	struct AVertexCluster
 	{
 		unsigned int beginVertexIndex = 0;

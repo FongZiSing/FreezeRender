@@ -59,23 +59,24 @@ namespace Pluto
 	template <typename T>
 	struct BasicBoundingBox3 : public BasicBox3<T>
 	{
-	private:
-		 bool bIsValid = false;
-
-
 	public:
-		explicit BasicBoundingBox3(const BasicVector3<T>& minPosition, const BasicVector3<T>& maxPosition) noexcept
-			: BasicBox3<T>(minPosition, maxPosition)
-			, bIsValid(true)
+		BasicBoundingBox3() noexcept
+			: BasicBox3<T>(BasicBox3<T>::Max, BasicBox3<T>::Min)
+		{}
+
+		BasicBoundingBox3(const BasicVector3<T>& position) noexcept
+			: BasicBox3<T>(position, position)
 		{}
 
 		//--------------------------------
 		//~ Begin self-related operations.
 
-		constexpr bool IsValid() const noexcept { return bIsValid; }
-		force_inline BasicVector3<T> GetCenter() const noexcept { return (this->max + this->min) / 2; }
-		force_inline BasicVector3<T> GetExtent() const noexcept { return (this->max - this->min) / 2; }
-		
+		warn_nodiscard constexpr bool IsValid() const noexcept;
+		warn_nodiscard force_inline BasicVector3<T> GetCenter() const noexcept { return (this->max + this->min) / 2; }
+		warn_nodiscard force_inline BasicVector3<T> GetExtent() const noexcept { return (this->max - this->min) / 2; }
+		warn_nodiscard force_inline BasicVector3<T> GetSize() const noexcept { return (this->max - this->min); }
+
+		force_inline const BasicBoundingBox3& operator += (const BasicVector3<T>& rhs);
 		force_inline const BasicBoundingBox3& operator += (const BasicBoundingBox3& rhs);
 
 		//~ Begin  self-related operations.
@@ -85,31 +86,44 @@ namespace Pluto
 	using BoundingBox3i = BasicBoundingBox3<int>;
 	using BoundingBox3f = BasicBoundingBox3<float>;
 	using BoundingBox3d = BasicBoundingBox3<double>;
-	static_assert(sizeof(BoundingBox3i) == 28, "[FreezeRender] BoundingBox2i size is invalid!");
-	static_assert(sizeof(BoundingBox3f) == 28, "[FreezeRender] BoundingBox2f size is invalid!");
-	static_assert(sizeof(BoundingBox3d) == 56, "[FreezeRender] BoundingBox2d size is invalid!");
+	static_assert(sizeof(BoundingBox3i) == 24, "[FreezeRender] BoundingBox2i size is invalid!");
+	static_assert(sizeof(BoundingBox3f) == 24, "[FreezeRender] BoundingBox2f size is invalid!");
+	static_assert(sizeof(BoundingBox3d) == 48, "[FreezeRender] BoundingBox2d size is invalid!");
 
 
 
 #pragma region boundingbox3_implemention
 
 	template<typename T>
+	force_inline constexpr bool BasicBoundingBox3<T>::IsValid() const noexcept
+	{
+		return this->max.x >= this->min.x && this->max.y >= this->min.y && this->max.z >= this->min.z;
+	}
+
+	template<typename T>
+	force_inline const BasicBoundingBox3<T>& BasicBoundingBox3<T>::operator += (const BasicVector3<T>& rhs)
+	{
+		this->min.x = std::min(this->min.x, rhs.x);
+		this->min.y = std::min(this->min.y, rhs.y);
+		this->min.z = std::min(this->min.z, rhs.z);
+
+		this->max.x = std::max(this->max.x, rhs.x);
+		this->max.y = std::max(this->max.y, rhs.y);
+		this->max.z = std::max(this->max.z, rhs.z);
+
+		return *this;
+	}
+
+	template<typename T>
 	force_inline const BasicBoundingBox3<T>& BasicBoundingBox3<T>::operator += (const BasicBoundingBox3<T>& rhs)
 	{
-		if (bIsValid && rhs.bIsValid) branch_likely
-		{
-			this->min.x = std::min(this->min.x, rhs.min.x);
-			this->min.y = std::min(this->min.y, rhs.min.y);
-			this->min.z = std::min(this->min.z, rhs.min.z);
+		this->min.x = std::min(this->min.x, rhs.min.x);
+		this->min.y = std::min(this->min.y, rhs.min.y);
+		this->min.z = std::min(this->min.z, rhs.min.z);
 
-			this->max.x = std::max(this->max.x, rhs.max.x);
-			this->max.y = std::max(this->max.y, rhs.max.y);
-			this->max.z = std::max(this->max.z, rhs.max.z);
-		}
-		else if (rhs.bIsValid) branch_unlikely
-		{
-			*this = rhs;
-		}
+		this->max.x = std::max(this->max.x, rhs.max.x);
+		this->max.y = std::max(this->max.y, rhs.max.y);
+		this->max.z = std::max(this->max.z, rhs.max.z);
 
 		return *this;
 	}

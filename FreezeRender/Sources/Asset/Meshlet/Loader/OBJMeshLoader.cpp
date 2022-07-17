@@ -269,11 +269,7 @@ namespace Pluto
 
 		// Fill meshlet.
 		mesh.vertices.Swap(vertices);
-		AVertex* vertex = mesh.vertices.Data();
-		for (auto& index : positionIndices)
-		{
-			mesh.indices.Push({ index, vertex + index });
-		}
+		mesh.indices.Swap(positionIndices);
 		return Status::Ok;
 	}
 

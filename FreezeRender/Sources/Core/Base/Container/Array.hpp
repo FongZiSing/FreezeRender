@@ -75,6 +75,8 @@ namespace Pluto
 		constexpr void Push(ElementType&& element) noexcept { Super::push_back(std::move(element)); }
 		constexpr void Push(const ElementType& element) noexcept { Super::push_back(element); }
 
+		constexpr ElementType& AddDefault() noexcept { return Super::emplace_back(); }
+
 		template <typename... Args>
 		constexpr auto Emplace(Args&&... args) noexcept -> decltype(Super::emplace_back(std::forward<Args>(args)...))
 		{

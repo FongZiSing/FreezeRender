@@ -116,15 +116,15 @@ namespace Pluto
 			vertices[2] = vertex3;
 		}
 
-		inline ShadingTriangle(const AVertex* scope_restrict vertex1, const AVertex* scope_restrict vertex2, const AVertex* scope_restrict vertex3, const Material* target)
+		inline ShadingTriangle(const AVertex& vertex1, const AVertex& vertex2, const AVertex& vertex3, const Material* target)
 		{
-			Register8Copy(vertex1, vertices + 0);
-			Register8Copy(vertex2, vertices + 1);
-			Register8Copy(vertex3, vertices + 2);
+			Register8Copy(&vertex1, vertices + 0);
+			Register8Copy(&vertex2, vertices + 1);
+			Register8Copy(&vertex3, vertices + 2);
 
-			vertices[0].screenspace.position = { vertex1->position, 1.f };
-			vertices[1].screenspace.position = { vertex2->position, 1.f };
-			vertices[2].screenspace.position = { vertex3->position, 1.f };
+			vertices[0].screenspace.position = { vertex1.position, 1.f };
+			vertices[1].screenspace.position = { vertex2.position, 1.f };
+			vertices[2].screenspace.position = { vertex3.position, 1.f };
 
 			material = target;
 		}
