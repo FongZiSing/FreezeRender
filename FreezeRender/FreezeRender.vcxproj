@@ -36,6 +36,7 @@
     <ClInclude Include="Sources\Asset\World\World.hpp" />
     <ClInclude Include="Sources\Common.hpp" />
     <ClInclude Include="Sources\Core\Base\Algorithm\KahanSum.hpp" />
+    <ClInclude Include="Sources\Core\Base\Algorithm\TopK.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\Array.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\Bulkdata.hpp" />
     <ClInclude Include="Sources\Core\Base\Container\String.hpp" />

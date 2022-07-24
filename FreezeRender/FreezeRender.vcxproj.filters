@@ -312,6 +312,9 @@
     <ClInclude Include="Sources\Engine\Render\Shading\Sampler.hpp">
       <Filter>Sources\Engine %28 Function Layer %29\Render\Shading</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Core\Base\Algorithm\TopK.hpp">
+      <Filter>Sources\Core %28 Core Layer %29\Base\Algorithm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\Engine.cpp" />
