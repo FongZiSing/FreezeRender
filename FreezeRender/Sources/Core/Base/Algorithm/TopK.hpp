@@ -22,8 +22,10 @@ namespace Pluto
          * @see https://en.wikipedia.org/wiki/Quickselect
          */
         template <typename Type, bool order = true>
-        constexpr const Type& QuickSelect(Type* list, uint64_t left, uint64_t right, uint64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
+        constexpr const Type& QuickSelect(Type* list, uint64_t num, uint64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
         {
+            uint64_t left = 0;
+            uint64_t right = num - 1;
             // Inverse k.
             k = right - left - k;
 

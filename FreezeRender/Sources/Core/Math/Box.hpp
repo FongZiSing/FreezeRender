@@ -61,7 +61,7 @@ namespace Pluto
 	{
 	public:
 		BasicBoundingBox3() noexcept
-			: BasicBox3<T>(BasicBox3<T>::Max, BasicBox3<T>::Min)
+			: BasicBox3<T>(BasicVector3<T>::Max, BasicVector3<T>::Min)
 		{}
 
 		BasicBoundingBox3(const BasicVector3<T>& position) noexcept

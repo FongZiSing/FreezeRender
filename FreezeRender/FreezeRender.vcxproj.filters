@@ -379,6 +379,9 @@
     <ClCompile Include="Sources\Core\Math\Box.hpp">
       <Filter>Sources\Core %28 Core Layer %29\Math</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Engine\Render\RayTracing\BoundingVolumeHierarchy\BVH.cpp">
+      <Filter>Sources\Engine %28 Function Layer %29\Render\RayTracing\BoundingVolumeHierarchy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint">

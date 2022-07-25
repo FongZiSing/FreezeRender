@@ -96,6 +96,7 @@
     <ClCompile Include="Sources\Engine\Renderer\Raster\Rasterizer.cpp" />
     <ClCompile Include="Sources\Engine\Renderer\RayTacing\RayTracingRenderer.cpp" />
     <ClCompile Include="Sources\Engine\Render\GeometryBuffer.hpp" />
+    <ClCompile Include="Sources\Engine\Render\RayTracing\BoundingVolumeHierarchy\BVH.cpp" />
     <ClCompile Include="Sources\Engine\Render\Shading\Meshlet.cpp" />
     <ClCompile Include="Sources\Engine\Shader\FragmentShader.cpp" />
     <ClCompile Include="Sources\Engine\Shader\VertexShader.cpp" />
