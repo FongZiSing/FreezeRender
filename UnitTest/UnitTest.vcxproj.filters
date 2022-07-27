@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Sources\Algorithm">
+      <UniqueIdentifier>{07980a16-4493-441a-bc12-1983e11f0f2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\Utility">
+      <UniqueIdentifier>{8e50938c-3533-4312-8d7b-70b04dc05bd7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Sources\Algorithm\TopK.cpp">
+      <Filter>Sources\Algorithm</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\Algorithm\TopK.hpp">
+      <Filter>Sources\Algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utility\Timer.hpp">
+      <Filter>Sources\Utility</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
