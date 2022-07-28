@@ -38,6 +38,7 @@
 
 // C++ RunTime Header.
 #include <cassert>
+#include <cstdint>
 
 
 

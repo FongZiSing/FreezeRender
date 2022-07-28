@@ -23,24 +23,24 @@ namespace Pluto
          * @see https://en.wikipedia.org/wiki/Quickselect
          */
         template <typename Type, bool order = true>
-        constexpr const Type& QuickSelect(Type* list, uint64_t num, uint64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
+        constexpr const Type& QuickSelect(Type* list, int64_t num, int64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
         {
-            uint64_t left = 0;
-            uint64_t right = num - 1;
+            int64_t left = 0;
+            int64_t right = num - 1;
             // Inverse k.
             k = right - left - k;
 
             while (left != right)
             {
                 // Select a pivot index between left right.
-                std::size_t index = left + ((right - left + 1) >> 1);
+                int64_t index = left + ((right - left + 1) >> 1);
 
                 // The subprocedure called partition.
 #pragma region QuickSelect Partition
                 {
-                    uint64_t start = left;
-                    uint64_t cursor = left;
-                    const uint64_t& end = right;
+                    int64_t start = left;
+                    int64_t cursor = left;
+                    const int64_t& end = right;
 
                     Type privot = list[index];
                     std::swap(list[index], list[end]);
@@ -53,7 +53,7 @@ namespace Pluto
                             ++start; ++cursor;
                         }
 
-                        for (std::size_t i = start; i < end; ++i)
+                        for (int64_t i = start; i < end; ++i)
                         {
                             if (list[i] <= privot)
                             {
@@ -70,7 +70,7 @@ namespace Pluto
                             ++start; ++cursor;
                         }
 
-                        for (std::size_t i = start; i < end; ++i)
+                        for (int64_t i = start; i < end; ++i)
                         {
                             if (list[i] >= privot)
                             {
@@ -109,25 +109,27 @@ namespace Pluto
         * @see https://en.wikipedia.org/wiki/Floyd-Rivest_algorithm
         */
         template <typename Type, bool order = true>
-        constexpr const Type& FloydRivestSelect(Type* list, uint64_t left, uint64_t right, uint64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
+        constexpr void FloydRivestSelect(Type* list, int64_t left, int64_t right, int64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
         {
             while (right > left)
             {
+                
                 if (right - left > 600Ui64)
                 {
-                    uint64_t n = right - left + 1;
-                    uint64_t i = k - left + 1;
+                    int64_t n = right - left + 1;
+                    int64_t i = k - left + 1;
                     double z = std::log10(n);
                     double s = 0.5 * std::exp(2 * z / 3);
-                    double sd = 0.5 * std::sqrt(z * s * (n - s) / n) * std::signbit(i - n / 2);
-                    uint32_t newLeft = (uint32_t)std::max((double)left, k - i * s / n + sd);
-                    uint32_t newRight = (uint32_t)std::min((double)right, k + (n - i) * s / n + sd);
+                    double sign = (i - n / 2) >= 0 ? 1 : -1;
+                    double sd = 0.5 * std::sqrt(z * s * (n - s) / n) * sign;
+                    int64_t newLeft = (int64_t)std::max((double)left, k - i * s / n + sd);
+                    int64_t newRight = (int64_t)std::min((double)right, k + (n - i) * s / n + sd);
                     FloydRivestSelect(list, newLeft, newRight, k);
                 }
 
                 Type t = list[k];
-                uint64_t i = left;
-                uint64_t j = right;
+                int64_t i = left;
+                int64_t j = right;
 
                 std::swap(list[left], list[k]);
                 if (list[right] > t)
@@ -136,10 +138,11 @@ namespace Pluto
                 }
                 while (i < j)
                 {
+                    std::swap(list[i], list[j]);
                     i++;
                     j--;
-                    while (list[i] < t) i++;
-                    while (list[j] > t) j--;
+                    while (list[i] < t) ++i;
+                    while (list[j] > t) --j;
                 }
 
                 if (list[left] == t)
