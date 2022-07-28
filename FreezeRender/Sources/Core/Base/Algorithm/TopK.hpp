@@ -118,7 +118,7 @@ namespace Pluto
                 {
                     int64_t n = right - left + 1;
                     int64_t i = k - left + 1;
-                    double z = std::log10(n);
+                    double z = std::log(n);
                     double s = 0.5 * std::exp(2 * z / 3);
                     double sign = (i - n / 2) >= 0 ? 1 : -1;
                     double sd = 0.5 * std::sqrt(z * s * (n - s) / n) * sign;
