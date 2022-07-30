@@ -26,7 +26,8 @@ namespace Pluto
 
 		void Test(FindKthLargest)
 		{
-			for (int num = 500; num < 100000; num += 500)
+			Timer timer;
+			for (int num = 50000; num < 100000; num += 500)
 			{
 				// Random data.
 				std::vector<int> data;
@@ -35,28 +36,27 @@ namespace Pluto
 				std::vector<int> sorted = data;
 				std::sort(sorted.begin(), sorted.end(), std::greater<int>{});
 
-				constexpr int loopmax = 1;
+				constexpr int loopmax = 250;
 				std::vector<double> accum;
 				accum.reserve(loopmax);
 				
 				std::vector<unsigned char> result;
 				result.reserve(loopmax);
-				
+
+				//Timer timer;
 				for (int loop = 0; loop < loopmax; ++loop)
 				{
 					std::vector<int> dup = data;
 					int randomPivot = rand() % dup.size();
 
-					Timer timer;
 					timer.start();
 #if 1
-					FloydRivestSelect(dup.data(), 0, dup.size() - 1, dup.size() - randomPivot - 1);
-					int ret = dup[dup.size() - randomPivot - 1];
+					int ret = FloydRivestSelect(dup.data(), dup.size(), randomPivot);
 #else
 					int ret = QuickSelect(dup.data(), dup.size(), randomPivot);
 #endif
 					timer.stop();
-					accum.push_back(timer.total);
+					//accum.push_back(timer.total);
 					result.push_back(sorted[randomPivot] == ret);
 				}
 
@@ -65,10 +65,9 @@ namespace Pluto
 					force_softbreak;
 				}
 
-				double t = std::accumulate(accum.begin(), accum.end(), 0.0) / loopmax;
-				std::cout << std::setprecision(8) << t << '\n';
+				//double t = std::accumulate(accum.begin(), accum.end(), 0.0);
 			}
-
+			std::cout << std::setprecision(8) << timer.total << '\n';
 		}
 	}
 }

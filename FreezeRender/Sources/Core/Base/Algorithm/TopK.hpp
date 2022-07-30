@@ -9,8 +9,8 @@
 #pragma once
 
 #include <Common.hpp>
+#include <Math/Math.hpp>
 #include <type_traits>
-#include <cmath>
 
 
 
@@ -19,16 +19,28 @@ namespace Pluto
     namespace Algorithm
     {
         /**
+         * @brief Type of top-k problem.
+         */
+        enum class Selection : unsigned int
+        {
+            TopK,    // Used to find k-th largest elements.
+            BottomK, // Used to find k-th smallest elements.
+        };
+
+
+
+        /**
          * @brief Hoare's selection algorithm.
          * @see https://en.wikipedia.org/wiki/Quickselect
          */
-        template <typename Type, bool order = true>
-        constexpr const Type& QuickSelect(Type* list, int64_t num, int64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
+        template <typename Type>
+        constexpr const Type& QuickSelect(Type* list, int64_t num, int64_t k, const Selection& selection = Selection::TopK) requires std::is_same_v<Type, std::decay_t<Type>>
         {
             int64_t left = 0;
             int64_t right = num - 1;
+
             // Inverse k.
-            k = right - left - k;
+            k = selection == Selection::TopK ? right - left - k : k;
 
             while (left != right)
             {
@@ -45,38 +57,17 @@ namespace Pluto
                     Type privot = list[index];
                     std::swap(list[index], list[end]);
 
-                    // Maximum top-k.
-                    if constexpr (order)
+                    while (start < end && list[start] <= privot)
                     {
-                        while (start < end && list[start] <= privot)
-                        {
-                            ++start; ++cursor;
-                        }
-
-                        for (int64_t i = start; i < end; ++i)
-                        {
-                            if (list[i] <= privot)
-                            {
-                                std::swap(list[cursor], list[i]);
-                                cursor++;
-                            }
-                        }
+                        ++start; ++cursor;
                     }
-                    // Minimum top-k.
-                    else
-                    {
-                        while (start < end && list[start] >= privot)
-                        {
-                            ++start; ++cursor;
-                        }
 
-                        for (int64_t i = start; i < end; ++i)
+                    for (int64_t i = start; i < end; ++i)
+                    {
+                        if (list[i] <= privot)
                         {
-                            if (list[i] >= privot)
-                            {
-                                std::swap(list[cursor], list[i]);
-                                cursor++;
-                            }
+                            std::swap(list[cursor], list[i]);
+                            cursor++;
                         }
                     }
 
@@ -104,18 +95,24 @@ namespace Pluto
         }
 
 
+
         /**
-        * @brief Hoare's selection algorithm.
+        * @brief Floyd-Rivest SELECT algorithm.
         * @see https://en.wikipedia.org/wiki/Floyd-Rivest_algorithm
+        * @see https://core.ac.uk/download/pdf/82672439.pdf
         */
-        template <typename Type, bool order = true>
-        constexpr void FloydRivestSelect(Type* list, int64_t left, int64_t right, int64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
+        template <typename Type>
+        constexpr void FloydRivestSelectInternal(Type* list, int64_t left, int64_t right, int64_t k) requires std::is_same_v<Type, std::decay_t<Type>>
         {
             while (right > left)
             {
-                
-                if (right - left > 600Ui64)
+                constexpr int64_t arbitraryConstants = 600;
+                if (right - left > arbitraryConstants)
                 {
+                    // Use SELECT recursively on a sample of size `s` to get an estimate
+                    // for the `(k-left+1)-th` smallest element int `list[k]`, biased slightly
+                    // so that the `(k-left+1)-th` element is expected to lie in the smaller set
+                    // after partitioning.
                     int64_t n = right - left + 1;
                     int64_t i = k - left + 1;
                     double z = std::log(n);
@@ -124,10 +121,14 @@ namespace Pluto
                     double sd = 0.5 * std::sqrt(z * s * (n - s) / n) * sign;
                     int64_t newLeft = (int64_t)std::max((double)left, k - i * s / n + sd);
                     int64_t newRight = (int64_t)std::min((double)right, k + (n - i) * s / n + sd);
-                    FloydRivestSelect(list, newLeft, newRight, k);
+                    FloydRivestSelectInternal(list, newLeft, newRight, k);
                 }
 
                 Type t = list[k];
+
+                // The following code partitions `list[left] ~ list[right]` about `t`.
+                // It is similar to partition but will run faster on most machines
+                // since subscript range checking on `i` and `j` has been eliminated.
                 int64_t i = left;
                 int64_t j = right;
 
@@ -155,6 +156,8 @@ namespace Pluto
                     std::swap(list[j], list[right]);
                 }
 
+                // New adjust `left`, `right` so they surround the subset containing
+                // the `(k-left+1)-th` smallest elements.
                 if (j <= k)
                 {
                     left = j + 1;
@@ -163,8 +166,20 @@ namespace Pluto
                 {
                     right = j - 1;
                 }
-
             }
+        }
+
+        /**
+        * @brief Hoare's selection algorithm.
+        * @see https://en.wikipedia.org/wiki/Floyd-Rivest_algorithm
+        * @see https://core.ac.uk/download/pdf/82672439.pdf
+        */
+        template <typename Type, bool order = true>
+        constexpr const Type& FloydRivestSelect(Type* list, int64_t num, int64_t k, const Selection& selection = Selection::TopK) requires std::is_same_v<Type, std::decay_t<Type>>
+        {
+            k = selection == Selection::TopK ? num - 1 - k : k;
+            FloydRivestSelectInternal(list, 0, num - 1, k);
+            return list[k];
         }
     }
 }
