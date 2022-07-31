@@ -50,8 +50,10 @@ namespace Pluto
 					int randomPivot = rand() % dup.size();
 
 					timer.start();
-#if 1
-					int ret = FloydRivestSelect(dup.data(), dup.size(), randomPivot);
+#if 0
+					//int ret = FloydRivestSelect(dup.data(), dup.size(), randomPivot);
+					std::nth_element(dup.begin(), dup.begin() + randomPivot, dup.end(), std::greater<int>{});
+					int ret = dup[randomPivot];
 #else
 					int ret = QuickSelect(dup.data(), dup.size(), randomPivot);
 #endif

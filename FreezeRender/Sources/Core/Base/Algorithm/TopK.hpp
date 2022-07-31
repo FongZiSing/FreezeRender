@@ -9,7 +9,7 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Math/Math.hpp>
+#include <Core/Math/Math.hpp>
 #include <type_traits>
 
 

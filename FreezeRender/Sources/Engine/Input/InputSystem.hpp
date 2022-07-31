@@ -8,8 +8,8 @@
 //
 #pragma once
 
-#include <Math/SIMD.hpp>
-#include <Pattern/Singleton.hpp>
+#include <Core/Math/SIMD.hpp>
+#include <Core/Base/Pattern/Singleton.hpp>
 
 
 

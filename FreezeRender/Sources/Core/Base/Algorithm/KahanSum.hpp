@@ -8,7 +8,7 @@
 //
 #pragma once
 
-#include <Math/SIMD.hpp>
+#include <Core/Math/SIMD.hpp>
 
 
 

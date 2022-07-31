@@ -8,8 +8,8 @@
 //
 #pragma once
 
-#include <Math/Box.hpp>
-#include <Container/Array.hpp>
+#include <Core/Math/Box.hpp>
+#include <Core/Base/Container/Array.hpp>
 #include <Asset/Meshlet/Meshlet.hpp>
 
 
@@ -18,13 +18,13 @@ namespace Pluto
 {
 	struct BVHNode
 	{
-		BVHNode* left;
-		BVHNode* right;
+		BVHNode* left = nullptr;
+		BVHNode* right = nullptr;
 
-		bool leaf;
 		BoundingBox3f bounds;
-		unsigned int first;
-		unsigned int count;
+		bool leaf = false;
+		unsigned int first = 0;
+		unsigned int count = 0;
 	};
 
 

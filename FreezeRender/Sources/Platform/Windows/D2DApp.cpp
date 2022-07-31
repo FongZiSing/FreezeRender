@@ -17,7 +17,7 @@
 #define GET_Y_LPARAM(lp) ((int)(short)HIWORD(lp))
 
 // Engine header.
-#include <Container/Array.hpp>
+#include <Core/Base/Container/Array.hpp>
 
 // C++ RunTime Header.
 #include <sstream>

@@ -9,10 +9,10 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Container/Bulkdata.hpp>
-#include <Math/Matrix.hpp>
-#include <Math/Color.hpp>
-#include <Math/Math.hpp>
+#include <Core/Base/Container/Bulkdata.hpp>
+#include <Core/Math/Matrix.hpp>
+#include <Core/Math/Color.hpp>
+#include <Core/Math/Math.hpp>
 
 
 

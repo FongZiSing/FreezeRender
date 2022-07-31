@@ -8,9 +8,8 @@
 //
 #pragma once
 
-#include <Pattern/Singleton.hpp>
-#include <Render/RenderTarget.hpp>
-#include <Pattern/Singleton.hpp>
+#include <Core/Base/Pattern/Singleton.hpp>
+#include <Engine/Render/RenderTarget.hpp>
 
 
 

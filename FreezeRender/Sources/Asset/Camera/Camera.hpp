@@ -9,8 +9,8 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Math/Matrix.hpp>
-#include <Math/Rotator.hpp>
+#include <Core/Math/Matrix.hpp>
+#include <Core/Math/Rotator.hpp>
 
 
 

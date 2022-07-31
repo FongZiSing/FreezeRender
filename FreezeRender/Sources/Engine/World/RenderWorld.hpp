@@ -8,12 +8,12 @@
 //
 #pragma once
 
-#include <Container/Array.hpp>
-#include <Pattern/Singleton.hpp>
-#include <Render/Shading/Light.hpp>
-#include <Component/CameraComponent.hpp>
-#include <Component/MeshletComponent.hpp>
-#include <Component/PointLightComponent.hpp>
+#include <Core/Base/Container/Array.hpp>
+#include <Core/Base/Pattern/Singleton.hpp>
+#include <Engine/Render/Shading/Light.hpp>
+#include <Engine/Component/CameraComponent.hpp>
+#include <Engine/Component/MeshletComponent.hpp>
+#include <Engine/Component/PointLightComponent.hpp>
 
 
 

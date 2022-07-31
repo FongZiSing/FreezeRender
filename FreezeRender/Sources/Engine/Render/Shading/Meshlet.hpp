@@ -9,6 +9,7 @@
 #pragma once
 
 #include <Asset/Meshlet/Meshlet.hpp>
+#include <Engine/Render/RayTracing/BoundingVolumeHierarchy/BVH.hpp>
 #include "Polygon.hpp"
 
 
@@ -19,6 +20,7 @@ namespace Pluto
 	{
 	public:
 		AMeshlet& data;
+		BVHTree bvh;
 		Array<Material> materials;
 
 
@@ -63,7 +65,7 @@ namespace Pluto
 					mesh.data.vertices[begin[0]],
 					mesh.data.vertices[begin[1]],
 					mesh.data.vertices[begin[2]],
-					&mesh.materials[mesh.data.GetMaterialIndex(*begin)]
+					&mesh.materials[mesh.data.vertices[begin[0]].materialIndex]
 				);
 			}
 		};

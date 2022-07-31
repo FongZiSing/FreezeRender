@@ -9,10 +9,10 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Math/Math.hpp>
-#include <Math/Matrix.hpp>
-#include <Math/Color.hpp>
-#include <Math/Box.hpp>
+#include <Core/Math/Math.hpp>
+#include <Core/Math/Matrix.hpp>
+#include <Core/Math/Color.hpp>
+#include <Core/Math/Box.hpp>
 #include <Asset/Meshlet/Meshlet.hpp>
 
 #include "Material.hpp"

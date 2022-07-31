@@ -1,6 +1,6 @@
 #include "OBJMeshLoader.hpp"
 #include <Asset/Utility/LoaderUitlity.hpp>
-#include <Math/Math.hpp>
+#include <Core/Math/Math.hpp>
 #include <fstream>
 
 
@@ -240,6 +240,7 @@ namespace Pluto
 				vertex.position = positions[corner.position];
 				vertex.uv = uvs[corner.uv];
 				vertex.normal = normals[corner.normal];
+				vertex.materialIndex = 0;
 
 				// Determines whether the vertex exists.
 				bool bMatch = false;

@@ -10,7 +10,7 @@
 
 #include <Common.hpp>
 #include <type_traits>
-#include <Thread/SpinLock.hpp>
+#include <Core/Base/Thread/SpinLock.hpp>
 
 
 

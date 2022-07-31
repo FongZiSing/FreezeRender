@@ -44,12 +44,6 @@ namespace Pluto
 			auto& material = mesh.materials.Emplace();
 			material.diffuse = std::make_unique<ATexture>();
 			TextureLoaderLibrary::Load(tex, material.diffuse.get());
-
-			auto& cluster = mesh.clusters.Emplace();
-			cluster.beginVertexIndex = 0;
-			cluster.endVertexIndex = cluster.beginVertexIndex + (unsigned int)mesh.indices.Size();
-			cluster.triangleNumber = (cluster.endVertexIndex - cluster.beginVertexIndex) / 3;
-			cluster.materialIndex = 0;
 		}
 
 

@@ -1,7 +1,7 @@
 #include "RenderWorld.hpp"
 
 #include <Asset/World/Loader/WorldLoaderLibrary.hpp>
-#include <Input/InputSystem.hpp>
+#include <Engine/Input/InputSystem.hpp>
 
 
 
@@ -47,6 +47,7 @@ namespace Pluto
 		for (auto& perMeshlet : world->allMeshlet)
 		{
 			auto& renderMeshlet = render.meshlets.Emplace(perMeshlet);
+			renderMeshlet.Build();
 			logic.meshlets.Emplace(perMeshlet, renderMeshlet);
 		}
 

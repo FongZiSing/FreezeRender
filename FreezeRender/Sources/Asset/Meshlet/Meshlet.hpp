@@ -9,7 +9,7 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Container/Array.hpp>
+#include <Core/Base/Container/Array.hpp>
 #include <Asset/Material/Material.hpp>
 #include "Polygon.hpp"
 
@@ -30,26 +30,11 @@ namespace Pluto
 		Array<AMaterial> materials;
 		Array<AVertex> vertices;
 		Array<unsigned int> indices;
-		Array<AVertexCluster> clusters;
 
 
 		warn_nodiscard bool IsValid() const
 		{
-			return !vertices.IsEmpty() && !indices.IsEmpty() && !materials.IsEmpty() && !clusters.IsEmpty();
-		}
-
-		unsigned int GetMaterialIndex(const unsigned int& target)
-		{
-			for (auto& cluster : clusters)
-			{
-				if (target >= cluster.beginVertexIndex &&
-					target < cluster.endVertexIndex &&
-					cluster.materialIndex < materials.Size())
-				{
-					return cluster.materialIndex;
-				}
-			}
-			return -1;
+			return !vertices.IsEmpty() && !indices.IsEmpty() && !materials.IsEmpty();
 		}
 	};
 }

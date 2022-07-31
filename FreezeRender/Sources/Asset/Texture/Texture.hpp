@@ -9,10 +9,10 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Container/Bulkdata.hpp>
-#include <Container/String.hpp>
+#include <Core/Base/Container/Bulkdata.hpp>
+#include <Core/Base/Container/String.hpp>
+#include <Core/Math/Color.hpp>
 #include <Engine/Render/PixelFormat.hpp>
-#include <Math/Color.hpp>
 
 
 

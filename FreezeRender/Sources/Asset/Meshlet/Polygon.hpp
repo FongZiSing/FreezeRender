@@ -8,8 +8,8 @@
 //
 #pragma once
 
-#include <Math/Matrix.hpp>
-#include <Math/Color.hpp>
+#include <Core/Math/Matrix.hpp>
+#include <Core/Math/Color.hpp>
 
 
 
@@ -21,25 +21,15 @@ namespace Pluto
 		Vector3f normal;
 		Vector2f uv;
 		Color color;
-	};
-
-
-
-	struct AVertexCluster
-	{
-		unsigned int beginVertexIndex = 0;
-		unsigned int endVertexIndex = 0;
-		unsigned int triangleNumber = 0;
 		unsigned int materialIndex = 0;
+
+		inline bool operator == (const AVertex& rhs) const
+		{
+			return
+				(position - rhs.position).LengthSquared() < Number::SMALL_NUMBER &&
+				(normal - rhs.normal).LengthSquared() < Number::SMALL_NUMBER &&
+				(uv - rhs.uv).LengthSquared() < Number::SMALL_NUMBER &&
+				materialIndex == rhs.materialIndex;
+		}
 	};
-
-
-
-	inline bool operator == (const AVertex& lhs, const AVertex& rhs)
-	{
-		return
-			(lhs.position - rhs.position).LengthSquared() < Number::SMALL_NUMBER &&
-			(lhs.normal - rhs.normal).LengthSquared() < Number::SMALL_NUMBER &&
-			(lhs.uv - rhs.uv).LengthSquared() < Number::SMALL_NUMBER;
-	}
 }

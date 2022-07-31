@@ -8,9 +8,9 @@
 //
 #pragma once
 
-#include <Container/Array.hpp>
-#include <Render/Shading/Material.hpp>
-#include <Render/Shading/Light.hpp>
+#include <Core/Base/Container/Array.hpp>
+#include <Engine/Render/Shading/Material.hpp>
+#include <Engine/Render/Shading/Light.hpp>
 
 
 

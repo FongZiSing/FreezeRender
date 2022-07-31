@@ -1,7 +1,7 @@
 #include "CameraComponent.hpp"
 
-#include <Input/InputSystem.hpp>
-#include <Output/OutputSystem.hpp>
+#include <Engine/Input/InputSystem.hpp>
+#include <Engine/Output/OutputSystem.hpp>
 #include <sstream>
 
 

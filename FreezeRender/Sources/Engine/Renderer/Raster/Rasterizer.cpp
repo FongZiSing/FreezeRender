@@ -1,9 +1,9 @@
 #include "Rasterizer.hpp"
 
-#include <Thread/RunnableTask.hpp>
-#include <Thread/ParallelFor.hpp>
-#include <Pattern/Singleton.hpp>
-#include <World/RenderWorld.hpp>
+#include <Core/Base/Thread/RunnableTask.hpp>
+#include <Core/Base/Thread/ParallelFor.hpp>
+#include <Core/Base/Pattern/Singleton.hpp>
+#include <Engine/World/RenderWorld.hpp>
 
 
 

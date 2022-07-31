@@ -9,8 +9,8 @@
 #pragma once
 
 #include <Common.hpp>
-#include <Container/String.hpp>
-#include <Pattern/Singleton.hpp>
+#include <Core/Base/Container/String.hpp>
+#include <Core/Base/Pattern/Singleton.hpp>
 
 
 
